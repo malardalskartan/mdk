@@ -1,3 +1,8 @@
+/ * ========================================================================
+  * Copyright 2014 by Mälardalskartan
+  * Licensed under BSD 2-Clause (https://github.com/malardalskartan/mdk/blob/master/LICENSE.txt)
+  * ======================================================================== */
+
 var modal = (function($){
 
   var object = {
