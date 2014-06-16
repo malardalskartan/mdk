@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Mälardalskartan</title>
+	<link href="css/style.css" rel="stylesheet">
+	<script src="externs/modernizr.js"></script>	
+	<script src="externs/jquery-1.11.0.min.js"></script>
+	<script src="externs/bootstrap.min.js"></script>	
+	<script type="text/javascript">
+	$(function(){
+
+		//Init the viewer
+        Viewer.init({
+	     	projectionCode: 'EPSG:3010',
+	     	projectionExtent: [-1678505.1838360203,4665380.0,2159633.1149295056,8528052.051340872],
+	     	center: [182603, 6613614],
+	     	zoom: 5,
+	     	resolutions: [1146.8799999999999, 573.4399999999999, 286.71999999999997, 143.35999999999999, 71.67999999999999, 35.839999999999996, 17.919999999999998, 8.959999999999999, 4.4799999999999995, 2.2399999999999998, 1.1199999999999999, 0.5599999999999999, 0.27999999999999997, 0.13999999999999999],
+	     	source: {
+	     		local: {
+	     			url: 'http://localhost/geoserver/mdk/wms',
+	     			version: '1.1.1',
+	     			type: 'WMS'
+	     		},
+	     		basemap: {
+	     			url: 'http://localhost:8080/geoserver/gwc/service/wmts'
+	     		}
+	     	},
+	     	layers: [{
+	     		format: 'image/png', 
+	     		name: 'fmis_uppsala_l_sweref_point',
+	     		source: 'local',
+	     		title: 'Forminnen, punkt',
+	     		type: 'WMS',
+	     		visible: false
+	     	}, {	     		
+	     		format: 'image/png', 
+	     		name: 'fmis_uppsala_l_sweref_area',
+	     		source: 'local',
+	     		title: 'Forminnen, yta',
+	     		type: 'WMS',
+	     		visible: false
+	     	}, {
+	     		attribution: '&copy Geodatasamverkan',		     		
+	     		format: 'image/jpeg',
+	     		name: 'opengeo:topowebbkartan',	     		
+	     		source: 'basemap',
+	     		title: 'Karta',
+	     		type: 'WMTS',
+	     		visible: true     		
+	     	}		
+	     	]
+        });
+
+		MapMenu.init([{
+			itemName: 'ShareMap'
+		}
+		]);
+		ShareMap.init();
+
+	});
+
+	</script>
+</head>
+<body>
+<div id="app-wrapper">
+	<div id="wrapper">
+
+		<div id="map" class="map">
+			<div id="mapmenu-button">
+				<button class="mapmenu-button-true"></button>
+			</div>
+			<div id="mapmenu">
+				<div class="block">
+					<ul id="menutools"> 
+						<li></li>			
+						<li>
+							<div id='share-button' class="menu-button">
+								<div class="button-icon share-icon"></div>
+								Dela karta
+							</div>
+							<li class="menu-item"><div class="menu-item-divider"></div></li>
+						</li>					
+					</ul>
+				</div>
+			</div>			
+		</div>
+<div id="popup"></div>		
+	<!-- Wrapper -->
+	</div>
+<!-- app-wrapper	 -->
+</div>
+<script src="externs/proj4js-compressed.js"></script>	
+<script src="externs/defs/EPSG3010.js"></script>	
+<script src="externs/ol.js"></script>	
+<script src="src/Viewer.js"></script>
+<script src="src/MapMenu.js"></script>
+<script src="src/ShareMap.js"></script>
+<script src="src/MapWindow.js"></script>
+</body>
+</html>
