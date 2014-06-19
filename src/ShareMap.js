@@ -1,7 +1,7 @@
-/ * ========================================================================
-  * Copyright 2014 by Mälardalskartan
-  * Licensed under BSD 2-Clause (https://github.com/malardalskartan/mdk/blob/master/LICENSE.txt)
-  * ======================================================================== */
+/* ========================================================================
+ * Copyright 2014 Mälardalskartan
+ * Licensed under BSD 2-Clause (https://github.com/malardalskartan/mdk/blob/master/LICENSE.txt)
+ * ======================================================================== */
 
 var ShareMap = (function($){
 
@@ -14,9 +14,10 @@ var ShareMap = (function($){
         this.bindUIActions();
     },
     bindUIActions: function() {
-    	settings.shareButton.click(function() {
+    	settings.shareButton.on('touchend click', function(e) {
     		ShareMap.createModal();
         MapMenu.toggleMenu();
+        e.preventDefault();
     	});
     },
     createModal: function() {
@@ -33,8 +34,9 @@ var ShareMap = (function($){
                     '</div>' +
                     '</div>';
       $('#map').prepend(modal);
-      $('.modal-screen, .modal-close-button').click(function() {
+      $('.modal-screen, .modal-close-button').on('touchend click', function(e) {
         ShareMap.closeOverlay();
+        e.preventDefault();
       });
       this.createLink();               
     },

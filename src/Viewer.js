@@ -1,7 +1,7 @@
-/ * ========================================================================
-  * Copyright 2014 by Mälardalskartan
-  * Licensed under BSD 2-Clause (https://github.com/malardalskartan/mdk/blob/master/LICENSE.txt)
-  * ======================================================================== */
+/* ========================================================================
+ * Copyright 2014 Mälardalskartan
+ * Licensed under BSD 2-Clause (https://github.com/malardalskartan/mdk/blob/master/LICENSE.txt)
+ * ======================================================================== */
 
 var Viewer = (function($){
  
@@ -40,7 +40,7 @@ var Viewer = (function($){
 
         //Set map controls
         mapControls = [
-                new ol.control.Zoom(),
+                new ol.control.Zoom({zoomInTipLabel: null, zoomOutTipLabel:null,zoomInLabel: '', zoomOutLabel:''}),
                 new ol.control.Attribution()
         ]; 
         if(window.top!=window.self) {
@@ -193,7 +193,7 @@ var Viewer = (function($){
 
         var viewResolution = map.getView().getResolution();
 
-        map.on('click', function(evt) { 
+        map.on('touchend click', function(evt) { 
           var element = popup.getElement();
           var coordinate = evt.coordinate;
 
@@ -250,7 +250,7 @@ var Viewer = (function($){
                 $(element).popover('hide');
               }
           });
-
+          evt.preventDefault();
 
         });
         map.addOverlay(popup);  

@@ -111,15 +111,18 @@ i {
 .ol-zoom,
 .ol-full-screen {
   position: absolute;
-  background-color: #fff;
-  background-color: rgba(255,255,255,1.0);
   border-radius: 4px;
 }
 #window-button,
 #mapmenu-button .mapmenu-button-true,
 .ol-zoom,
 .ol-full-screen {
+  background-color: #fff;  
   box-shadow: 0 2px 5px rgba(0,0,0,0.45);
+}
+#mapmenu-button .mapmenu-button-false {
+  background-color: #fff;
+  background-color: rgba(255,255,255,0.5);
 }
 .no-boxshadow #window-button,
 .no-boxshadow #mapmenu-button .mapmenu-button-true,
@@ -149,7 +152,7 @@ i {
 }
 .ol-full-screen {
   left: .5em;
-  top: 4.5em;
+  top: 6em;
 }
 @media print {
   .ol-zoom,
@@ -165,12 +168,12 @@ i {
   padding: 0;
   color: #424242;
   color: rgba(66,66,66,1.0);
-  font-size: 1.14em;
+  font-size: 1em;
   text-decoration: none;
   text-align: center;
-  height: 1.375em;
-  width: 1.375em;
-  line-height: 1.14em;
+  height: 2.25em;
+  width: 2.25em;
+  line-height: 1em;
   background-color: white;
   border: none;
 }
@@ -182,7 +185,7 @@ i {
 .ol-touch .ol-zoom button,
 .ol-touch .ol-full-screen button,
 .ol-touch .ol-zoom-extent button {
-  font-size: 1.14em;
+  /*font-size: 1.14em;*/
 }
 #window-button button:hover,
 #window-button button:focus,
@@ -233,6 +236,8 @@ button.ol-full-screen-true:hover {
 }
 button.mapmenu-button-true:after {
   font-family: 'FontAwesome';
+  font-size: 1.3em;
+  line-height: 1.3em;
   content: "\f0c9";
   display: inline-block;
 }
@@ -245,6 +250,8 @@ button.mapmenu-button-true:hover:after {
 }
 button.mapmenu-button-false:after {
   font-family: 'FontAwesome';
+  font-size: 1.3em;
+  line-height: 1.3em;  
   content: "\f0c9";
   display: inline-block;
 }
@@ -323,6 +330,16 @@ button.window-button:after {
 .ol-zoom button,
 .ol-has-tooltip [role=tooltip] {
   font-family: 'Lucida Grande',Verdana,Geneva,Lucida,Arial,Helvetica,sans-serif;
+}
+button.ol-zoom-in:after{
+  font-family: 'FontAwesome';    
+  content: '\f067';
+  font-size: 12px;
+}
+button.ol-zoom-out:after{
+  font-family: 'FontAwesome';  
+  content: '\f068';
+  font-size: 12px;  
 }
 /*end openlayers style*/
 
@@ -524,7 +541,7 @@ li {
 	/*border-bottom: 1px solid #C5C5C5;*/
 }
 #menutools li:first-child {
-	height: 2.4em;
+	height: 2.8em;
 }
 .mapmenu-open {
 	display: inline-block;
@@ -536,7 +553,7 @@ li .menu-button {
   cursor: pointer;
   display: inline-block;
   font-family: Arial,sans-serif;
-  font-size: 0.95em;
+  font-size: 1em;
   line-height: 1.5em;
   padding: 0 5px; 
   text-decoration: none;
@@ -636,7 +653,7 @@ li .menu-button:hover {
 li .legend-item {
   cursor: pointer;
   font-family: Arial,sans-serif;
-  font-size: 0.9em;	
+  font-size: 1em;	
   line-height: 1em;
   padding: 5px;
 }

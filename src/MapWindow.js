@@ -1,7 +1,7 @@
-/ * ========================================================================
-  * Copyright 2014 by Mälardalskartan
-  * Licensed under BSD 2-Clause (https://github.com/malardalskartan/mdk/blob/master/LICENSE.txt)
-  * ======================================================================== */
+/* ========================================================================
+ * Copyright 2014 Mälardalskartan
+ * Licensed under BSD 2-Clause (https://github.com/malardalskartan/mdk/blob/master/LICENSE.txt)
+ * ======================================================================== */
 
 var MapWindow = (function($){
 
