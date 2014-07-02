@@ -10,7 +10,8 @@ var Viewer = (function($){
   var settings = {
     projection: '',
     projectionCode: '',
-    projectionExtent: '',    
+    projectionExtent: '',
+    extent: [],    
     center: [0, 0],
     zoom: 0,
     resolutions: null, 
@@ -26,12 +27,13 @@ var Viewer = (function($){
         settings.projection = ol.proj.configureProj4jsProjection({
             code: settings.projectionCode,
             extent: settings.projectionExtent
-        });                 
+        });
+        settings.extent = mapSettings.extent;                 
         settings.center = mapSettings.center;
         settings.zoom = mapSettings.zoom;
         settings.resolutions = mapSettings.resolutions;
         settings.source = mapSettings.source;
-        this.createLayers(mapSettings.layers);        
+        this.createLayers(mapSettings.layers); //read layers from mapSettings      
 
         //If url arguments, parse this settings
         if (window.location.search) {
@@ -51,8 +53,13 @@ var Viewer = (function($){
         }    
 
     	this.loadMap();
+      this.addGetFeatureInfo();
 
-      this.addGetFeatureInfo(); 
+      MapMenu.init([{
+        itemName: 'ShareMap'
+      }
+      ]);
+      ShareMap.init();       
 
     },
     createLayers: function(layerlist) {
@@ -71,6 +78,7 @@ var Viewer = (function($){
 	      controls: mapControls,
 	      layers: settings.layers,
 	      view: new ol.View2D({
+          extent: settings.extent,
 	      	projection: settings.projection,
 	        center: settings.center,
             resolutions: settings.resolutions,
@@ -96,7 +104,7 @@ var Viewer = (function($){
                 var l = elements[i].split(",");
                 var layers = settings.layers;
                 for (var j = 0; j < l.length; j++) {  
-                    layers.forEach(function(el) {
+                    $.each(layers, function(index, el) {
                       if (l[j] == el.get('name')) {
                         el.setVisible(true);
                       }
@@ -147,6 +155,7 @@ var Viewer = (function($){
         return new ol.layer.Tile({
           name: layersConfig.name.split(':').pop(), //remove workspace part of name
           title: layersConfig.title,
+          type: layersConfig.type,
           visible: layersConfig.visible,           
           source: new ol.source.TileWMS(/** @type {olx.source.TileWMSOptions} */ ({
             url: settings.source[layersConfig.source].url,
@@ -179,81 +188,85 @@ var Viewer = (function($){
                resolutions: settings.resolutions,
                matrixIds: matrixIds
              }),                       
-             extent: settings.projectionExtent,
+             extent: settings.extent,
              style: 'default'
            })
         })
     },
     addGetFeatureInfo: function() {
+        Popup.init('#map');
 
         // Popup showing the position the user clicked
-        var popup = new ol.Overlay({
+        var overlay = new ol.Overlay({
           element: $('#popup')
         });
 
-        var viewResolution = map.getView().getResolution();
-
-        map.on('touchend click', function(evt) { 
-          var element = popup.getElement();
+        map.on('singleclick', function(evt) {
+          var element = overlay.getElement();
           var coordinate = evt.coordinate;
+          var layer, queryLayers=[];
+          for(var i=0; i<settings.layers.length; i++) {
+            layer = settings.layers[i];
+            if(layer.get('type')=='WMS' && layer.getVisible()==true) {
+              (function(l) {
+              var url = layer.getSource().getGetFeatureInfoUrl(
+              evt.coordinate, map.getView().getResolution(), settings.projection,
+              {'INFO_FORMAT': 'text/html'});
+                $.post(url, function(data) {
+                  var match = data.match(/<body[^>]*>([\s\S]*)<\/body>/);
+                    if (match && !match[1].match(/^\s*$/)) {
+                      if(queryLayers.length==0) {
+                      queryLayers.push(data);
 
-          var url = Viewer.getLayer('fmis_uppsala_l_sweref_point').getSource().getGetFeatureInfoUrl(
-            evt.coordinate, viewResolution, settings.projection,
-            {'INFO_FORMAT': 'text/html'});
+                      overlay.setPosition(coordinate);
+                      
+                      Popup.setContent({content: data, title: l.get('title')});
+                      Popup.setVisibility(true);
 
-          $.post(url, function(data) {
-            var match = data.match(/<body[^>]*>([\s\S]*)<\/body>/);
-              if (match && !match[1].match(/^\s*$/)) {
-                $(element).popover('destroy');
+                      /*Workaround to remove when autopan implemented for overlays */
+                        var el=$('.popup');
+                        var center = map.getView().getCenter();
+                        var popupOffset = $(el).offset();
+                        var mapOffset = $('#' + map.getTarget()).offset();
+                        var offsetY = popupOffset.top - mapOffset.top;
+                        var mapSize = map.getSize();
+                        var offsetX = (mapOffset.left + mapSize[0])-(popupOffset.left+$(el).outerWidth(true));                 
+                        if (offsetY < 0 || offsetX < 0) {
+                          var dx = 0, dy = 0;
+                          if (offsetX < 0) {
+                            dx = (-offsetX)*map.getView().getResolution();
+                          }
+                          if (offsetY < 0) {
+                            dy = (-offsetY)*map.getView().getResolution();
+                          }
+                          var pan = ol.animation.pan({
+                            duration: 300,
+                            source: center
+                          });
+                          map.beforeRender(pan);
+                          map.getView().setCenter([center[0]+dx, center[1]+dy]);
 
-                popup.setPosition(coordinate);
+                        }
+                      /*End workaround*/
 
-                $(element).popover({
-                  'placement': 'top',
-                  'animation': false,
-                  'html': true,
-                  'title': Viewer.getLayer('fmis_uppsala_l_sweref_point').get('title') + '<span class="modal-close-button"></span>',
-                  'content': data
-                });
-                $(element).popover('show');
-                $('.popover-title .modal-close-button').click(function() {
-                  $(element).popover('hide');
-                });
-                /*Workaround to remove when autopan implemented for overlays */
-                  var el=$('.popover');
-                  var center = map.getView().getCenter();
-                  var popupOffset = $(el).offset();
-                  var mapOffset = $('#' + map.getTarget()).offset();
-                  var offsetY = popupOffset.top - mapOffset.top;
-                  var mapSize = map.getSize();
-                  var offsetX = (mapOffset.left + mapSize[0])-(popupOffset.left+$(el).outerWidth(true));                 
-                  if (offsetY < 0 || offsetX < 0) {
-                    var dx = 0, dy = 0;
-                    if (offsetX < 0) {
-                      dx = (-offsetX)*viewResolution;
+                      }/*End if empty*/
+                      else {
+                        queryLayers.push(data);;
+                      }
                     }
-                    if (offsetY < 0) {
-                      dy = (-offsetY)*viewResolution;
+                    else {
+                      // $(element).popover('hide');
+                      Popup.setVisibility(false);
                     }
-                    var pan = ol.animation.pan({
-                      duration: 300,
-                      source: center
-                    });
-                    map.beforeRender(pan);
-                    map.getView().setCenter([center[0]+dx, center[1]+dy]);
-
-                  }
-                /*End workaround*/
-
-              }
-              else {
-                $(element).popover('hide');
-              }
-          });
+                });//end post
+              })(layer) //end post function
+              } //end if
+              } //end for
+          
+          map.addOverlay(overlay);
           evt.preventDefault();
-
         });
-        map.addOverlay(popup);  
+          
     }  
   };
  

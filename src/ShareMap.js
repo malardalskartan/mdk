@@ -3,10 +3,12 @@
  * Licensed under BSD 2-Clause (https://github.com/malardalskartan/mdk/blob/master/LICENSE.txt)
  * ======================================================================== */
 
+/*requires Modal.js*/
+
 var ShareMap = (function($){
 
   var settings = {
-  		shareButton: $('#share-button'),
+  		shareButton: $('#share-button')
   };
 
   return {
@@ -14,34 +16,18 @@ var ShareMap = (function($){
         this.bindUIActions();
     },
     bindUIActions: function() {
+      var that = this;
     	settings.shareButton.on('touchend click', function(e) {
-    		ShareMap.createModal();
+        var modal = Modal('#map', {title: 'Länk till karta', content: that.createContent()});
+        modal.showModal();
+        that.createLink(); //Add link to input
         MapMenu.toggleMenu();
         e.preventDefault();
     	});
     },
-    createModal: function() {
-      var modal = '<div id="modal">' +
-                    '<div class="modal-screen"></div>' +
-                    '<div class="modal">' +
-                    '<div class="modal-close-button"></div>' +
-                    '<div class="modal-title">Länk till karta</div>' +
-                    '<div class="modal-content">' +
-                    '<div class="share-link"><input type="text"></div>' +
-                    '<i>Kopiera och klistra in länken för att dela kartan.</i>' +
-                    '</div>' +
-                    '<div></div>' +
-                    '</div>' +
-                    '</div>';
-      $('#map').prepend(modal);
-      $('.modal-screen, .modal-close-button').on('touchend click', function(e) {
-        ShareMap.closeOverlay();
-        e.preventDefault();
-      });
-      this.createLink();               
-    },
-    closeOverlay: function() {
-      $('#modal').remove();
+    createContent: function() {
+      return '<div class="share-link"><input type="text"></div>' +
+                    '<i>Kopiera och klistra in länken för att dela kartan.</i>';              
     },
     createLink: function() {
       $('.share-link input').val(Viewer.getMapUrl());

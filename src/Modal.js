@@ -3,39 +3,38 @@
  * Licensed under BSD 2-Clause (https://github.com/malardalskartan/mdk/blob/master/LICENSE.txt)
  * ======================================================================== */
 
-var modal = (function($){
+var Modal = function(modalTarget, options){
 
   var object = {
-    init: function(){
-        this.bindUIActions();
-    },
+    target: $(modalTarget),
+    title: options.title || undefined,
+    content: options.content || undefined,
+    footer: options.footer || undefined,
+    modal: null,
     bindUIActions: function() {
-    	settings.shareButton.click(function() {
-    		ShareMap.createModal();
-        MapMenu.toggleMenu();
-    	});
+      var that = this;
+      $('.modal-screen, .close-button').click(function() {
+        that.closeModal();
+      });   
     },
     createModal: function() {
-      var modal = '<div id="modal">' +
+      this.modal = '<div id="modal">' +
                     '<div class="modal-screen"></div>' +
                     '<div class="modal">' +
-                    '<div class="modal-close-button"></div>' +
-                    '<div class="modal-title">Länk till karta</div>' +
-                    '<div class="modal-content">' +
-                    '<div class="share-link"><input type="text"></div>' +
-                    '<i>Kopiera och klistra in länken för att dela kartan.</i>' +
+                    '<div class="close-button"></div>' +
+                    '<div class="modal-title">' + this.title + '</div>' +
+                    '<div class="modal-content">' + this.content +'</div>' +
                     '</div>' +
-                    '<div></div>' +
-                    '</div>' +
-                    '</div>';
-      //$('#map').prepend(modal);
-      $('.modal-screen, .modal-close-button').click(function() {
-        ShareMap.closeModal();
-      });              
+                    '</div>';           
+    },
+    showModal: function() {
+      this.createModal();
+      this.target.prepend(this.modal);
+      this.bindUIActions();
     },
     closeModal: function() {
       $('#modal').remove();
     }
   };
   return object;
-})(jQuery);	
+};	
