@@ -77,7 +77,7 @@ var Viewer = (function($){
 	      target: 'map',
 	      controls: mapControls,
 	      layers: settings.layers,
-	      view: new ol.View2D({
+	      view: new ol.View({
           extent: settings.extent,
 	      	projection: settings.projection,
 	        center: settings.center,
