@@ -229,11 +229,16 @@ var Viewer = (function($){
                         var mapOffset = $('#' + map.getTarget()).offset();
                         var offsetY = popupOffset.top - mapOffset.top;
                         var mapSize = map.getSize();
-                        var offsetX = (mapOffset.left + mapSize[0])-(popupOffset.left+$(el).outerWidth(true));                 
-                        if (offsetY < 0 || offsetX < 0 || offsetX > (mapSize[0]-$(el).outerWidth(true))) {
+                        var offsetX = (mapOffset.left + mapSize[0])-(popupOffset.left+$(el).outerWidth(true));
+                        // Check if mapmenu widget is used and opened
+                        var menuSize = 0;
+                        if(MapMenu) {
+                          menuSize = MapMenu.getTarget().offset().left > 0 ? mapSize[0]- MapMenu.getTarget().offset().left : menuSize = 0;                 
+                        }
+                        if (offsetY < 0 || offsetX < 0 + menuSize || offsetX > (mapSize[0]-$(el).outerWidth(true))) {
                           var dx = 0, dy = 0;
-                          if (offsetX < 0) {
-                            dx = (-offsetX)*map.getView().getResolution();
+                          if (offsetX < 0 + menuSize) {
+                            dx = (-offsetX + menuSize)*map.getView().getResolution();
                           }
                           if (offsetX > (mapSize[0]-$(el).outerWidth(true))) {
                             dx = -($(el).outerWidth(true)-(mapSize[0]-offsetX))*map.getView().getResolution();

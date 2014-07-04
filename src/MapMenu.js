@@ -70,6 +70,9 @@ var MapMenu = (function($){
         $('#' + layerid + ' .checkbox').addClass('checkbox-true'); 
         Viewer.getLayer(layerid).setVisible(true);       
       }      
+    },
+    getTarget: function() {
+      return settings.mapMenu;
     }
   };
 })(jQuery);	
