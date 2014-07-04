@@ -78,10 +78,10 @@ var Viewer = (function($){
 	      controls: mapControls,
 	      layers: settings.layers,
 	      view: new ol.View({
-          extent: settings.extent,
+          extent: settings.projectionExtent,
 	      	projection: settings.projection,
 	        center: settings.center,
-            resolutions: settings.resolutions,
+          resolutions: settings.resolutions,
 	        zoom: settings.zoom
 	      })
 	    });    	
@@ -188,7 +188,7 @@ var Viewer = (function($){
                resolutions: settings.resolutions,
                matrixIds: matrixIds
              }),                       
-             extent: settings.extent,
+             extent: settings.extent, //layer extent to avoid bad requests out of range
              style: 'default'
            })
         })
@@ -196,7 +196,6 @@ var Viewer = (function($){
     addGetFeatureInfo: function() {
         Popup.init('#map');
 
-        // Popup showing the position the user clicked
         var overlay = new ol.Overlay({
           element: $('#popup')
         });
@@ -231,11 +230,14 @@ var Viewer = (function($){
                         var offsetY = popupOffset.top - mapOffset.top;
                         var mapSize = map.getSize();
                         var offsetX = (mapOffset.left + mapSize[0])-(popupOffset.left+$(el).outerWidth(true));                 
-                        if (offsetY < 0 || offsetX < 0) {
+                        if (offsetY < 0 || offsetX < 0 || offsetX > (mapSize[0]-$(el).outerWidth(true))) {
                           var dx = 0, dy = 0;
                           if (offsetX < 0) {
                             dx = (-offsetX)*map.getView().getResolution();
                           }
+                          if (offsetX > (mapSize[0]-$(el).outerWidth(true))) {
+                            dx = -($(el).outerWidth(true)-(mapSize[0]-offsetX))*map.getView().getResolution();
+                          }                         
                           if (offsetY < 0) {
                             dy = (-offsetY)*map.getView().getResolution();
                           }
