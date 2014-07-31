@@ -24,10 +24,8 @@ var Viewer = (function($){
         //Map settings to use for this viewer       
         settings.projectionCode = mapSettings.projectionCode;
         settings.projectionExtent = mapSettings.projectionExtent;
-        settings.projection = ol.proj.configureProj4jsProjection({
-            code: settings.projectionCode,
-            extent: settings.projectionExtent
-        });
+        settings.projection = ol.proj.get(settings.projectionCode);
+        settings.projection.setExtent(settings.projectionExtent);
         settings.extent = mapSettings.extent;                 
         settings.center = mapSettings.center;
         settings.zoom = mapSettings.zoom;
