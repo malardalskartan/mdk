@@ -41,7 +41,7 @@ var Viewer = (function($){
         //Set map controls
         mapControls = [
                 new ol.control.Zoom({zoomInTipLabel: null, zoomOutTipLabel:null,zoomInLabel: '', zoomOutLabel:''}),
-                new ol.control.Attribution()
+                new ol.control.Attribution({collapsible: false})
         ]; 
         if(window.top!=window.self) {
             MapWindow.init();

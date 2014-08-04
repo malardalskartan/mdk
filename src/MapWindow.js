@@ -21,7 +21,7 @@ var MapWindow = (function($){
     	});
     },
     createButton: function() {
-      var button = '<div id="window-button"><button class="window-button"></button></div>';
+      var button = '<div id="window-button" class="mdk-button"><button class="window-button"></button></div>';
       $('#map').append(button);
     },
     openMapWindow: function() {
