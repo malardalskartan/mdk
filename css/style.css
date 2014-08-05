@@ -12,9 +12,11 @@ body {
 i {
   font-style: italic;
 }
-b,
-strong{
+b, strong{
   font-weight: bold;
+}
+button {
+  border: none;
 }
 @font-face {
 	font-family: 'FontAwesome';
@@ -45,8 +47,8 @@ strong{
   background-color: #fff;  
   box-shadow: 0 2px 5px rgba(0,0,0,0.45);  
 }
-.no-boxshadow .control {
-  border: 1px solid #A6A6A6;
+.no-boxshadow .ol-control {
+  border: 1px solid #C5C5C5;
 }
 .ol-control:hover {
   background-color: rgba(255,255,255,0.6);
@@ -57,7 +59,7 @@ strong{
 }
 .ol-full-screen {
   left: .5em;
-  top: 6em;
+  top: 5em;
 }
 @media print {
   .ol-zoom,
@@ -75,8 +77,8 @@ strong{
   font-size: 1em;
   text-decoration: none;
   text-align: center;
-  height: 2.25em;
-  width: 2.25em;
+  height: 2em;
+  width: 2em;
   line-height: 1em;
   background-color: white;
   border: none;
@@ -245,8 +247,8 @@ button.ol-full-screen-true:after {
   font-size: 1em;
   text-decoration: none;
   text-align: center;
-  height: 2.25em;
-  width: 2.25em;
+  height: 2em;
+  width: 2em;
   line-height: 1em;
   background-color: white;
   border: none;
@@ -275,13 +277,16 @@ button.ol-full-screen-true:after {
   background-color: rgba(255,255,255,0.5);
   box-shadow: none;
 }
+.no-boxshadow #mapmenu-button.mdk-button {
+  border: none;
+}
 .no-boxshadow .mdk-button .mapmenu-button-true {
-  border: 1px solid #A6A6A6;
+  border: 1px solid #C5C5C5;
 }
 /**/
 #window-button {
   left: .5em;
-  top: 4.5em;
+  top: 5em;
   z-index: 5;   
 }
 button.mapmenu-button-true:after {
@@ -295,9 +300,9 @@ button.mapmenu-button-false:after {
   content: "\f0c9";
 }
 button.window-button:after {
-  font-size: 0.95em;
+  font-size: 1.2em;
   content: "\f08e";
-  line-height: 0.95;
+  line-height: 1.2em;
   vertical-align: middle;
 }
 #mapmenu {
@@ -318,7 +323,7 @@ button.window-button:after {
 	transition: .3s ease all;	
 }
 .no-boxshadow #mapmenu {
-  border-left: 1px solid #A6A6A6;
+  border-left: 1px solid #C5C5C5;
 }
 #mapmenu.mapmenu-show {
 	-ms-transform: translateX(-250px);
@@ -559,7 +564,7 @@ li .legend-item:hover {
 }
 .menu-item-divider {
   border-bottom: 1px solid #C5C5C5;
-  margin: 0.5em 0.5em;
+  margin: 0.5em 0em;
 }
 .menu-item-empty {
   margin: 0.8em 0;
