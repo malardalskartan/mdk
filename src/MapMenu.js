@@ -42,12 +42,31 @@ var MapMenu = (function($){
     },
     addLegend: function() {
       var layers = Viewer.getLayers();
-      $('#mapmenu').append('<div><ul id="legendlist"></ul></div>');
+      var legend ='<div id="legendlist">' + 
+                    '<ul>' + 
+                        '<li>' +
+                          '<ul id="group-default">' +
+                          '</ul>' + 
+                        '</li>' +
+                        '<li class="menu-item-divider"></li>' +
+                        '<li>' + 
+                          '<ul id="group-background">' +
+                          '</ul>' + 
+                        '</li>' +                                   
+                    '</ul>' +
+                  '</div>';
+      $('#mapmenu').append(legend);
       for (var i=layers.length-1; i>=0; i--) {
         var name = (layers[i].get('name'));
         var item = '<li><div class ="legend-item" id="' + name + '"><div><div class="checkbox"></div>';
-        item += layers[i].get('title') + '</div><div class="getLegend"></div></div></li>'     
-        $('#legendlist').append(item);
+        item += layers[i].get('title') + '</div></div></li>';
+        //Append layer to group in legend. Add to default group if not defined.
+        if(layers[i].get('group')) {     
+          $('#group-' + layers[i].get('group')).append(item);
+        }
+        else {
+          $('#group-default').append(item);
+        }
         if(layers[i].getVisible()==true) {
           $('#' + name + ' .checkbox').addClass('checkbox-true');
         }

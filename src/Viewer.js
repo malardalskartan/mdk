@@ -57,8 +57,7 @@ var Viewer = (function($){
         itemName: 'ShareMap'
       }
       ]);
-      ShareMap.init();       
-
+      ShareMap.init();
     },
     createLayers: function(layerlist) {
         for(var i=layerlist.length-1; i>=0; i--) {
@@ -76,7 +75,7 @@ var Viewer = (function($){
 	      controls: mapControls,
 	      layers: settings.layers,
 	      view: new ol.View({
-          extent: settings.projectionExtent,
+          extent: settings.extent,
 	      	projection: settings.projection,
 	        center: settings.center,
           resolutions: settings.resolutions,
@@ -171,6 +170,7 @@ var Viewer = (function($){
         layersConfig.hasOwnProperty('attribution') ? attr=[new ol.Attribution({html: layersConfig.attribution})] : [attr = null];
 
         return new ol.layer.Tile({
+           group: layersConfig.group,          
            name: layersConfig.name.split(':').pop(), //remove workspace part of name
            title: layersConfig.title,
            visible: layersConfig.visible,
