@@ -20,23 +20,26 @@
 	     	resolutions: [1146.8799999999999, 573.4399999999999, 286.71999999999997, 143.35999999999999, 71.67999999999999, 35.839999999999996, 17.919999999999998, 8.959999999999999, 4.4799999999999995, 2.2399999999999998, 1.1199999999999999, 0.5599999999999999, 0.27999999999999997, 0.13999999999999999],
 	     	source: {
 	     		local: {
-	     			url: 'http://karta.enkoping.se/geoserver/ena_extern/wms',
+	     			url: 'http://localhost/geoserver/mdk/wms',
 	     			version: '1.1.1',
 	     			type: 'WMS'
 	     		},
+	     		local_wfs: {
+	     			url: 'http://localhost/geoserver/mdk/wfs',
+	     			type: 'WFS'
+	     		},	     		
 	     		basemap: {
-	     			url: 'http://mbf-karttst-01:8080/geowebcache/service/wmts'
+	     			url: 'http://karta.enkoping.se/geowebcache/service/wmts'
 	     		}
 	     	},
 	     	layers: [{
-	     		format: 'image/png', 
 	     		name: 'fmis_punkter_4k',
 	     		source: 'local',
 	     		title: 'Forminnen, punkt',
 	     		type: 'WMS',
 	     		visible: false
 	     	}, {	     		
-	     		format: 'image/png', 
+	     		format: 'image/png',
 	     		name: 'fmis_ytor_4k',
 	     		source: 'local',
 	     		title: 'Forminnen, yta',
@@ -44,14 +47,23 @@
 	     		visible: false
 	     	}, {
 	     		attribution: '&copy Geodatasamverkan',		     		
-	     		format: 'image/jpeg',
+	     		format: 'image/png',
 	     		group: 'background',
 	     		name: 'topowebbkartan',	     		
 	     		source: 'basemap',
 	     		title: 'Karta',
 	     		type: 'WMTS',
 	     		visible: true     		
-	     	}		
+	     	}, {
+	     		attribution: '&copy Geodatasamverkan',		     		
+	     		format: 'image/png',
+	     		group: 'background',
+	     		name: 'topowebbkartan_nedtonad',	     		
+	     		source: 'basemap',
+	     		title: 'Karta nedtonad',
+	     		type: 'WMTS',
+	     		visible: false	     		   		
+	     	}		     			
 	     	]
         });
 
@@ -62,11 +74,13 @@
 <body>
 <div id="app-wrapper">
 	<div id="wrapper">
-
 		<div id="map" class="map">
 			<div id="mapmenu-button" class="mdk-button">
 				<button class="mapmenu-button-true"></button>
 			</div>
+			<div id="geolocation-button" class="mdk-button">
+				<button class="geolocation-button"></button>
+			</div>			
 			<div id="mapmenu">
 				<div class="block">
 					<ul id="menutools"> 
@@ -76,14 +90,21 @@
 								<div class="button-icon share-icon"></div>
 								Dela karta
 							</div>
-							<li class="menu-item"><div class="menu-item-divider"></div></li>
-						</li>					
+						</li>								
+		        		<li>
+		                	<div id="print-button" class="menu-button">
+			                  	<div class="button-icon print-icon"></div>
+			                  	Skriv ut
+		                	</div>
+		                </li>														
+						<li class="menu-item"><div class="menu-item-divider"></div><li>				
 					</ul>
 				</div>
 			</div>				
-		</div>	
+		</div>
 	<!-- Wrapper -->
 	</div>
+	<canvas id="temp" style="display: none"></canvas>
 <!-- app-wrapper	 -->
 </div>
 <script src="externs/es5-shim.min.js"></script>
@@ -96,5 +117,7 @@
 <script src="src/Popup.js"></script>
 <script src="src/ShareMap.js"></script>
 <script src="src/MapWindow.js"></script>
+<script src="src/Print.js"></script>
+<script src="src/Geoposition.js"></script>
 </body>
 </html>

@@ -41,7 +41,9 @@ var Viewer = (function($){
         //Set map controls
         mapControls = [
                 new ol.control.Zoom({zoomInTipLabel: null, zoomOutTipLabel:null,zoomInLabel: '', zoomOutLabel:''}),
-                new ol.control.Attribution({collapsible: false})
+                new ol.control.Attribution({collapsible: false}),
+                new ol.control.Rotate({label: ''}), /*Override default label for compass*/
+                new ol.control.ScaleLine()
         ]; 
         if(window.top!=window.self) {
             MapWindow.init();
@@ -58,6 +60,8 @@ var Viewer = (function($){
       }
       ]);
       ShareMap.init();
+      Geoposition.init();
+      Print.init();
     },
     createLayers: function(layerlist) {
         for(var i=layerlist.length-1; i>=0; i--) {
@@ -67,6 +71,9 @@ var Viewer = (function($){
             else if(layerlist[i].type == 'WMS') {
                 settings.layers.push(Viewer.addWMS(layerlist[i]));
             }
+            else if(layerlist[i].type == 'WFS') {
+                settings.layers.push(Viewer.addWFS(layerlist[i]));
+            }
         }
     },
     loadMap: function(){
@@ -75,6 +82,7 @@ var Viewer = (function($){
 	      controls: mapControls,
 	      layers: settings.layers,
 	      view: new ol.View({
+          renderer: 'canvas',
           extent: settings.extent,
 	      	projection: settings.projection,
 	        center: settings.center,
@@ -111,6 +119,9 @@ var Viewer = (function($){
         }
     	 	
     },
+    getSettings: function () {
+      return settings;
+    },
     getMapUrl: function () {
       var layerNames = '', url;
       //delete search arguments if present
@@ -143,19 +154,28 @@ var Viewer = (function($){
     },
     getLayer: function(layername) {    
         var layer = $.grep(settings.layers, function(obj) {
-            return (obj.get('name') == layername);
+           return (obj.get('name') == layername);
         }); 
         return layer[0];       
     },
+    getGroup: function(group) {    
+        var group = $.grep(settings.layers, function(obj) {
+            return (obj.get('group') == group);
+        }); 
+        return group;       
+    },    
     addWMS: function(layersConfig) {    
 
         return new ol.layer.Tile({
           name: layersConfig.name.split(':').pop(), //remove workspace part of name
+          group: layersConfig.group || 'default',
+          opacity: layersConfig.opacity || 1,          
           title: layersConfig.title,
           type: layersConfig.type,
           visible: layersConfig.visible,           
-          source: new ol.source.TileWMS(/** @type {olx.source.TileWMSOptions} */ ({
+          source: new ol.source.TileWMS(({
             url: settings.source[layersConfig.source].url,
+            crossOrigin: 'anonymous',
             projection: settings.projection,
             params: {'LAYERS': layersConfig.name, 'TILED': true, VERSION: settings.source[layersConfig.source].version}
           }))
@@ -170,11 +190,13 @@ var Viewer = (function($){
         layersConfig.hasOwnProperty('attribution') ? attr=[new ol.Attribution({html: layersConfig.attribution})] : [attr = null];
 
         return new ol.layer.Tile({
-           group: layersConfig.group,          
+           group: layersConfig.group || 'background',          
            name: layersConfig.name.split(':').pop(), //remove workspace part of name
+           opacity: layersConfig.opacity || 1,
            title: layersConfig.title,
            visible: layersConfig.visible,
            source: new ol.source.WMTS({
+             crossOrigin: 'anonymous',
              attributions: attr,
              url: settings.source[layersConfig.source].url,
              projection: settings.projection,
@@ -191,6 +213,51 @@ var Viewer = (function($){
            })
         })
     },
+    // addWFS: function(layersConfig) {
+    //     var vectorSource = new ol.source.ServerVector({
+    //       format: new ol.format.GeoJSON(),
+    //       loader: function(extent, resolution, projection) {
+    //         var url = settings.source[layersConfig.source].url + '?service=WFS&' +
+    //             'version=1.1.0&request=GetFeature&typeName=' + layersConfig.name +
+    //             '&outputFormat=text/javascript&format_options=callback:loadFeatures' +
+    //             '&srsname=' + settings.projectionCode + '&bbox=' + extent.join(',') + ',' + settings.projectionCode;
+    //         $.ajax({
+    //           url: url,
+    //           dataType: 'jsonp',
+    //           error: function(jqXHR, textStatus, errorThrown) {
+    //             alert(errorThrown);
+    //           },
+    //           loadFeatures: function(response) {
+    //               alert('hej');
+    //               vectorSource.addFeatures(vectorSource.readFeatures(response));
+    //           }
+    //         });
+    //       },
+    //       strategy: ol.loadingstrategy.createTile(new ol.tilegrid.XYZ({
+    //         maxZoom: settings.resolutions.length
+    //       })),
+    //       projection: settings.projectionCode
+    //     });
+
+    //     //Callback function for jsonp
+    //     var loadFeatures = function(response) {
+    //       alert('hej');
+    //       vectorSource.addFeatures(vectorSource.readFeatures(response));
+          
+    //     }; 
+            
+    //     return new ol.layer.Vector({
+    //       name: layersConfig.name.split(':').pop(),
+    //       title: layersConfig.title,
+    //       source: vectorSource,
+    //       style: new ol.style.Style({
+    //         image: new ol.style.Circle({
+    //           radius: 20,
+    //           fill: new ol.style.Fill({color: 'black'})
+    //         })
+    //       })
+    //     })
+    // },
     addGetFeatureInfo: function() {
         Popup.init('#map');
 

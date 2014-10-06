@@ -67,28 +67,64 @@ var MapMenu = (function($){
         else {
           $('#group-default').append(item);
         }
-        if(layers[i].getVisible()==true) {
-          $('#' + name + ' .checkbox').addClass('checkbox-true');
+
+        //Append class according to visiblity and if group is background
+        if(layers[i].get('group') == 'background') {
+          if(layers[i].getVisible()==true) {
+            $('#' + name + ' .checkbox').addClass('check-true');
+          }
+          else {
+            $('#' + name + ' .checkbox').addClass('check-false');
+          }  
         }
         else {
-          $('#' + name + ' .checkbox').addClass('checkbox-false');
+          if(layers[i].getVisible()==true) {
+            $('#' + name + ' .checkbox').addClass('checkbox-true');
+          }
+          else {
+            $('#' + name + ' .checkbox').addClass('checkbox-false');
+          }  
         }
+
+        //Event listener for tick layer
         $('#' + name).click(function() {
-          MapMenu.toggleCheck($(this).attr("id"), layers[i]);
+          MapMenu.toggleCheck($(this).attr("id"));
         })
       }
     },
     toggleCheck: function(layerid) {
-      if($('#' + layerid + ' .checkbox').hasClass('checkbox-true')) {
-        $('#' + layerid + ' .checkbox').removeClass('checkbox-true');
-        $('#' + layerid + ' .checkbox').addClass('checkbox-false');
-        Viewer.getLayer(layerid).setVisible(false);        
+      var layer = Viewer.getLayer(layerid);
+      if(layer.get('group') == 'background') {
+        if($('#' + layerid + ' .checkbox').hasClass('check-true')) {
+          $('#' + layerid + ' .checkbox').removeClass('check-true');
+          $('#' + layerid + ' .checkbox').addClass('check-false');
+          Viewer.getLayer(layerid).setVisible(false);        
+        }
+        else {
+          var group = Viewer.getGroup('background'); 
+          for(var i=0; i<group.length; i++) {
+              group[i].setVisible(false);
+              $('#' + group[i].get('name') + ' .checkbox').removeClass('check-true');
+              $('#' + group[i].get('name') + ' .checkbox').addClass('check-false');              
+          }
+          Viewer.getLayer(layerid).setVisible(true);
+          $('#' + layerid + ' .checkbox').removeClass('check-false');
+          $('#' + layerid + ' .checkbox').addClass('check-true');                
+        }  
       }
       else {
-        $('#' + layerid + ' .checkbox').removeClass('checkbox-false');
-        $('#' + layerid + ' .checkbox').addClass('checkbox-true'); 
-        Viewer.getLayer(layerid).setVisible(true);       
-      }      
+        if($('#' + layerid + ' .checkbox').hasClass('checkbox-true')) {
+          $('#' + layerid + ' .checkbox').removeClass('checkbox-true');
+          $('#' + layerid + ' .checkbox').addClass('checkbox-false');
+          Viewer.getLayer(layerid).setVisible(false);        
+        }
+        else {
+          $('#' + layerid + ' .checkbox').removeClass('checkbox-false');
+          $('#' + layerid + ' .checkbox').addClass('checkbox-true'); 
+          Viewer.getLayer(layerid).setVisible(true);       
+        }          
+      }
+    
     },
     getTarget: function() {
       return settings.mapMenu;

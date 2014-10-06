@@ -61,6 +61,14 @@ button {
   left: .5em;
   top: 5em;
 }
+.ol-rotate {
+  bottom: 3em;
+  left: .5em;
+  transition: opacity .25s;
+}
+.ol-rotate.ol-hidden {
+  opacity: 0;
+}
 @media print {
   .ol-zoom,
   .ol-full-screen {
@@ -113,6 +121,43 @@ button.ol-full-screen-false:after {
 }
 button.ol-full-screen-true:after {
   content: "\f066";
+}
+.ol-control.ol-rotate button {
+  border-radius: 0;  
+  background-color: transparent;
+}
+.ol-rotate.ol-control {
+  background-color: transparent;
+  box-shadow: none;  
+}
+.ol-compass {
+  background: url('../img/kompass.svg') left center no-repeat;
+  background-size: 2em;
+  display: block;
+  font-family: Arial;
+  font-weight: normal;
+  height: 2em;
+  width: 2em;
+}
+.ol-scale-line, .ol-scale-line:not([ie8andbelow]) {
+  background: #ffffff;
+  background: rgba(255,255,255,0.7);
+  border-radius: 4px;
+  bottom: .5em;
+  left: 3em;
+  padding: 2px;
+  position: absolute;
+}
+.ol-scale-line-inner {
+  border-bottom-right-radius: 3px;
+  border-bottom-left-radius: 3px;  
+  border: 1px solid #424242;
+  border-top: none;
+  color: #424242;
+  font-size: 10px;
+  text-align: center;
+  margin: 1px;
+  padding: 0px 2px;
 }
 /* invisible but not hidden */
 .ol-has-tooltip [role=tooltip] {
@@ -264,12 +309,27 @@ button.ol-full-screen-true:after {
   top: .5em;
   z-index: 5;
 }
+#geolocation-button {
+  left: .5em;
+  bottom: .5em;
+  z-index: 1;
+}
+#geolocation-button.mdk-button {
+  box-shadow: 0 0 5px rgba(0,0,0,0.45);
+}
+.mdk-button .geolocation-button-true {
+  color: #47B9EB;
+  background-color: #424242;
+}
+button.geolocation-button:after {
+  content: "\f124";
+}
 /*remove the boxshadow when selected*/
 #mapmenu-button.mdk-button {
   box-shadow: none;
 }
 .mdk-button .mapmenu-button-true {
-  background-color: rgba(255,255,255,0.5);
+  background-color: transparent;
   box-shadow: 0 2px 5px rgba(0,0,0,0.45);
 }
 .mdk-button .mapmenu-button-false {
@@ -376,6 +436,10 @@ li .menu-button:hover {
 }
 .menu-button .share-icon:after {
   content: "\f045";
+  font-family: 'FontAwesome';
+}
+.menu-button .print-icon:after {
+  content: "\f02f";
   font-family: 'FontAwesome';
 }
 .hidden {
@@ -562,6 +626,13 @@ li .legend-item:hover {
 .checkbox-false:after {
   content: "\f096";
 }
+.check-true:after {
+  content: "\f00c";
+}
+.check-false:after {
+  content: "\f00c";  
+  visibility: hidden;
+}
 .menu-item-divider {
   border-bottom: 1px solid #C5C5C5;
   margin: 0.5em 0em;
@@ -573,6 +644,9 @@ li .legend-item:hover {
 .modal {
   max-width: 300px;
   width: 90%;  
+}
+.ol-scale-line, .ol-scale-line-inner {
+  display: none;
 }
 @media screen and (max-width: 320px) { 
 #mapmenu {
@@ -588,10 +662,8 @@ li .legend-item:hover {
 #popup {
   width: 240px;
 }
-
 }
 @media screen and (max-width: 240px) {
-
 #popup {
   width: 200px;
 }
