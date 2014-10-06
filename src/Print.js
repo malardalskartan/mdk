@@ -26,8 +26,14 @@ var Print = (function($){
     exportPng: function() {
       var canvas = $('canvas');
       var image = new Image();      
+      var imageUrl;
+      image.onload = function() {
+        imageUrl = canvas.get(0).toDataURL("image/png");
+        alert(imageUrl + '1');
+      }
+      alert(imageUrl + '2');
       image.crossOrigin = 'Anonymous';      
-      image.src = canvas.get(0).toDataURL("image/png");
+      image.src = imageUrl;
       var copyCanvas = $('#temp');
       var drawCanvas = copyCanvas[0].getContext('2d')
       var sourceWidth = canvas[0].width;
