@@ -74,6 +74,9 @@ var Viewer = (function($){
             else if(layerlist[i].type == 'WFS') {
                 settings.layers.push(Viewer.addWFS(layerlist[i]));
             }
+            else if(layerlist[i].type == 'GEOJSON') {
+                settings.layers.push(Viewer.addGeoJson(layerlist[i]));
+            }            
         }
     },
     loadMap: function(){
@@ -175,6 +178,7 @@ var Viewer = (function($){
           visible: layersConfig.visible,           
           source: new ol.source.TileWMS(({
             url: settings.source[layersConfig.source].url,
+            gutter: layersConfig.gutter || 0,
             crossOrigin: 'anonymous',
             projection: settings.projection,
             params: {'LAYERS': layersConfig.name, 'TILED': true, VERSION: settings.source[layersConfig.source].version}
@@ -213,6 +217,22 @@ var Viewer = (function($){
            })
         })
     },
+    addGeoJson: function(layersConfig) {
+        return new ol.layer.Vector({
+          group: 'none',
+          name: layersConfig.name.split(':').pop(),
+          opacity: layersConfig.opacity || 1,
+          title: layersConfig.title,
+          visible: layersConfig.visible,
+          source: new ol.source.GeoJSON({
+            url: layersConfig.source
+          }),
+          style: new ol.style.Style({
+            fill: layersConfig.style['fill'] ? new ol.style.Fill(layersConfig.style['fill']) : null,
+            stroke: layersConfig.style['stroke'] ? new ol.style.Stroke(layersConfig.style['stroke']) : null
+          })                  
+        })
+    },    
     // addWFS: function(layersConfig) {
     //     var vectorSource = new ol.source.ServerVector({
     //       format: new ol.format.GeoJSON(),

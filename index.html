@@ -15,8 +15,8 @@
 	     	projectionCode: 'EPSG:3010',
 	     	projectionExtent: [-1678505.1838360203,4665380.0,2431912.7361639794,8775797.92],
 	     	extent: [-1678505.1838360203,4665380.0,2431912.7361639794,8775797.92],
-	     	center: [161856, 6589434],
-	     	zoom: 4,
+	     	center: [162429, 6599905],
+	     	zoom: 3,
 	     	resolutions: [1146.8799999999999, 573.4399999999999, 286.71999999999997, 143.35999999999999, 71.67999999999999, 35.839999999999996, 17.919999999999998, 8.959999999999999, 4.4799999999999995, 2.2399999999999998, 1.1199999999999999, 0.5599999999999999, 0.27999999999999997, 0.13999999999999999],
 	     	source: {
 	     		local: {
@@ -36,6 +36,7 @@
 	     		name: 'fmis_punkter_4k',
 	     		source: 'local',
 	     		title: 'Forminnen, punkt',
+	     		gutter: 50,
 	     		type: 'WMS',
 	     		visible: false
 	     	}, {	     		
@@ -46,6 +47,14 @@
 	     		type: 'WMS',
 	     		visible: false
 	     	}, {
+	     		name: 'mdk',
+	     		opacity: 0.15,
+	     		title: 'Mdk',
+	     		source: 'data/mdk.geojson',
+	     		style: {fill: {color: 'black'}},
+	     		type: 'GEOJSON',
+	     		visible: true
+	     	}, {	     		
 	     		attribution: '&copy Geodatasamverkan',		     		
 	     		format: 'image/png',
 	     		group: 'background',
@@ -104,7 +113,6 @@
 		</div>
 	<!-- Wrapper -->
 	</div>
-	<canvas id="temp" style="display: none"></canvas>
 <!-- app-wrapper	 -->
 </div>
 <script src="externs/es5-shim.min.js"></script>

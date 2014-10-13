@@ -19,39 +19,56 @@ var Print = (function($){
     },
     bindUIActions: function() {
         settings.printButton.on('touchend click', function(e) {
-          Print.exportPng();
+          $('#app-wrapper').append('<canvas id="print" style="display: none"></canvas>');
+          Print.createImage();
           e.preventDefault();
         });
     },
-    exportPng: function() {
-      var canvas = $('canvas');
-      var image = new Image();      
-      var imageUrl;
-      image.onload = function() {
-        imageUrl = canvas.get(0).toDataURL("image/png");
-        alert(imageUrl + '1');
-      }
-      alert(imageUrl + '2');
-      image.crossOrigin = 'Anonymous';      
-      image.src = imageUrl;
-      var copyCanvas = $('#temp');
-      var drawCanvas = copyCanvas[0].getContext('2d')
-      var sourceWidth = canvas[0].width;
-      copyCanvas.attr('width', settings.printWith);
-      copyCanvas.attr('height', settings.printWith);
-      var sourceWidth = canvas[0].width;        
-      var destinyWidth = sourceWidth >= 800 ? 800 : sourceWidth;
-      var height = sourceWidth * canvas[0].height/sourceWidth;      
-      drawCanvas.drawImage(image, (sourceWidth/2 - destinyWidth/2), 0, destinyWidth, settings.printWith, 0, 0, settings.printWith, settings.printWith);
-
+    imageToPrint: function(copyCanvas) {
       var imageCrop = new Image();
-      imageCrop.src = copyCanvas.get(0).toDataURL("image/png");
-      var printWindow = window.open('','','width=800,height=800');
-      printWindow.document.write('<img src="' + imageCrop.src + '"/>');
-      printWindow.document.close();      
-      printWindow.print();
-      printWindow.document.close();
+      try {
+        imageCrop.src = copyCanvas.get(0).toDataURL("image/png");
+      }
+      catch (e) {
+        console.log(e);
+      }
+      finally {
+        var printWindow = window.open('','','width=800,height=820');
+        printWindow.document.write('<body style="margin: 0;"><img src="' + imageCrop.src + '"/><p>&copy Lantmäteriet Geodatasamverkan</p></body>'); 
+        printWindow.document.close();   
+        printWindow.print();
+        setTimeout(function(){
+          printWindow.close();
+          $('#print').remove();
+        }, 10); 
+      }
+    },
+    createImage: function() {
+      var canvas = $('canvas');
+      var image = new Image();
+      // image.crossOrigin = 'Anonymous';
 
+      try {
+        var imageUrl = canvas.get(0).toDataURL("image/png");        
+      }
+      catch (e) {
+        console.log(e);
+      }
+      finally {
+        var copyCanvas = $('#print'); 
+        image.onload = function() {
+          var ctxCanvas = copyCanvas[0].getContext('2d');
+          var sourceWidth = canvas[0].width;
+          copyCanvas[0].width = settings.printWith;
+          copyCanvas[0].height = settings.printWith;
+          var sourceWidth = canvas[0].width;        
+          var destinyWidth = sourceWidth >= 800 ? 800 : sourceWidth;
+          var height = sourceWidth * canvas[0].height/sourceWidth; 
+          ctxCanvas.drawImage(image, (sourceWidth/2 - destinyWidth/2), 0, settings.printWith, settings.printWith, 0, 0, settings.printWith, settings.printWith);       
+          Print.imageToPrint(copyCanvas);  
+        };    
+        image.src = imageUrl;      
+      }
     }
   };
 })(jQuery); 
