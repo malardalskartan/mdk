@@ -5,7 +5,7 @@
 
 var Viewer = (function($){
  
-  var map, mapControls;
+  var map, mapControls, attribution;
 
   var settings = {
     projection: '',
@@ -38,22 +38,31 @@ var Viewer = (function($){
             this.parseArg();
         }    
 
+        //Create attribution
+        attribution = new ol.control.Attribution({
+          collapsible: false
+        });
+
         //Set map controls
         mapControls = [
                 new ol.control.Zoom({zoomInTipLabel: null, zoomOutTipLabel:null,zoomInLabel: '', zoomOutLabel:''}),
-                new ol.control.Attribution({collapsible: false}),
+                attribution,
                 new ol.control.Rotate({label: ''}), /*Override default label for compass*/
-                new ol.control.ScaleLine()
-        ]; 
+                new ol.control.ScaleLine({target: 'bottom-tools'})
+        ]
         if(window.top!=window.self) {
             MapWindow.init();
         }
         else {
             mapControls.push(new ol.control.FullScreen());
         }    
-
+      this.bindFooter();
     	this.loadMap();
       this.addGetFeatureInfo();
+
+      //Check size for attribution mode
+      $(window).on('resize', this.checkSize);
+      this.checkSize();
 
       MapMenu.init([{
         itemName: 'ShareMap'
@@ -359,6 +368,19 @@ var Viewer = (function($){
           evt.preventDefault();
         });
           
+    },
+    bindFooter: function() {
+      $('#home-button').on('touchend click', function(e) {
+        var homeb = [105085, 6571627, 219773, 6628182];
+        map.getView().fitExtent(homeb, map.getSize());
+        $('#home-button button').blur();
+        e.preventDefault();
+      });                                
+    },
+    checkSize: function() {
+      var small = map.getSize()[0] < 768;
+      attribution.setCollapsible(small);
+      attribution.setCollapsed(small);      
     }  
   };
  

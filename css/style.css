@@ -7,7 +7,6 @@ body, html {
 body {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: #333333;
-  background-color: #cccccc;
 }
 i {
   font-style: italic;
@@ -59,10 +58,10 @@ button {
 }
 .ol-full-screen {
   left: .5em;
-  top: 5em;
+  top: 7.5em;
 }
 .ol-rotate {
-  bottom: 3em;
+  bottom: 4.5em;
   left: .5em;
   transition: opacity .25s;
 }
@@ -173,33 +172,22 @@ button.ol-full-screen-true:after {
   font-size: 14px;
   text-shadow: 0 0 2px #fff;
 }
-.ol-attribution,
-.ol-has-tooltip [role=tooltip] {
-  font-family: 'Lucida Grande',Verdana,Geneva,Lucida,Arial,Helvetica,sans-serif;
-}
-.ol-attribution {
-  position: absolute;
-  text-align: right;
-  bottom: 0;
-  right: 0;
-  padding: 6px;
-  color: #000000;
-  color: rgba(238,238,238,1);
-  background: rgba(66,66,66,0.4);
-}
 .ol-attribution {
   text-align: right;
   bottom: .5em;
+  padding: .35em 0;
+  position: fixed;
   right: .5em;
+  max-width: calc(100% - 3.5em);
+  z-index: 2;
 }
-
 .ol-attribution ul {
   margin: 0;
   padding: 0 .5em;
   font-size: .7rem;
   line-height: 1.375em;
-  color: #000;
-  text-shadow: 0 0 2px #fff;
+  color: #fff;
+  max-width: 60%;
 }
 .ol-attribution li {
   display: inline;
@@ -209,17 +197,8 @@ button.ol-full-screen-true:after {
 .ol-attribution li:not(:last-child):after {
   content: " ";
 }
-.ol-attribution img {
-  max-height: 2em;
-}
 .ol-attribution ul, .ol-attribution button {
-  display: inline-block;
-}
-.ol-attribution button {
-  border: none;
-  border-radius: 50%;
-  width: 24px;
-  height: 24px;
+  display: inline;
 }
 .ol-attribution:not(.ol-collapsed) button:hover [role=tooltip],
 .ol-attribution.ol-collapsed ul {
@@ -229,7 +208,25 @@ button.ol-full-screen-true:after {
   display: block;
 }
 .ol-attribution:not(.ol-collapsed) {
-  background: rgba(255,255,255,0.8);
+  background: transparent;
+}
+.ol-control.ol-attribution:not(.ol-collapsed) {
+  box-shadow: none;
+}
+.ol-attribution:not(.ol-collapsed) button {
+  background: transparent;
+  color: #000;
+}
+.ol-attribution:not(.ol-collapsed) button:hover {
+  background: #424242;
+  color: #fff;
+}
+.ol-attribution.ol-collapsed button {
+  background: rgba(0,0,0,0.8);
+  border-radius: 15px;
+  color: #fff;
+  height: 1.5em;
+  width: 1.5em;
 }
 .ol-attribution.ol-uncollapsible {
   bottom: 0;
@@ -252,10 +249,15 @@ button.ol-full-screen-true:after {
 .ol-attribution.ol-uncollapsible button {
   display: none;
 }
+
 /*workaround to remove ol logo until class for the logo*/
 .ol-attribution img {
   display: none;
 }
+.ol-attribution span {
+  font-family: 'FontAwesome';  
+}
+
 /*end openlayers style*/
 
 #app-wrapper {
@@ -270,6 +272,72 @@ button.ol-full-screen-true:after {
 #map {
 	height:100%;
 }
+#bottom-tools {
+  bottom: 1.7em;
+  height: auto;
+  left: 0;
+  position: fixed;
+  width: 100%;
+  z-index: 1;
+}
+#footer {
+  background-color: black;
+  background-color: rgba(0,0,0,0.8);
+  color: white;
+  font-size: 0.7em;
+  height: 2.5em;
+  line-height: 1em;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  z-index: 1;
+  width: 100%;
+}
+#footer a {
+  color: white;
+  text-decoration: none;
+}
+#footer a:hover {
+  color: white;
+  text-decoration: underline;
+}
+#footer .footer-left {
+  float: left;
+  position: relative;
+  width: 30%;
+}
+#footer .footer-middle {
+  float: left;
+  padding: 0.75em 0;
+  position: relative;
+  text-align: center;
+  width: 40%;
+}
+#footer .footer-right {
+  position: relative;
+  float: left;
+  width: 30%;
+}
+#footer .footer-right .footer-attribution {
+  position: relative;
+  float: right;
+  padding-right: 5px;
+  text-align: right;
+}
+#footer .footer-middle ul{
+  display: inline-block;
+  padding-left:0;
+}
+#footer .footer-middle ul li{ 
+  border-right: 1px solid #ffffff;
+  float: left;
+  padding: 0 6px;
+}
+#footer .footer-middle ul li:last-child{
+  border-right: none;
+  padding-right:0;
+}
+
 .mdk-button {
   position: absolute;
   border-radius: 4px;
@@ -309,6 +377,11 @@ button.ol-full-screen-true:after {
   top: .5em;
   z-index: 5;
 }
+#home-button {
+  left: .5em;
+  top: 5em; 
+  z-index: 1; 
+}
 #geolocation-button {
   left: .5em;
   bottom: .5em;
@@ -346,7 +419,7 @@ button.geolocation-button:after {
 /**/
 #window-button {
   left: .5em;
-  top: 5em;
+  top: 7.5em;
   z-index: 5;   
 }
 button.mapmenu-button-true:after {
@@ -364,6 +437,16 @@ button.window-button:after {
   content: "\f08e";
   line-height: 1.2em;
   vertical-align: middle;
+}
+button.home-button:after {
+  font-size: 1.3em;
+  content: "\f015";
+  line-height: 1.2em;
+}
+#home:after {
+  content: "\f015";
+  font-size: 1.0em;
+  font-family: 'FontAwesome';
 }
 #mapmenu {
   background-color: #FFF;
@@ -641,11 +724,65 @@ li .legend-item:hover {
   margin: 0.8em 0;
 }
 @media screen and (max-width: 768px) {
+.ol-scale-line, .ol-scale-line-inner {
+  display: none;
+}   
+.ol-attribution {
+  max-width: calc(100% - 3.5em);
+  padding: 0;
+}
+.ol-attribution ul {
+  color: #000;
+}
+.ol-control.ol-attribution:not(.ol-collapsed) {
+  box-shadow: 0 0 5px rgba(0,0,0,0.45);
+}
+.ol-control.ol-attribution.ol-collapsed {
+  background-color: transparent;
+  box-shadow: none;
+}
+.ol-attribution:not(.ol-collapsed) {
+  background: rgba(255,255,255,0.9);
+}
+.ol-attribution:not(.ol-collapsed) button {
+  background: transparent;
+  color: #000;
+}
+.ol-attribution.ol-collapsed button {
+  background: rgba(0,0,0,0.8);
+  border-radius: 15px;
+  color: #fff;
+  height: 1.5em;
+  width: 1.5em;
+}  
+/*.ol-zoom {
+  top: .5em;
+  left: .5em;
+}
+.ol-full-screen {
+  left: .5em;
+  top: 7.5em;
+}
+#mapmenu-button {
+  top: .5em;
+}*/
+/*#home-button {
+  top: 5em; 
+}*/
+.ol-rotate {
+  bottom: 3em;
+}
+#bottom-tools {
+  bottom: 0;
+}
 .modal {
   max-width: 300px;
   width: 90%;  
 }
-@media screen and (max-width: 320px) { 
+#footer {
+  display: none;
+}
+@media screen and (max-width: 320px) {
 #mapmenu {
   width: 100%;
   right: -320px;  
@@ -655,12 +792,8 @@ li .legend-item:hover {
   -webkit-transform: translateX(-320px);
   transform: translateX(-320px);
 }
-
 #popup {
   width: 240px;
-}
-.ol-scale-line, .ol-scale-line-inner {
-  display: none;
 }
 }
 @media screen and (max-width: 240px) {

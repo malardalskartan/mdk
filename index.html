@@ -51,27 +51,27 @@
 	     		opacity: 0.15,
 	     		title: 'Mdk',
 	     		source: 'data/mdk.geojson',
-	     		style: {fill: {color: 'black'}},
+	     		style: {fill: {color: 'black'}, stroke: {color:'black'}},
 	     		type: 'GEOJSON',
 	     		visible: true
 	     	}, {	     		
-	     		attribution: '&copy Geodatasamverkan',		     		
+	     		attribution: '&copy&nbspLantmäteriet&nbspGeodatasamverkan',		     		
 	     		format: 'image/png',
 	     		group: 'background',
 	     		name: 'topowebbkartan',	     		
 	     		source: 'basemap',
 	     		title: 'Karta',
 	     		type: 'WMTS',
-	     		visible: true     		
+	     		visible: false     		
 	     	}, {
-	     		attribution: '&copy Geodatasamverkan',		     		
+	     		attribution: '&copy Lantmäteriet Geodatasamverkan',		     		
 	     		format: 'image/png',
 	     		group: 'background',
 	     		name: 'topowebbkartan_nedtonad',	     		
 	     		source: 'basemap',
 	     		title: 'Karta nedtonad',
 	     		type: 'WMTS',
-	     		visible: false	     		   		
+	     		visible: true	     		   		
 	     	}		     			
 	     	]
         });
@@ -87,9 +87,9 @@
 			<div id="mapmenu-button" class="mdk-button">
 				<button class="mapmenu-button-true"></button>
 			</div>
-			<div id="geolocation-button" class="mdk-button">
-				<button class="geolocation-button"></button>
-			</div>			
+			<div id="home-button" class="mdk-button">
+				<button class="home-button"></button>
+			</div>							
 			<div id="mapmenu">
 				<div class="block">
 					<ul id="menutools"> 
@@ -108,6 +108,24 @@
 		                </li>														
 						<li class="menu-item"><div class="menu-item-divider"></div><li>				
 					</ul>
+				</div>
+			</div>
+			<div id="bottom-tools">
+				<div id="geolocation-button" class="mdk-button">
+					<button class="geolocation-button"></button>
+				</div>			
+			</div>
+			<div id="footer">
+				<div class="footer-left">&nbsp</div>
+				<div class="footer-middle">
+					<ul>				
+						<li><a id="enkoping" href="http://www.enkoping.se/" target="blank">Enköping</a></li>
+						<li><a id="eskilstuna" href="http://www.eskilstuna.se/" target="blank">Eskilstuna</a></li>
+						<li><a id="strangnas" href="http://www.strangnas.se/" target="blank">Strängnäs</a></li>
+						<li><a id="vasteras" href="http://www.vasteras.se/" target="blank">Västerås</a></li>
+					</ul>
+				</div>
+				<div class="footer-right">
 				</div>
 			</div>				
 		</div>
