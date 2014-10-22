@@ -33,13 +33,13 @@
 	     		}
 	     	},
 	     	layers: [{
-	     		name: 'fmis_punkter_4k',
-	     		source: 'local',
-	     		title: 'Forminnen, punkt',
-	     		gutter: 50,
-	     		type: 'WMS',
-	     		visible: false
-	     	}, {	     		
+	     	// 	name: 'fmis_punkter_4k',
+	     	// 	source: 'local',
+	     	// 	title: 'Forminnen, punkt',
+	     	// 	gutter: 50,
+	     	// 	type: 'WMS',
+	     	// 	visible: false
+	     	// }, {	     		
 	     		format: 'image/png',
 	     		name: 'fmis_ytor_4k',
 	     		source: 'local',
@@ -47,6 +47,12 @@
 	     		type: 'WMS',
 	     		visible: false
 	     	}, {
+	     		name: 'fmis_punkter_4k',
+	     		source: 'local_wfs',
+	     		title: 'Forminnen, punkt',
+	     		type: 'WFS',
+	     		visible: true
+	     	}, {	     		
 	     		name: 'mdk',
 	     		opacity: 0.15,
 	     		title: 'Mdk',

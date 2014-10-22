@@ -241,52 +241,46 @@ var Viewer = (function($){
             stroke: layersConfig.style['stroke'] ? new ol.style.Stroke(layersConfig.style['stroke']) : null
           })                  
         })
-    },    
-    // addWFS: function(layersConfig) {
-    //     var vectorSource = new ol.source.ServerVector({
-    //       format: new ol.format.GeoJSON(),
-    //       loader: function(extent, resolution, projection) {
-    //         var url = settings.source[layersConfig.source].url + '?service=WFS&' +
-    //             'version=1.1.0&request=GetFeature&typeName=' + layersConfig.name +
-    //             '&outputFormat=text/javascript&format_options=callback:loadFeatures' +
-    //             '&srsname=' + settings.projectionCode + '&bbox=' + extent.join(',') + ',' + settings.projectionCode;
-    //         $.ajax({
-    //           url: url,
-    //           dataType: 'jsonp',
-    //           error: function(jqXHR, textStatus, errorThrown) {
-    //             alert(errorThrown);
-    //           },
-    //           loadFeatures: function(response) {
-    //               alert('hej');
-    //               vectorSource.addFeatures(vectorSource.readFeatures(response));
-    //           }
-    //         });
-    //       },
-    //       strategy: ol.loadingstrategy.createTile(new ol.tilegrid.XYZ({
-    //         maxZoom: settings.resolutions.length
-    //       })),
-    //       projection: settings.projectionCode
-    //     });
+    },  
+    addWFS: function(layersConfig) {
+        var vectorSource;
 
-    //     //Callback function for jsonp
-    //     var loadFeatures = function(response) {
-    //       alert('hej');
-    //       vectorSource.addFeatures(vectorSource.readFeatures(response));
-          
-    //     }; 
+        vectorSource = new ol.source.ServerVector({
+          format: new ol.format.GeoJSON(),
+          loader: function(extent, resolution, projection) {
+            var that = this;
+            var url = settings.source[layersConfig.source].url + '?service=WFS&' +
+                'version=1.1.0&request=GetFeature&typeName=' + layersConfig.name +
+                '&outputFormat=text/javascript&format_options=callback:loadFeatures' +
+                '&srsname=' + settings.projectionCode + '&bbox=' + extent.join(',') + ',' + settings.projectionCode;
+            $.ajax({
+              url: url,
+              dataType: 'jsonp'
+            });            
+          },
+          strategy: ol.loadingstrategy.createTile(new ol.tilegrid.XYZ({
+            maxZoom: settings.resolutions.length
+          })),
+          projection: settings.projectionCode
+        });
+
+        // Callback function for jsonp
+        window.loadFeatures = function(response) {        
+          vectorSource.addFeatures(vectorSource.readFeatures(response));
+        }; 
             
-    //     return new ol.layer.Vector({
-    //       name: layersConfig.name.split(':').pop(),
-    //       title: layersConfig.title,
-    //       source: vectorSource,
-    //       style: new ol.style.Style({
-    //         image: new ol.style.Circle({
-    //           radius: 20,
-    //           fill: new ol.style.Fill({color: 'black'})
-    //         })
-    //       })
-    //     })
-    // },
+        return new ol.layer.Vector({
+          name: layersConfig.name.split(':').pop(),
+          title: layersConfig.title,
+          source: vectorSource,
+          style: new ol.style.Style({
+            image: new ol.style.Circle({
+              radius: 8,
+              fill: new ol.style.Fill({color: 'black'})
+            })
+          })
+        })
+    },
     addGetFeatureInfo: function() {
         Popup.init('#map');
 
