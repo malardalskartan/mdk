@@ -31,7 +31,7 @@ var Viewer = (function($){
         settings.zoom = mapSettings.zoom;
         settings.resolutions = mapSettings.resolutions;
         settings.source = mapSettings.source;
-        this.createLayers(mapSettings.layers); //read layers from mapSettings      
+        this.createLayers(mapSettings.layers, settings.layers); //read layers from mapSettings      
 
         //If url arguments, parse this settings
         if (window.location.search) {
@@ -58,7 +58,7 @@ var Viewer = (function($){
         }    
       this.bindFooter();
     	this.loadMap();
-      this.addGetFeatureInfo();
+      this.addFeatureInfo();
 
       //Check size for attribution mode
       $(window).on('resize', this.checkSize);
@@ -71,22 +71,32 @@ var Viewer = (function($){
       ShareMap.init();
       Geoposition.init();
       Print.init();
+
     },
-    createLayers: function(layerlist) {
+    createLayers: function(layerlist, layerTarget) {
         for(var i=layerlist.length-1; i>=0; i--) {
             if(layerlist[i].type == 'WMTS') {
-                settings.layers.push(Viewer.addWMTS(layerlist[i]));
+                layerTarget.push(Viewer.addWMTS(layerlist[i]));
             }
             else if(layerlist[i].type == 'WMS') {
-                settings.layers.push(Viewer.addWMS(layerlist[i]));
+                layerTarget.push(Viewer.addWMS(layerlist[i]));
             }
             else if(layerlist[i].type == 'WFS') {
-                settings.layers.push(Viewer.addWFS(layerlist[i]));
+                layerTarget.push(Viewer.addWFS(layerlist[i]));
             }
             else if(layerlist[i].type == 'GEOJSON') {
-                settings.layers.push(Viewer.addGeoJson(layerlist[i]));
-            }            
+                layerTarget.push(Viewer.addGeoJson(layerlist[i]));
+            } 
+            else if(layerlist[i].type == 'GROUP') {
+                layerTarget.push(Viewer.createLayerGroup(layerlist[i].layers, layerlist[i]));
+            }          
         }
+        return layerTarget;
+    },
+    createLayerGroup: function(layers, layersConfig) {
+      var group = [];
+      group = Viewer.createLayers(layers, group);
+      return new ol.layer.Group({name: layersConfig.name, title: layersConfig.title, layers: group});
     },
     loadMap: function(){
 	    map = new ol.Map({
@@ -236,14 +246,11 @@ var Viewer = (function($){
           source: new ol.source.GeoJSON({
             url: layersConfig.source
           }),
-          style: new ol.style.Style({
-            fill: layersConfig.style['fill'] ? new ol.style.Fill(layersConfig.style['fill']) : null,
-            stroke: layersConfig.style['stroke'] ? new ol.style.Stroke(layersConfig.style['stroke']) : null
-          })                  
+          style: Viewer.createStyle(layersConfig.style)                  
         })
     },  
     addWFS: function(layersConfig) {
-        var vectorSource;
+        var vectorSource = null;
 
         vectorSource = new ol.source.ServerVector({
           format: new ol.format.GeoJSON(),
@@ -251,11 +258,14 @@ var Viewer = (function($){
             var that = this;
             var url = settings.source[layersConfig.source].url + '?service=WFS&' +
                 'version=1.1.0&request=GetFeature&typeName=' + layersConfig.name +
-                '&outputFormat=text/javascript&format_options=callback:loadFeatures' +
+                '&outputFormat=json' +
                 '&srsname=' + settings.projectionCode + '&bbox=' + extent.join(',') + ',' + settings.projectionCode;
             $.ajax({
               url: url,
-              dataType: 'jsonp'
+              dataType: 'json',
+              success: function(response) {
+                vectorSource.addFeatures(vectorSource.readFeatures(response));
+              }
             });            
           },
           strategy: ol.loadingstrategy.createTile(new ol.tilegrid.XYZ({
@@ -264,22 +274,111 @@ var Viewer = (function($){
           projection: settings.projectionCode
         });
 
-        // Callback function for jsonp
-        window.loadFeatures = function(response) {        
-          vectorSource.addFeatures(vectorSource.readFeatures(response));
-        }; 
-            
-        return new ol.layer.Vector({
+        var options = {
           name: layersConfig.name.split(':').pop(),
           title: layersConfig.title,
-          source: vectorSource,
-          style: new ol.style.Style({
-            image: new ol.style.Circle({
-              radius: 8,
-              fill: new ol.style.Fill({color: 'black'})
-            })
-          })
-        })
+          visible: layersConfig.visible,          
+          attributes: layersConfig.attributes     
+        }
+
+        var styleOptions = Viewer.createStyle(layersConfig.style);
+
+        var layerType = layersConfig.vectorSource ? layersConfig.vectorSource : 'vector';
+
+        if (layerType == 'vector') {
+          options.source = vectorSource;
+          options.style = styleOptions;
+          return new ol.layer.Vector(options);                                 
+        }
+        else if (layerType == 'image') {
+          options.source = new ol.source.ImageVector({
+            source: vectorSource,
+            style: styleOptions
+          });
+          return new ol.layer.Image(options);
+        }
+    },
+    createStyle: function(styleName) {
+          var name = styleName;
+          var style = (function() {
+            var styleOptions = {
+              fill: styleSettings[name].fill ? new ol.style.Fill(styleSettings[name].fill) : undefined,
+              stroke: styleSettings[name].stroke ? new ol.style.Stroke(styleSettings[name].stroke) : undefined,
+              image: styleSettings[name].icon ? new ol.style.Icon(styleSettings[name].icon) : undefined,
+              circle: styleSettings[name].circle ? new ol.style.Circle(styleSettings[name].circle) : undefined
+            };
+            var styleInstance = [new ol.style.Style(styleOptions)];            
+            return function(feature,resolution) {
+              return styleInstance;
+            }
+          })()
+          return style;   
+    },
+    getAttributes: function(feature, layer) {
+        var content = '<ul>';
+        var attribute, li = '', title, val;
+        //If layer is configured with attributes
+        if(layer.get('attributes')) {
+          for(var i=0; i<layer.get('attributes').length; i++) {
+            attribute = layer.get('attributes')[i];
+            title = '';
+            if (attribute['name']) {
+              val = feature.get(attribute['name']);
+              if (attribute['title']) {
+                title = '<b>' + attribute['title'] + ': </b>';
+              }
+              if (attribute['url']) {
+                val = '<a href="' + feature.get(attribute['url']) + '" target="blank">' +
+                      feature.get(attribute['name']) + 
+                      '</a>';
+              }
+              if (attribute['urlPrefix'] && attribute['url']) {
+                val = '<a href="' + attribute['urlPrefix'] + feature.get(attribute['url']) + '" target="blank">' + 
+                      feature.get(attribute['name']) +
+                      '</a>';
+              } 
+            }
+            else if (attribute['html']) {
+              val = attribute['html'];
+            }
+
+            li += '<li>' + title + val + '</li>';
+          }
+        }
+        content += li + '</ul>';
+        return content;
+    },
+    addFeatureInfo: function() {
+        Popup.init('#map');
+
+        var overlay = new ol.Overlay({
+          element: $('#popup')
+        });
+
+        map.addOverlay(overlay);
+
+        map.on('click', function(evt) {
+          var l;
+          var feature = map.forEachFeatureAtPixel(evt.pixel,
+              function(feature, layer) {
+                l = layer;
+                return feature;
+              });
+          if (feature) {
+            var geometry = feature.getGeometry();
+            var coord;
+            geometry.getType() == 'Point' ? coord = geometry.getCoordinates() : coord = evt.coordinate;
+            overlay.setPosition(coord);
+            var content = Viewer.getAttributes(feature,l);
+            Popup.setContent({content: content, title: l.get('title')});            
+            Popup.setVisibility(true);
+            Viewer.autoPan();
+         
+          } else {
+            Popup.setVisibility(false);
+          }
+          evt.preventDefault();
+        });      
     },
     addGetFeatureInfo: function() {
         Popup.init('#map');
@@ -309,40 +408,7 @@ var Viewer = (function($){
                       
                       Popup.setContent({content: data, title: l.get('title')});
                       Popup.setVisibility(true);
-
-                      /*Workaround to remove when autopan implemented for overlays */
-                        var el=$('.popup');
-                        var center = map.getView().getCenter();
-                        var popupOffset = $(el).offset();
-                        var mapOffset = $('#' + map.getTarget()).offset();
-                        var offsetY = popupOffset.top - mapOffset.top;
-                        var mapSize = map.getSize();
-                        var offsetX = (mapOffset.left + mapSize[0])-(popupOffset.left+$(el).outerWidth(true));
-                        // Check if mapmenu widget is used and opened
-                        var menuSize = 0;
-                        if(MapMenu) {
-                          menuSize = MapMenu.getTarget().offset().left > 0 ? mapSize[0]- MapMenu.getTarget().offset().left : menuSize = 0;                 
-                        }
-                        if (offsetY < 0 || offsetX < 0 + menuSize || offsetX > (mapSize[0]-$(el).outerWidth(true))) {
-                          var dx = 0, dy = 0;
-                          if (offsetX < 0 + menuSize) {
-                            dx = (-offsetX + menuSize)*map.getView().getResolution();
-                          }
-                          if (offsetX > (mapSize[0]-$(el).outerWidth(true))) {
-                            dx = -($(el).outerWidth(true)-(mapSize[0]-offsetX))*map.getView().getResolution();
-                          }                         
-                          if (offsetY < 0) {
-                            dy = (-offsetY)*map.getView().getResolution();
-                          }
-                          var pan = ol.animation.pan({
-                            duration: 300,
-                            source: center
-                          });
-                          map.beforeRender(pan);
-                          map.getView().setCenter([center[0]+dx, center[1]+dy]);
-
-                        }
-                      /*End workaround*/
+                      Viewer.autoPan();
 
                       }/*End if empty*/
                       else {
@@ -363,6 +429,41 @@ var Viewer = (function($){
         });
           
     },
+    autoPan: function() {
+    /*Workaround to remove when autopan implemented for overlays */
+      var el=$('.popup');
+      var center = map.getView().getCenter();
+      var popupOffset = $(el).offset();
+      var mapOffset = $('#' + map.getTarget()).offset();
+      var offsetY = popupOffset.top - mapOffset.top;
+      var mapSize = map.getSize();
+      var offsetX = (mapOffset.left + mapSize[0])-(popupOffset.left+$(el).outerWidth(true));
+      // Check if mapmenu widget is used and opened
+      var menuSize = 0;
+      if(MapMenu) {
+        menuSize = MapMenu.getTarget().offset().left > 0 ? mapSize[0]- MapMenu.getTarget().offset().left : menuSize = 0;                 
+      }
+      if (offsetY < 0 || offsetX < 0 + menuSize || offsetX > (mapSize[0]-$(el).outerWidth(true))) {
+        var dx = 0, dy = 0;
+        if (offsetX < 0 + menuSize) {
+          dx = (-offsetX + menuSize)*map.getView().getResolution();
+        }
+        if (offsetX > (mapSize[0]-$(el).outerWidth(true))) {
+          dx = -($(el).outerWidth(true)-(mapSize[0]-offsetX))*map.getView().getResolution();
+        }                         
+        if (offsetY < 0) {
+          dy = (-offsetY)*map.getView().getResolution();
+        }
+        var pan = ol.animation.pan({
+          duration: 300,
+          source: center
+        });
+        map.beforeRender(pan);
+        map.getView().setCenter([center[0]+dx, center[1]+dy]);
+
+      }
+    /*End workaround*/
+    },    
     bindFooter: function() {
       $('#home-button').on('touchend click', function(e) {
         var homeb = [105085, 6571627, 219773, 6628182];
