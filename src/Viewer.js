@@ -31,6 +31,8 @@ var Viewer = (function($){
         settings.zoom = mapSettings.zoom;
         settings.resolutions = mapSettings.resolutions;
         settings.source = mapSettings.source;
+        settings.home = mapSettings.home;
+        settings.groups = mapSettings.groups;
         this.createLayers(mapSettings.layers, settings.layers); //read layers from mapSettings      
 
         //If url arguments, parse this settings
@@ -56,7 +58,7 @@ var Viewer = (function($){
         else {
             mapControls.push(new ol.control.FullScreen());
         }    
-      this.bindFooter();
+      this.bindHome(settings.home);
     	this.loadMap();
       this.addFeatureInfo();
 
@@ -67,7 +69,7 @@ var Viewer = (function($){
       MapMenu.init([{
         itemName: 'ShareMap'
       }
-      ]);
+      ], settings.groups);
       ShareMap.init();
       Geoposition.init();
       Print.init();
@@ -104,7 +106,6 @@ var Viewer = (function($){
 	      controls: mapControls,
 	      layers: settings.layers,
 	      view: new ol.View({
-          renderer: 'canvas',
           extent: settings.extent,
 	      	projection: settings.projection,
 	        center: settings.center,
@@ -193,6 +194,8 @@ var Viewer = (function($){
           group: layersConfig.group || 'default',
           opacity: layersConfig.opacity || 1,          
           title: layersConfig.title,
+          minResolution: layersConfig.hasOwnProperty('minScale') ? Viewer.scaleToResolution(layersConfig.minScale): undefined,
+          maxResolution: layersConfig.hasOwnProperty('maxScale') ? Viewer.scaleToResolution(layersConfig.maxScale): undefined,            
           type: layersConfig.type,
           visible: layersConfig.visible,           
           source: new ol.source.TileWMS(({
@@ -217,6 +220,8 @@ var Viewer = (function($){
            name: layersConfig.name.split(':').pop(), //remove workspace part of name
            opacity: layersConfig.opacity || 1,
            title: layersConfig.title,
+           minResolution: layersConfig.hasOwnProperty('minScale') ? Viewer.scaleToResolution(layersConfig.minScale): undefined,
+           maxResolution: layersConfig.hasOwnProperty('maxScale') ? Viewer.scaleToResolution(layersConfig.maxScale): undefined,             
            visible: layersConfig.visible,
            source: new ol.source.WMTS({
              crossOrigin: 'anonymous',
@@ -241,6 +246,9 @@ var Viewer = (function($){
           group: 'none',
           name: layersConfig.name.split(':').pop(),
           opacity: layersConfig.opacity || 1,
+          queryable: layersConfig.hasOwnProperty('queryable') ? layersConfig.queryable : true,
+          minResolution: layersConfig.hasOwnProperty('minScale') ? Viewer.scaleToResolution(layersConfig.minScale): undefined,
+          maxResolution: layersConfig.hasOwnProperty('maxScale') ? Viewer.scaleToResolution(layersConfig.maxScale): undefined,            
           title: layersConfig.title,
           visible: layersConfig.visible,
           source: new ol.source.GeoJSON({
@@ -277,6 +285,10 @@ var Viewer = (function($){
         var options = {
           name: layersConfig.name.split(':').pop(),
           title: layersConfig.title,
+          opacity: layersConfig.opacity || 1,          
+          queryable: layersConfig.hasOwnProperty('queryable') ? layersConfig.queryable : true,
+          minResolution: layersConfig.hasOwnProperty('minScale') ? Viewer.scaleToResolution(layersConfig.minScale): undefined,
+          maxResolution: layersConfig.hasOwnProperty('maxScale') ? Viewer.scaleToResolution(layersConfig.maxScale): undefined,                  
           visible: layersConfig.visible,          
           attributes: layersConfig.attributes     
         }
@@ -299,20 +311,72 @@ var Viewer = (function($){
         }
     },
     createStyle: function(styleName) {
-          var name = styleName;
+          var s = styleSettings[styleName];
+
           var style = (function() {
-            var styleOptions = {
-              fill: styleSettings[name].fill ? new ol.style.Fill(styleSettings[name].fill) : undefined,
-              stroke: styleSettings[name].stroke ? new ol.style.Stroke(styleSettings[name].stroke) : undefined,
-              image: styleSettings[name].icon ? new ol.style.Icon(styleSettings[name].icon) : undefined,
-              circle: styleSettings[name].circle ? new ol.style.Circle(styleSettings[name].circle) : undefined
-            };
-            var styleInstance = [new ol.style.Style(styleOptions)];            
+            var styleList=[];
+            for (var i = 0; i < s.length; i++) {
+              var styleOptions = {
+                fill: s[i].fill ? new ol.style.Fill(s[i].fill) : undefined,
+                stroke: s[i].stroke ? new ol.style.Stroke(s[i].stroke) : undefined,
+                image: s[i].icon ? new ol.style.Icon(s[i].icon) : undefined,
+                circle: s[i].circle ? new ol.style.Circle(s[i].circle) : undefined
+              };
+              var styleInstance = [new ol.style.Style(styleOptions)];
+              styleList.push(styleInstance);
+            }
+
             return function(feature,resolution) {
-              return styleInstance;
+              var scale = Viewer.getScale(resolution);
+              for (var j=0; j<s.length; j++) {
+                var styleL;
+                if (s[j].filter) {
+                  if(eval('"' + feature.get(s[j].filter.attribute) + '"' + s[j].filter.operand + '"' + s[j].filter.value + '"')) {
+                    styleL = styleList[j];
+                  }
+                }
+                else {
+                  styleL = styleList[j];                
+                }
+                if (s[j].maxScale || s[j].minScale) {
+                  if(s[j].maxScale && s[j].minScale) {
+                    if ((scale > s[j].maxScale) && (scale < s[j].minScale)) {
+                      return styleL;
+                    }
+                  }
+                  else if (s[j].maxScale) {
+                    if(scale > s[j].maxScale) {
+                      return styleL;  
+                    }
+                  }
+                  else if (s[j].minScale) {
+                    if(scale > s[j].minScale) {
+                      return styleL;  
+                    }
+                  }                  
+                }
+                else {
+                  return styleL;
+                }                        
+              }
             }
           })()
-          return style;   
+          return style; 
+          
+    },
+    getScale: function(resolution) {
+      var view = map.getView(); ;
+      var dpi = 25.4 / 0.28;
+      var mpu = map.getView().getProjection().getMetersPerUnit();
+      var scale = resolution * mpu * 39.37 * dpi;
+      scale = Math.round(scale);
+      return scale;
+    },
+    scaleToResolution: function(scale) {
+      var dpi = 25.4 / 0.28;
+      var mpu = settings.projection.getMetersPerUnit();
+      var resolution = scale / (mpu * 39.37 * dpi);
+      return resolution;      
     },
     getAttributes: function(feature, layer) {
         var content = '<ul>';
@@ -362,7 +426,9 @@ var Viewer = (function($){
           var feature = map.forEachFeatureAtPixel(evt.pixel,
               function(feature, layer) {
                 l = layer;
-                return feature;
+                if(l.get('queryable') == true) {
+                  return feature;
+              }
               });
           if (feature) {
             var geometry = feature.getGeometry();
@@ -464,9 +530,9 @@ var Viewer = (function($){
       }
     /*End workaround*/
     },    
-    bindFooter: function() {
+    bindHome: function(home) {
+      var homeb = home;
       $('#home-button').on('touchend click', function(e) {
-        var homeb = [105085, 6571627, 219773, 6628182];
         map.getView().fitExtent(homeb, map.getSize());
         $('#home-button button').blur();
         e.preventDefault();

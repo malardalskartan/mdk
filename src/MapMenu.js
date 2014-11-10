@@ -11,10 +11,10 @@ var MapMenu = (function($){
   };
 
   return {
-    init: function(menuSettings){
+    init: function(menuSettings, groups){
         this.loadMenuItems(menuSettings);
         this.bindUIActions();
-        this.addLegend();
+        this.addLegend(groups);
     },
     bindUIActions: function() {
     	settings.menuButton.on('touchend click', function(e) {
@@ -40,25 +40,37 @@ var MapMenu = (function($){
         settings.menuButton.addClass('mapmenu-button-false');
       }
     },
-    addLegend: function() {
+    addLegend: function(groups) {
       var layers = Viewer.getLayers();
-      var legend ='<div id="legendlist">' + 
-                    '<ul>' + 
-                        '<li>' +
-                          '<ul id="group-default">' +
-                          '</ul>' + 
-                        '</li>' +
-                        '<li class="menu-item-divider"></li>' +
-                        '<li>' + 
-                          '<ul id="group-background">' +
-                          '</ul>' + 
-                        '</li>' +                                   
-                    '</ul>' +
-                  '</div>';
-      $('#mapmenu').append(legend);
+      var legendGroup;
+      //Add legend groups
+      var legend = '<div id="legendlist"><ul class="legendlist"></ul></div>';
+      $('#mapmenu').append(legend);                
+      for (var i=0; i < groups.length; i++) {
+        legendGroup ='<li>' +
+                       '<ul id="group-' + groups[i].name + '" class="legend-group">' +
+                          '<li class="legend-header"><div class="legend-item">' + groups[i].title + '<div class="icon-expand"></div></div></li>' +
+                       '</ul>' + 
+                     '</li>';
+        $('#legendlist .legendlist').append(legendGroup);
+        if(groups[i].expanded == true) {
+          $('#group-' + groups[i].name +' .icon-expand').addClass('icon-expand-true');
+        }
+        else{
+          $('#group-' + groups[i].name +' .icon-expand').addClass('icon-expand-false'); 
+          $('#group-' + groups[i].name).addClass('ul-expand-false');                             
+        }
+        //Event listener for tick layer
+        $('#group-' + groups[i].name + ' .legend-header').on('touchend click', function() {
+          MapMenu.toggleGroup($(this));
+        });     
+      }
+
+
+      //Add layers to legend
       for (var i=layers.length-1; i>=0; i--) {
         var name = (layers[i].get('name'));
-        var item = '<li><div class ="legend-item" id="' + name + '"><div><div class="checkbox"></div>';
+        var item = '<li class="legend"><div class ="legend-item" id="' + name + '"><div><div class="checkbox"></div>';
         item += layers[i].get('title') + '</div></div></li>';
         //Append layer to group in legend. Add to default group if not defined.
         if(layers[i].get('group')) {     
@@ -87,9 +99,23 @@ var MapMenu = (function($){
         }
 
         //Event listener for tick layer
-        $('#' + name).click(function() {
+        $('#' + name).on('touchend click', (function() {
           MapMenu.toggleCheck($(this).attr("id"));
-        })
+        }));
+      }
+    },
+    toggleGroup: function(groupheader) {
+      var group = groupheader.parent('.legend-group');
+      var groupicon = $('#' + group.attr('id') + ' .icon-expand');
+      if (groupicon.hasClass('icon-expand-false')) {
+        groupicon.removeClass('icon-expand-false');
+        groupicon.addClass('icon-expand-true');
+        group.removeClass('ul-expand-false');
+      }
+      else {
+        groupicon.removeClass('icon-expand-true');
+        groupicon.addClass('icon-expand-false');
+        group.addClass('ul-expand-false');
       }
     },
     toggleCheck: function(layerid) {

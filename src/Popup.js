@@ -19,7 +19,7 @@ var Popup = (function($){
     },
     bindUIActions: function() {
       var that = this;
-      $('#popup .popup .close-button').click(function() {
+      $('#popup .popup .close-button').on('touchend click', function() {
         that.closePopup();
       });   
     },    

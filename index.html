@@ -17,6 +17,7 @@
 	     	projectionExtent: [-1678505.1838360203,4665380.0,2431912.7361639794,8775797.92],
 	     	extent: [-1678505.1838360203,4665380.0,2431912.7361639794,8775797.92],
 	     	center: [162429, 6599905],
+	     	home: [105085, 6571627, 219773, 6628182],
 	     	zoom: 3,
 	     	resolutions: [1146.8799999999999, 573.4399999999999, 286.71999999999997, 143.35999999999999, 71.67999999999999, 35.839999999999996, 17.919999999999998, 8.959999999999999, 4.4799999999999995, 2.2399999999999998, 1.1199999999999999, 0.5599999999999999, 0.27999999999999997, 0.13999999999999999],
 	     	source: {
@@ -33,6 +34,23 @@
 	     			url: 'http://karta.enkoping.se/geowebcache/service/wmts'
 	     		}
 	     	},
+	     	groups: [{
+	     		name: 'default',
+	     		title: 'Lager',
+	     		expanded: true
+	     	},{	     		
+	     	// 	name: 'naringsliv',
+	     	// 	title: 'Näringsliv',
+	     	// 	expanded: true
+	     	// },{
+	     	// 	name: 'bestammelser',
+	     	// 	title: 'Bestämmelser',
+	     	// 	expanded: true
+	     	// },{	     		
+	     		name: 'background',
+	     		title: 'Bakgrundskartor',
+	     		expanded: true	
+	     	}],
 	     	layers: [{    		     		     		
 	     		name: 'mdk',
 	     		opacity: 0.15,
@@ -40,8 +58,26 @@
 	     		source: 'data/mdk.geojson',
 	     		style: 'mask',
 	     		type: 'GEOJSON',
+		     	queryable: false,	     		
 	     		visible: true
 	     	}, {
+		     	attributes: [{
+		     			name: 'raa_nummer',
+		     			title: 'RAÄ-nummer',
+		     			url: 'url'
+		     		},{
+		     			name: 'lamningtyp',
+		     			title: 'Lämningstyp'
+		     		},{
+		     			html: 'Valfri html'
+		     	}],
+		     	name: 'fmis_punktval',
+		     	source: 'local',
+				style: 'fmis_punktval',	     		
+		     	title: 'Forminnen, punkter',
+		     	type: 'WFS',
+		     	visible: false     		
+	     	}, {	     		
 		     	attributes: [{
 		     			name: 'raa_nummer',
 		     			title: 'RAÄ-nummer',
@@ -59,7 +95,48 @@
 		     	type: 'WFS',
 		     	vectorSource: 'vector',
 		     	visible: false     		
+	     	}, {
+		     	name: 'ledig_naringsmark',
+		     	source: 'local',
+				style: 'ledig_naringsmark',	     		
+		     	title: 'Ledig näringslivsmark',
+		     	type: 'WFS',
+		     	visible: false,
+		     	maxScale: 10000,
+		     	attributes: [{
+		     			name: 'FASTIGHET',
+		     			title: 'Fastighet',
+		     		},{
+		     			name: 'TYP',
+		     			title: 'Typ'
+		     	}],		     	     		
+	     	}, {
+		     	name: 'etableringsomraden',
+		     	source: 'local',
+				style: 'fornminnen_ytor',	     		
+		     	title: 'Etableringsområden',
+		     	type: 'WFS',
+		     	visible: false,
+		     	attributes: [{
+		     			name: 'ETABL_OMR',
+		     			title: 'Etableringsområde',
+		     		},{
+		     			name: 'BESKRIVNIN',
+		     			title: 'Beskrivning'
+		     	}],		     	     		
 	     	}, {	     		
+		     	name: 'pagaende_detaljplaner',
+		     	source: 'local',
+				style: 'fornminnen_ytor',	     		
+		     	title: 'Pågående detaljplaner',
+		     	type: 'WFS',
+		     	visible: false,
+		     	attributes: [{
+		     			name: 'NAMN',
+		     			title: 'Namn',
+		     			url: 'LANK'
+		     	}],		     	     		
+	     	}, {		     		     	     		
 	     		attribution: '&copy&nbspLantmäteriet&nbspGeodatasamverkan',		     		
 	     		format: 'image/png',
 	     		group: 'background',

@@ -680,6 +680,42 @@ li .menu-button:hover {
   padding: 5px;
   width: 100%;
 }
+li .legend-header {
+  border-bottom: 1px solid #C5C5C5;  
+}
+.legend-group li:last-child {
+  border-bottom: 1px solid #C5C5C5;  
+}
+ul.legendlist:first-child {
+  border-top: 1px solid #C5C5C5;  
+}
+ul.legendlist > li:last-child .legend-group li:last-child {
+  border-bottom: none;  
+}
+li .legend-header:hover {
+  background-color: #EEEEEE;
+}
+li .icon-expand {
+  display: inline;
+  float: right;
+  padding: 0 4px;
+}
+li .icon-expand:after {
+  font-family: 'FontAwesome';   
+  font-size: 0.9em; 
+  height: 1.3em;
+  vertical-align: middle;
+  width: 1.5em;
+}
+li .icon-expand-false:after {
+  content: "\f054";
+}
+li .icon-expand-true:after {
+  content: "\f078";
+}
+.ul-expand-false .legend {
+  display: none;
+}
 li .legend-item {
   cursor: pointer;
   font-family: Arial,sans-serif;
@@ -717,7 +753,7 @@ li .legend-item:hover {
   visibility: hidden;
 }
 .menu-item-divider {
-  border-bottom: 1px solid #C5C5C5;
+  /*border-bottom: 1px solid #C5C5C5;*/
   margin: 0.5em 0em;
 }
 .menu-item-empty {
