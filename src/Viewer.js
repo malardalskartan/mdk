@@ -55,9 +55,9 @@ var Viewer = (function($){
         if(window.top!=window.self) {
             MapWindow.init();
         }
-        else {
-            mapControls.push(new ol.control.FullScreen());
-        }    
+        // else {
+        //     mapControls.push(new ol.control.FullScreen());
+        // }    
       this.bindHome(settings.home);
     	this.loadMap();
       this.addFeatureInfo();
@@ -285,6 +285,7 @@ var Viewer = (function($){
         var options = {
           name: layersConfig.name.split(':').pop(),
           title: layersConfig.title,
+          group: layersConfig.group || 'default',
           opacity: layersConfig.opacity || 1,          
           queryable: layersConfig.hasOwnProperty('queryable') ? layersConfig.queryable : true,
           minResolution: layersConfig.hasOwnProperty('minScale') ? Viewer.scaleToResolution(layersConfig.minScale): undefined,
@@ -365,9 +366,8 @@ var Viewer = (function($){
           
     },
     getScale: function(resolution) {
-      var view = map.getView(); ;
       var dpi = 25.4 / 0.28;
-      var mpu = map.getView().getProjection().getMetersPerUnit();
+      var mpu = settings.projection.getMetersPerUnit();
       var scale = resolution * mpu * 39.37 * dpi;
       scale = Math.round(scale);
       return scale;

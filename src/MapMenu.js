@@ -43,10 +43,14 @@ var MapMenu = (function($){
     addLegend: function(groups) {
       var layers = Viewer.getLayers();
       var legendGroup;
+      var defaultGroup = 'default';
       //Add legend groups
       var legend = '<div id="legendlist"><ul class="legendlist"></ul></div>';
       $('#mapmenu').append(legend);                
       for (var i=0; i < groups.length; i++) {
+        if (groups[i].hasOwnProperty('defaultGroup')) {
+          defaultGroup = groups[i].name;
+        }
         legendGroup ='<li>' +
                        '<ul id="group-' + groups[i].name + '" class="legend-group">' +
                           '<li class="legend-header"><div class="legend-item">' + groups[i].title + '<div class="icon-expand"></div></div></li>' +
@@ -61,19 +65,31 @@ var MapMenu = (function($){
           $('#group-' + groups[i].name).addClass('ul-expand-false');                             
         }
         //Event listener for tick layer
-        $('#group-' + groups[i].name + ' .legend-header').on('touchend click', function() {
+        $('#group-' + groups[i].name + ' .legend-header').on('touchend click', function(evt) {
           MapMenu.toggleGroup($(this));
+          evt.preventDefault();
         });     
       }
+
+      //Add map legend
+      var mapLegend = '<div id="map-legend"><ul class="legend-default"></ul></div>';
+      $('#map').append(mapLegend);
 
 
       //Add layers to legend
       for (var i=layers.length-1; i>=0; i--) {
         var name = (layers[i].get('name'));
-        var item = '<li class="legend"><div class ="legend-item" id="' + name + '"><div><div class="checkbox"></div>';
+        var item = '<li class="legend"><div class ="legend-item ' + name + '" id="' + name + '"><div><div class="checkbox"></div>';
         item += layers[i].get('title') + '</div></div></li>';
         //Append layer to group in legend. Add to default group if not defined.
-        if(layers[i].get('group')) {     
+        if(layers[i].get('group') == defaultGroup) {
+          $('#group-' + layers[i].get('group')).append(item);            
+          item = '<li class="legend"><div class ="legend-item ' + name + '" id="default-' + name + '"><div><div class="checkbox"></div>';
+          item += layers[i].get('title') + '</div></div></li>';          
+          $('#map-legend .legend-default').append(item);                    
+                  
+        }
+        else if(layers[i].get('group')) {     
           $('#group-' + layers[i].get('group')).append(item);
         }
         else {
@@ -83,25 +99,29 @@ var MapMenu = (function($){
         //Append class according to visiblity and if group is background
         if(layers[i].get('group') == 'background') {
           if(layers[i].getVisible()==true) {
-            $('#' + name + ' .checkbox').addClass('check-true');
+            $('.' + name + ' .checkbox').addClass('check-true');
           }
           else {
-            $('#' + name + ' .checkbox').addClass('check-false');
+            $('.' + name + ' .checkbox').addClass('check-false');
           }  
         }
         else {
           if(layers[i].getVisible()==true) {
-            $('#' + name + ' .checkbox').addClass('checkbox-true');
+            $('.' + name + ' .checkbox').addClass('checkbox-true');
           }
           else {
-            $('#' + name + ' .checkbox').addClass('checkbox-false');
+            $('.' + name + ' .checkbox').addClass('checkbox-false');
           }  
         }
 
         //Event listener for tick layer
-        $('#' + name).on('touchend click', (function() {
-          MapMenu.toggleCheck($(this).attr("id"));
-        }));
+        $('.' + name).on('touchend click', function(evt) {
+          $(this).each(function() {
+            var that = this;
+            MapMenu.toggleCheck($(that).attr("id"));
+          });
+          evt.preventDefault();
+        });
       }
     },
     toggleGroup: function(groupheader) {
@@ -119,35 +139,36 @@ var MapMenu = (function($){
       }
     },
     toggleCheck: function(layerid) {
-      var layer = Viewer.getLayer(layerid);
+      var layername = layerid.split('default-').pop();
+      var layer = Viewer.getLayer(layername);
       if(layer.get('group') == 'background') {
-        if($('#' + layerid + ' .checkbox').hasClass('check-true')) {
-          $('#' + layerid + ' .checkbox').removeClass('check-true');
-          $('#' + layerid + ' .checkbox').addClass('check-false');
-          Viewer.getLayer(layerid).setVisible(false);        
+        if($('.' + layername + ' .checkbox').hasClass('check-true')) {
+          $('.' + layername + ' .checkbox').removeClass('check-true');
+          $('.' + layername + ' .checkbox').addClass('check-false');
+          layer.setVisible(false);        
         }
         else {
           var group = Viewer.getGroup('background'); 
           for(var i=0; i<group.length; i++) {
               group[i].setVisible(false);
-              $('#' + group[i].get('name') + ' .checkbox').removeClass('check-true');
-              $('#' + group[i].get('name') + ' .checkbox').addClass('check-false');              
+              $('.' + group[i].get('name') + ' .checkbox').removeClass('check-true');
+              $('.' + group[i].get('name') + ' .checkbox').addClass('check-false');              
           }
-          Viewer.getLayer(layerid).setVisible(true);
-          $('#' + layerid + ' .checkbox').removeClass('check-false');
-          $('#' + layerid + ' .checkbox').addClass('check-true');                
+          layer.setVisible(true);
+          $('.' + layername + ' .checkbox').removeClass('check-false');
+          $('.' + layername + ' .checkbox').addClass('check-true');                
         }  
       }
       else {
-        if($('#' + layerid + ' .checkbox').hasClass('checkbox-true')) {
-          $('#' + layerid + ' .checkbox').removeClass('checkbox-true');
-          $('#' + layerid + ' .checkbox').addClass('checkbox-false');
-          Viewer.getLayer(layerid).setVisible(false);        
+        if($('.' + layername + ' .checkbox').hasClass('checkbox-true')) {
+          $('.' + layername + ' .checkbox').removeClass('checkbox-true');
+          $('.' + layername + ' .checkbox').addClass('checkbox-false');
+          layer.setVisible(false);        
         }
         else {
-          $('#' + layerid + ' .checkbox').removeClass('checkbox-false');
-          $('#' + layerid + ' .checkbox').addClass('checkbox-true'); 
-          Viewer.getLayer(layerid).setVisible(true);       
+          $('.' + layername + ' .checkbox').removeClass('checkbox-false');
+          $('.' + layername + ' .checkbox').addClass('checkbox-true'); 
+          layer.setVisible(true);       
         }          
       }
     

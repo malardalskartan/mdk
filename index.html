@@ -35,10 +35,15 @@
 	     		}
 	     	},
 	     	groups: [{
-	     		name: 'default',
-	     		title: 'Lager',
+	     		name: 'naringsliv',
+	     		title: 'Näringsliv',
+	     		defaultGroup: true,
 	     		expanded: true
-	     	},{	     		
+	     	},{	
+	     		name: 'default',
+	     		title: 'Bestämmelser',
+	     		expanded: true
+	     	},{	 	     	     		
 	     	// 	name: 'naringsliv',
 	     	// 	title: 'Näringsliv',
 	     	// 	expanded: true
@@ -100,6 +105,7 @@
 		     	source: 'local',
 				style: 'ledig_naringsmark',	     		
 		     	title: 'Ledig näringslivsmark',
+		     	group: 'naringsliv',
 		     	type: 'WFS',
 		     	visible: false,
 		     	maxScale: 10000,
@@ -115,6 +121,7 @@
 		     	source: 'local',
 				style: 'fornminnen_ytor',	     		
 		     	title: 'Etableringsområden',
+		     	group: 'naringsliv',
 		     	type: 'WFS',
 		     	visible: false,
 		     	attributes: [{
@@ -171,7 +178,10 @@
 			</div>
 			<div id="home-button" class="mdk-button">
 				<button class="home-button"></button>
-			</div>							
+			</div>
+			<div id="geolocation-button" class="mdk-button">
+				<button class="geolocation-button"></button>
+			</div>											
 			<div id="mapmenu">
 				<div class="block">
 					<ul id="menutools"> 
@@ -193,9 +203,7 @@
 				</div>
 			</div>
 			<div id="bottom-tools">
-				<div id="geolocation-button" class="mdk-button">
-					<button class="geolocation-button"></button>
-				</div>			
+		
 			</div>
 			<div id="footer">
 				<div class="footer-left">&nbsp</div>
