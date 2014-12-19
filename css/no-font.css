@@ -1,0 +1,128 @@
+.wf-fontawesome-n4-inactive button {
+  background-color: #fff !important;
+}
+.wf-fontawesome-n4-inactive button.ol-zoom-in{
+  background: url('svg/black/f067_plus.svg') center center no-repeat;
+  background-size: 1em;
+}
+.wf-fontawesome-n4-inactive button.ol-zoom-out{
+  background: url('svg/black/f068_minus.svg') center center no-repeat;
+  background-size: 1em;
+}
+.wf-fontawesome-n4-inactive button.ol-full-screen-false{
+  background: url('svg/black/f065_expand.svg') center center no-repeat;
+  background-size: 1em;
+}
+.wf-fontawesome-n4-inactive button.ol-full-screen-true{
+  background: url('svg/black/f066_compress.svg') center center no-repeat;
+  background-size: 1em;
+}
+.wf-fontawesome-n4-inactive button.ol-full-screen-false:after,
+.wf-fontawesome-n4-inactive button.ol-full-screen-true:after,
+.wf-fontawesome-n4-inactive button.ol-zoom-in:after,
+.wf-fontawesome-n4-inactive button.ol-zoom-out:after{   
+  content: '';
+}
+.wf-fontawesome-n4-inactive button.geolocation-button{
+  background: url('svg/black/f124_location-arrow.svg') center center no-repeat;
+  background-size: 1.4em;
+}
+.wf-fontawesome-n4-inactive button.mapmenu-button-true{
+  background: url('svg/black/f0c9_bars.svg') center center no-repeat;
+  background-size: 1.4em;
+}
+.wf-fontawesome-n4-inactive button.mapmenu-button-false{
+  background: url('svg/black/f0c9_bars.svg') center center no-repeat;
+  background-size: 1.4em;
+}
+.wf-fontawesome-n4-inactive button.window-button{
+  background: url('svg/black/f065_expand.svg') center center no-repeat;
+  background-size: 1.4em;
+}
+.wf-fontawesome-n4-inactive button.home-button{
+  background: url('svg/black/f015_home.svg') center center no-repeat;
+  background-size: 1.6em;
+}
+.wf-fontawesome-n4-inactive button.geolocation-button:after,
+.wf-fontawesome-n4-inactive button.mapmenu-button-true:after,
+.wf-fontawesome-n4-inactive button.mapmenu-button-false:after,
+.wf-fontawesome-n4-inactive button.window-button:after,
+.wf-fontawesome-n4-inactive button.home-button:after {
+  content: '';
+}
+.wf-fontawesome-n4-inactive .menu-button .print-icon,
+.wf-fontawesome-n4-inactive .menu-button .share-icon{
+  height: 1.2em;
+  width: 1.2em;
+}
+.wf-fontawesome-n4-inactive .menu-button .share-icon{
+  background: url('svg/black/f045_share-square-o.svg') center center no-repeat;
+  background-size: 1.2em;
+}
+.wf-fontawesome-n4-inactive .menu-button .print-icon{
+  background: url('svg/black/f02f_print.svg') center center no-repeat;
+  background-size: 1.2em;
+}
+.wf-fontawesome-n4-inactive .menu-button .share-icon:after,
+.wf-fontawesome-n4-inactive .menu-button .print-icon:after {
+  content: '';  
+}
+.wf-fontawesome-n4-inactive li .icon-expand-false,
+.wf-fontawesome-n4-inactive li .icon-expand-true{  
+  height: 1.2em;
+  width: 1em;
+}
+.wf-fontawesome-n4-inactive li .icon-expand-false{
+  background: url('svg/black/f054_chevron-right.svg') center center no-repeat;
+  background-size: 1em;
+}
+.wf-fontawesome-n4-inactive li .icon-expand-true{
+  background: url('svg/black/f078_chevron-down.svg') center center no-repeat;
+  background-size: 1em;
+}
+.wf-fontawesome-n4-inactive li .icon-expand-false:after,
+.wf-fontawesome-n4-inactive li .icon-expand-true:after {
+  content: '';
+}
+.wf-fontawesome-n4-inactive .checkbox-true{
+  background: url('svg/black/f046_check-square-o.svg') center center no-repeat;
+  background-size: 1.1em;
+}
+.wf-fontawesome-n4-inactive .checkbox-false{
+  background: url('svg/black/f96_square-o.svg') center center no-repeat;
+  background-size: 1.1em;
+}
+.wf-fontawesome-n4-inactive .check-true{
+  background: url('svg/black/f00c_check.svg') center center no-repeat;
+  background-size: 1em;
+}
+.wf-fontawesome-n4-inactive .check-false{
+  background: url('svg/black/f00c_check.svg') center center no-repeat;
+  background-size: 1em;
+  visibility: hidden;  
+}
+.wf-fontawesome-n4-inactive .checkbox-true:after,
+.wf-fontawesome-n4-inactive .checkbox-false:after,
+.wf-fontawesome-n4-inactive .check-true:after,
+.wf-fontawesome-n4-inactive .check-false:after {
+  content: '';
+}
+.wf-fontawesome-n4-inactive #legend-overlay .toggle-button-max{
+  background: url('svg/black/f103_angle-double-down.svg') center center no-repeat;
+  background-size: 1em;
+}
+.wf-fontawesome-n4-inactive #legend-overlay .toggle-button-min{
+  background: url('svg/black/f102_angle-double-up.svg') center center no-repeat;
+  background-size: 1em;
+}
+.wf-fontawesome-n4-inactive #legend-overlay .toggle-button-max:after,
+.wf-fontawesome-n4-inactive #legend-overlay .toggle-button-min:after {
+  content: '';
+}
+.wf-fontawesome-n4-inactive #search-button.search-false{
+  background: url('svg/black/f002_search.svg') center center no-repeat;
+  background-size: 1.8em;
+}
+.wf-fontawesome-n4-inactive #search-button.search-false:after {
+  content: '';
+}

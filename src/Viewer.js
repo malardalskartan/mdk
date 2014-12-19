@@ -16,11 +16,18 @@ var Viewer = (function($){
     zoom: 0,
     resolutions: null, 
     source: {},
+    group: [],
     layers: []
   };
+  var cqlQuery, queryFinished = false;
  
   return {
     init: function(mapSettings){
+
+        if(!(Modernizr.canvas)) {
+          $('#wrapper').remove();
+          return;
+        }
         //Map settings to use for this viewer       
         settings.projectionCode = mapSettings.projectionCode;
         settings.projectionExtent = mapSettings.projectionExtent;
@@ -73,6 +80,7 @@ var Viewer = (function($){
       ShareMap.init();
       Geoposition.init();
       Print.init();
+      Search.init();
 
     },
     createLayers: function(layerlist, layerTarget) {
@@ -98,7 +106,7 @@ var Viewer = (function($){
     createLayerGroup: function(layers, layersConfig) {
       var group = [];
       group = Viewer.createLayers(layers, group);
-      return new ol.layer.Group({name: layersConfig.name, title: layersConfig.title, layers: group});
+      return new ol.layer.Group({name: layersConfig.name, group: layersConfig.group, title: layersConfig.title, styleName: layersConfig.style || 'default', layers: group, mapSource: layersConfig.source, visible: layersConfig.visible});
     },
     loadMap: function(){
 	    map = new ol.Map({
@@ -119,25 +127,44 @@ var Viewer = (function($){
     	var elements = str.split("&");          
 
     	for (var i = 0; i < elements.length; i++) {
-            //center coordinates
-            if (i==0) {
-                var z = elements[i].split(",");
-                settings.center[0] = parseInt(z[0]);
-                settings.center[1] = parseInt(z[1]);              
-            }
-            else if (i==1) {
-                settings.zoom = parseInt(elements[i]);
-            }             
+          //center coordinates
+         if (i==0) {
+             var z = elements[i].split(",");
+             settings.center[0] = parseInt(z[0]);
+             settings.center[1] = parseInt(z[1]);
+         }
+         else if (i==1) {
+             settings.zoom = parseInt(elements[i]);
+         }             
     		else if (i==2) {
-                var l = elements[i].split(",");
+                var l = elements[i].split(";");
                 var layers = settings.layers;
-                for (var j = 0; j < l.length; j++) {  
-                    $.each(layers, function(index, el) {
-                      if (l[j] == el.get('name')) {
-                        el.setVisible(true);
-                      }
+                var la, match;
+                for (var j = 0; j < layers.length; j++) {
+                    match = 0; 
+                    $.each(l, function(index, el) {
+                      la = el.split(",");
+                      if(layers[j].get('group')) {
+                        if((layers[j].get('group') == 'background') && (la[0] == layers[j].get('name'))) {
+                          layers[j].setVisible(true);
+                          match = 1;
+                        }
+                        else if ((layers[j].get('group') == 'background') && (match == 0)) {                    
+                          layers[j].setVisible(false);
+                        }
+                        else if (la[0] == layers[j].get('name')) {
+                          if (la[1] == 1) {
+                            layers[j].set('legend', true);
+                            layers[j].setVisible(false);                            
+                          }
+                          else {
+                            layers[j].set('legend', true);                            
+                            layers[j].setVisible(true);                         
+                          }   
+                        }
+                      }                                           
                     })                    
-    		    }
+    		        }
     	    }              
         }
     	 	
@@ -164,10 +191,13 @@ var Viewer = (function($){
       //add layer if visible
       layers.forEach(function(el) {
         if(el.getVisible() == true) {
-            layerNames += el.get('name') + ',';
+            layerNames += el.get('name') + ';';
+        }
+        else if(el.get('legend') == true) {
+            layerNames += el.get('name') + ',1;';          
         }
       })
-      return url + center + '&' + zoom + '&' + layerNames.slice(0, layerNames.lastIndexOf(","));
+      return url + center + '&' + zoom + '&' + layerNames.slice(0, layerNames.lastIndexOf(";"));
     },
     getMap: function() {
       return map;
@@ -186,7 +216,7 @@ var Viewer = (function($){
             return (obj.get('group') == group);
         }); 
         return group;       
-    },    
+    }, 
     addWMS: function(layersConfig) {    
 
         return new ol.layer.Tile({
@@ -194,10 +224,13 @@ var Viewer = (function($){
           group: layersConfig.group || 'default',
           opacity: layersConfig.opacity || 1,          
           title: layersConfig.title,
+          styleName: layersConfig.style || 'default',
+		  extent: layersConfig.extent || undefined,
           minResolution: layersConfig.hasOwnProperty('minScale') ? Viewer.scaleToResolution(layersConfig.minScale): undefined,
           maxResolution: layersConfig.hasOwnProperty('maxScale') ? Viewer.scaleToResolution(layersConfig.maxScale): undefined,            
           type: layersConfig.type,
-          visible: layersConfig.visible,           
+          visible: layersConfig.visible,
+          legend: false,          
           source: new ol.source.TileWMS(({
             url: settings.source[layersConfig.source].url,
             gutter: layersConfig.gutter || 0,
@@ -220,6 +253,7 @@ var Viewer = (function($){
            name: layersConfig.name.split(':').pop(), //remove workspace part of name
            opacity: layersConfig.opacity || 1,
            title: layersConfig.title,
+           styleName: layersConfig.style || 'default',
            minResolution: layersConfig.hasOwnProperty('minScale') ? Viewer.scaleToResolution(layersConfig.minScale): undefined,
            maxResolution: layersConfig.hasOwnProperty('maxScale') ? Viewer.scaleToResolution(layersConfig.maxScale): undefined,             
            visible: layersConfig.visible,
@@ -246,6 +280,8 @@ var Viewer = (function($){
           group: 'none',
           name: layersConfig.name.split(':').pop(),
           opacity: layersConfig.opacity || 1,
+          styleName: layersConfig.style || 'default',
+          legend: false,
           queryable: layersConfig.hasOwnProperty('queryable') ? layersConfig.queryable : true,
           minResolution: layersConfig.hasOwnProperty('minScale') ? Viewer.scaleToResolution(layersConfig.minScale): undefined,
           maxResolution: layersConfig.hasOwnProperty('maxScale') ? Viewer.scaleToResolution(layersConfig.maxScale): undefined,            
@@ -281,12 +317,15 @@ var Viewer = (function($){
           })),
           projection: settings.projectionCode
         });
-
         var options = {
           name: layersConfig.name.split(':').pop(),
           title: layersConfig.title,
           group: layersConfig.group || 'default',
-          opacity: layersConfig.opacity || 1,          
+          opacity: layersConfig.opacity || 1,
+          relations: layersConfig.relations || undefined,
+          legend: false,
+          mapSource: layersConfig.source,
+          styleName: layersConfig.style || 'default',         
           queryable: layersConfig.hasOwnProperty('queryable') ? layersConfig.queryable : true,
           minResolution: layersConfig.hasOwnProperty('minScale') ? Viewer.scaleToResolution(layersConfig.minScale): undefined,
           maxResolution: layersConfig.hasOwnProperty('maxScale') ? Viewer.scaleToResolution(layersConfig.maxScale): undefined,                  
@@ -311,59 +350,202 @@ var Viewer = (function($){
           return new ol.layer.Image(options);
         }
     },
+    wfsCql: function(relations, coordinates) {
+            var url, finishedQueries = 0;
+            cqlQuery = [];
+            // alert(coordinates);
+            // var matches = coordinates.filter.match(/\[(.*?)\]/);
+            for(var i=0; i < relations.length; i++) {
+              (function(index) {
+                var layer = relations[index].layer;
+                var mapServer = settings.source[Viewer.getLayer(layer).get('mapSource')].url;           
+                url = mapServer + '?';
+                data = 'service=WFS&' +
+                    'version=1.0.0&request=GetFeature&typeName=' + layer +
+                    '&outputFormat=json' +
+                    '&CQL_FILTER=INTERSECTS(geom,' + coordinates + ')&outputFormat=json';
+                $.ajax({
+                  url: url,
+                  type: 'POST',
+                  data: data,
+                  dataType: 'json',
+                  success: function(response) {
+                    var result = {};
+                    result.layer = relations[index].layer;
+                    result.url = relations[index].url || undefined;
+                    result.features = [];
+                    for(var j=0; j<response.features.length; j++) {
+                      var f = {};
+                      f.attribute = response.features[j]['properties'][relations[index].attribute];
+                      f.url = response.features[j]['properties'][relations[index].url] || undefined;                      
+                      result.features.push(f);
+                    }
+                    cqlQuery.push(result);
+                    finishedQueries++;
+                    if (finishedQueries >= relations.length) {
+                      queryFinished = true;
+                    }                  
+                  },
+                  error: function(jqXHR, textStatus, errorThrown) {
+                    console.log(errorThrown);
+                  }              
+                });
+            })(i);
+          } 
+    },
+    getCqlQuery: function() {
+      return cqlQuery;
+    },
+    modalMoreInfo: function() {
+      var content = $('#identify').html();
+      var title = $('.popup-title').html();
+      Popup.setVisibility(false);
+
+      var queryList = '<ul id="querylist">';
+      queryList += '</ul>';   
+
+      var modal = Modal('#map', {title: title, content: content + queryList});          
+      modal.showModal();
+      $('.modal li').removeClass('hidden');
+
+      var queryListItems = '';
+      var tries = 10, nrTries = 0;
+      checkQuery();
+
+      //check if query is finished
+      function checkQuery() {
+        if (queryFinished) {
+          appendQuery();
+          queryFinished = false;
+          return;
+        }
+        else {
+          setTimeout(function() {
+            if(nrTries <= tries) {
+              nrTries ++;
+              checkQuery();
+            }
+          }, 100);          
+        }        
+      }
+
+      //append query results to modal
+      function appendQuery() {
+        cqlQuery.sort(function(a, b) {
+          return a.layer.localeCompare(b.layer);
+        });        
+        for (var i=0; i < cqlQuery.length; i++) {
+          if(cqlQuery[i].features.length) {
+            var l = Viewer.getLayer(cqlQuery[i].layer);
+            queryListItems += '<ul><li>' + l.get('title') + '</li>';
+            for (var j=0; j < cqlQuery[i].features.length; j++) {
+                  var attr = cqlQuery[i].features[j].attribute;
+                  if (cqlQuery[i].features[j].url) {
+                    queryListItems += '<li><div class="query-item"><a href="' + cqlQuery[i].features[j].url + '" target="_blank">' +
+                          attr + 
+                          '</a></div></li>';
+                  }
+                  else {
+                    queryListItems += '<li><div class="query-item">' + attr + '</div></li>';//<div class="icon-expand icon-expand-false"></div></li>';                        
+                  }        
+            }
+            queryListItems += '</ul>';
+          }
+        }      
+        $('#querylist').append(queryListItems);
+      }
+    },
     createStyle: function(styleName) {
           var s = styleSettings[styleName];
-
           var style = (function() {
             var styleList=[];
+            //Create style for each rule
             for (var i = 0; i < s.length; i++) {
-              var styleOptions = {
-                fill: s[i].fill ? new ol.style.Fill(s[i].fill) : undefined,
-                stroke: s[i].stroke ? new ol.style.Stroke(s[i].stroke) : undefined,
-                image: s[i].icon ? new ol.style.Icon(s[i].icon) : undefined,
-                circle: s[i].circle ? new ol.style.Circle(s[i].circle) : undefined
-              };
-              var styleInstance = [new ol.style.Style(styleOptions)];
-              styleList.push(styleInstance);
+              var styleRule = [];
+              var styleOptions;
+              //Check if rule is array, ie multiple styles for the rule
+              if(s[i].constructor === Array) {
+                for(var j=0; j<s[i].length; j++) {
+                  styleOptions = Viewer.createStyleOptions(s[i][j]);
+                  styleRule.push(new ol.style.Style(styleOptions));
+                }
+              }
+              //If single style for rule
+              else {
+                styleOptions = Viewer.createStyleOptions(s[i]);
+                styleRule = [new ol.style.Style(styleOptions)];
+              }
+
+              styleList.push(styleRule);
             }
 
             return function(feature,resolution) {
               var scale = Viewer.getScale(resolution);
               for (var j=0; j<s.length; j++) {
                 var styleL;
-                if (s[j].filter) {
-                  if(eval('"' + feature.get(s[j].filter.attribute) + '"' + s[j].filter.operand + '"' + s[j].filter.value + '"')) {
+                if (s[j][0].hasOwnProperty('filter')) {  
+                  //find attribute vale between [] defined in styles
+                  var featAttr, expr, featMatch;
+                  var matches = s[j][0].filter.match(/\[(.*?)\]/);
+                  if (matches) {
+                      featAttr = matches[1];
+                      expr = s[j][0].filter.split(']')[1];
+                      featMatch = feature.get(featAttr);
+                      expr = typeof featMatch == 'number' ? featMatch + expr : '"' + featMatch + '"' + expr ;
+                  }
+                  if(eval(expr) && checkScale(s[j][0].maxScale, s[j][0].minScale)) {
                     styleL = styleList[j];
                   }
                 }
-                else {
+                else if (checkScale(s[j][0].maxScale, s[j][0].minScale)) {
                   styleL = styleList[j];                
                 }
-                if (s[j].maxScale || s[j].minScale) {
-                  if(s[j].maxScale && s[j].minScale) {
-                    if ((scale > s[j].maxScale) && (scale < s[j].minScale)) {
-                      return styleL;
+                     
+              }
+
+              // check if scale is defined
+              function checkScale(maxScale, minScale) {
+                if (maxScale || minScale) {
+                  // Alter 1: maxscale and minscale
+                  if(maxScale && minScale) {
+                    if ((scale > maxScale) && (scale < minScale)) {
+                      return true;
                     }
                   }
-                  else if (s[j].maxScale) {
-                    if(scale > s[j].maxScale) {
-                      return styleL;  
+                  // Alter 2: only maxscale
+                  else if (maxScale) {
+                    if(scale > maxScale) {
+                      return true;  
                     }
                   }
-                  else if (s[j].minScale) {
-                    if(scale > s[j].minScale) {
-                      return styleL;  
+                  // Alter 3: only minscale
+                  else if (minScale) {
+                    if(scale < minScale) {
+                      return true;  
                     }
                   }                  
                 }
+                // Alter 4: no scale limit
                 else {
-                  return styleL;
-                }                        
+                    return true;
+                }
               }
+              // end check scale 
+
+              return styleL;
             }
           })()
           return style; 
           
+    },
+    createStyleOptions: function(styleParams) {
+      var styleOptions = {
+        fill: styleParams.fill ? new ol.style.Fill(styleParams.fill) : undefined,
+        stroke: styleParams.stroke ? new ol.style.Stroke(styleParams.stroke) : undefined,
+        image: styleParams.icon ? new ol.style.Icon(styleParams.icon) : undefined,
+        circle: styleParams.circle ? new ol.style.Circle(styleParams.circle) : undefined
+      };
+      return styleOptions;
     },
     getScale: function(resolution) {
       var dpi = 25.4 / 0.28;
@@ -379,7 +561,7 @@ var Viewer = (function($){
       return resolution;      
     },
     getAttributes: function(feature, layer) {
-        var content = '<ul>';
+        var content = '<div id="identify"><ul>';
         var attribute, li = '', title, val;
         //If layer is configured with attributes
         if(layer.get('attributes')) {
@@ -387,17 +569,17 @@ var Viewer = (function($){
             attribute = layer.get('attributes')[i];
             title = '';
             if (attribute['name']) {
-              val = feature.get(attribute['name']);
+              val = feature.get(attribute['name']) || 'uppgift saknas';
               if (attribute['title']) {
-                title = '<b>' + attribute['title'] + ': </b>';
+                title = '<b>' + attribute['title'] + '</b>';
               }
               if (attribute['url']) {
-                val = '<a href="' + feature.get(attribute['url']) + '" target="blank">' +
+                val = '<a href="' + feature.get(attribute['url']) + '" target="_blank">' +
                       feature.get(attribute['name']) + 
                       '</a>';
               }
               if (attribute['urlPrefix'] && attribute['url']) {
-                val = '<a href="' + attribute['urlPrefix'] + feature.get(attribute['url']) + '" target="blank">' + 
+                val = '<a href="' + attribute['urlPrefix'] + feature.get(attribute['url']) + '" target="_blank">' + 
                       feature.get(attribute['name']) +
                       '</a>';
               } 
@@ -406,22 +588,24 @@ var Viewer = (function($){
               val = attribute['html'];
             }
 
-            li += '<li>' + title + val + '</li>';
+            var cls = ' class="' + attribute['cls'] + '" ' || '';
+
+            li += '<li' + cls +'>' + title + val + '</li>';
           }
         }
-        content += li + '</ul>';
+        content += li + '</ul></div>';
         return content;
     },
     addFeatureInfo: function() {
         Popup.init('#map');
 
-        var overlay = new ol.Overlay({
-          element: $('#popup')
-        });
-
-        map.addOverlay(overlay);
-
         map.on('click', function(evt) {
+          Viewer.removeOverlays();     
+          var overlay = new ol.Overlay({
+            element: $('#popup')
+          });
+
+          map.addOverlay(overlay);
           var l;
           var feature = map.forEachFeatureAtPixel(evt.pixel,
               function(feature, layer) {
@@ -436,8 +620,23 @@ var Viewer = (function($){
             geometry.getType() == 'Point' ? coord = geometry.getCoordinates() : coord = evt.coordinate;
             overlay.setPosition(coord);
             var content = Viewer.getAttributes(feature,l);
-            Popup.setContent({content: content, title: l.get('title')});            
-            Popup.setVisibility(true);
+            //If layer have relations to be queried, ie more information
+            if(l.get('relations')) {
+              var format = new ol.format.WKT();
+              var featureCoord = format.writeGeometry(feature.getGeometry()); 
+              Viewer.wfsCql(l.get('relations'), featureCoord);
+              content += '<br><div class="mdk-more-button">Mer information</div>';
+              Popup.setContent({content: content, title: l.get('title')});            
+              Popup.setVisibility(true);              
+              $('.mdk-more-button').on('click touchend', function(e) {
+                Viewer.modalMoreInfo();               
+                e.preventDefault();              
+              });
+            }
+            else {
+              Popup.setContent({content: content, title: l.get('title')});            
+              Popup.setVisibility(true);              
+            }           
             Viewer.autoPan();
          
           } else {
@@ -529,7 +728,15 @@ var Viewer = (function($){
 
       }
     /*End workaround*/
-    },    
+    },
+    removeOverlays: function() {
+      var overlays = map.getOverlays();
+      if (overlays.length > 0) {
+        for (var i=0; i < overlays.length; i++) {
+          map.removeOverlay(overlays[i]);
+        }
+      }   
+    }, 
     bindHome: function(home) {
       var homeb = home;
       $('#home-button').on('touchend click', function(e) {

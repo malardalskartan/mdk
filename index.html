@@ -2,9 +2,12 @@
 <html lang="sv">
 <head>
 	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+	<meta http-equiv="X-UA-Compatible" content="IE=Edge;chrome=1">		
 	<title>Mälardalskartan</title>
 	<link href="css/style.css" rel="stylesheet">
+	<link href="css/no-font.css" rel="stylesheet">	
+	<link href="data/attributes.css" rel="stylesheet">		
 	<script src="externs/modernizr.js"></script>	
 	<script src="externs/jquery-1.11.0.min.js"></script>
 	<script src="data/style.js"></script>	
@@ -17,151 +20,280 @@
 	     	projectionExtent: [-1678505.1838360203,4665380.0,2431912.7361639794,8775797.92],
 	     	extent: [-1678505.1838360203,4665380.0,2431912.7361639794,8775797.92],
 	     	center: [162429, 6599905],
-	     	home: [105085, 6571627, 219773, 6628182],
+	     	home: [105085, 6571627, 219773, 6628182],			
 	     	zoom: 3,
 	     	resolutions: [1146.8799999999999, 573.4399999999999, 286.71999999999997, 143.35999999999999, 71.67999999999999, 35.839999999999996, 17.919999999999998, 8.959999999999999, 4.4799999999999995, 2.2399999999999998, 1.1199999999999999, 0.5599999999999999, 0.27999999999999997, 0.13999999999999999],
 	     	source: {
+	     		mdk: {
+	     			url: 'http://www.malardalskartan.se/geoserver/mdk/ows',
+	     			type: 'WFS'
+	     		},				
 	     		local: {
-	     			url: 'http://localhost/geoserver/mdk/ows',
+	     			url: 'http://www.malardalskartan.se/geoserver/mdk_test/wms',
 	     			version: '1.1.1',
 	     			type: 'WMS'
-	     		},
-	     		local_wfs: {
-	     			url: 'http://localhost/geoserver/opengeo/wfs',
-	     			type: 'WFS'
-	     		},	     		
+	     		},			
 	     		basemap: {
-	     			url: 'http://karta.enkoping.se/geowebcache/service/wmts'
+	     			url: 'http://www.malardalskartan.se/geowebcache/service/wmts'
 	     		}
 	     	},
 	     	groups: [{
 	     		name: 'naringsliv',
 	     		title: 'Näringsliv',
-	     		defaultGroup: true,
 	     		expanded: true
 	     	},{	
-	     		name: 'default',
-	     		title: 'Bestämmelser',
+	     		name: 'bestammelser',
+	     		title: 'Planer & bestämmelser',
 	     		expanded: true
-	     	},{	 	     	     		
-	     	// 	name: 'naringsliv',
-	     	// 	title: 'Näringsliv',
-	     	// 	expanded: true
-	     	// },{
-	     	// 	name: 'bestammelser',
-	     	// 	title: 'Bestämmelser',
-	     	// 	expanded: true
-	     	// },{	     		
+	     	},{	 
+	     		name: 'kommunikation',
+	     		title: 'Kommunikation',
+	     		expanded: false
+	     	},{				    		
 	     		name: 'background',
 	     		title: 'Bakgrundskartor',
 	     		expanded: true	
-	     	}],
-	     	layers: [{    		     		     		
-	     		name: 'mdk',
-	     		opacity: 0.15,
-	     		title: 'Mdk',
-	     		source: 'data/mdk.geojson',
-	     		style: 'mask',
-	     		type: 'GEOJSON',
-		     	queryable: false,	     		
-	     		visible: true
-	     	}, {
-		     	attributes: [{
-		     			name: 'raa_nummer',
-		     			title: 'RAÄ-nummer',
-		     			url: 'url'
-		     		},{
-		     			name: 'lamningtyp',
-		     			title: 'Lämningstyp'
-		     		},{
-		     			html: 'Valfri html'
-		     	}],
-		     	name: 'fmis_punktval',
-		     	source: 'local',
-				style: 'fmis_punktval',	     		
-		     	title: 'Forminnen, punkter',
-		     	type: 'WFS',
-		     	visible: false     		
-	     	}, {	     		
-		     	attributes: [{
-		     			name: 'raa_nummer',
-		     			title: 'RAÄ-nummer',
-		     			url: 'url'
-		     		},{
-		     			name: 'lamningtyp',
-		     			title: 'Lämningstyp'
-		     		},{
-		     			html: 'Valfri html'
-		     	}],
-		     	name: 'fmis_ytor_4k',
-		     	source: 'local',
-				style: 'fornminnen_ytor',	     		
-		     	title: 'Forminnen, ytor',
-		     	type: 'WFS',
-		     	vectorSource: 'vector',
-		     	visible: false     		
-	     	}, {
+	     	}],			
+	     	layers: [{
 		     	name: 'ledig_naringsmark',
-		     	source: 'local',
+		     	source: 'mdk',
 				style: 'ledig_naringsmark',	     		
 		     	title: 'Ledig näringslivsmark',
 		     	group: 'naringsliv',
 		     	type: 'WFS',
-		     	visible: false,
-		     	maxScale: 10000,
+		     	visible: true,
 		     	attributes: [{
 		     			name: 'FASTIGHET',
-		     			title: 'Fastighet',
+		     			title: 'Fastighet: ',
 		     		},{
 		     			name: 'TYP',
-		     			title: 'Typ'
-		     	}],		     	     		
+		     			title: 'Status: '
+		     		},{
+		     			name: 'PRIS',
+		     			title: 'Pris: '
+		     		},{					
+		     			name: 'OPTI_INNEH',
+		     			title: 'Optionsinnehavare: ',
+						cls: 'hidden'
+		     		},{
+		     			name: 'OPT_TOM',
+		     			title: 'Option t.o.m: ',
+						cls: 'hidden'						
+		     		},{
+		     			name: 'OVRIGT',
+		     			title: 'Övrigt: ',
+						cls: 'hidden'						
+		     		},{					
+		     			name: 'SHAPE_AREA',
+		     			title: 'Area m&sup2;: ',
+						cls: 'hidden'						
+		     		},{
+		     			name: 'KONT_PERS',
+						title: 'Kontaktperson: ',
+						cls: 'hidden'						
+		     		},{
+		     			name: 'KONT_TELE',
+						title: 'Telefon: ',
+						cls: 'hidden'						
+		     		},{
+		     			name: 'KONT_EPOST',
+						title: 'E-post: ',
+						cls: 'hidden'						
+		     	}],
+				relations: [{layer: 'gallande_detaljplaner', attribute: 'AKT_BET', url: 'LANK'}, {layer: 'etableringsomraden', attribute: 'ETABL_OMR'}, {layer: 'pagaende_detaljplaner', attribute: 'NAMN', url: 'LANK'}]
 	     	}, {
 		     	name: 'etableringsomraden',
-		     	source: 'local',
-				style: 'fornminnen_ytor',	     		
+		     	source: 'mdk',
+				style: 'etableringsomraden',	     		
 		     	title: 'Etableringsområden',
 		     	group: 'naringsliv',
 		     	type: 'WFS',
-		     	visible: false,
+		     	visible: true,
 		     	attributes: [{
 		     			name: 'ETABL_OMR',
-		     			title: 'Etableringsområde',
+						cls: 'header1'
 		     		},{
-		     			name: 'BESKRIVNIN',
-		     			title: 'Beskrivning'
+		     			name: 'BESKRIVNIN'
+		     		},{
+		     			name: 'KONT_PERS',
+						title: 'Kontaktperson: '
+		     		},{
+		     			name: 'KONT_TELE',
+						title: 'Telefon: '
+		     		},{
+		     			name: 'KONT_EPOST',
+						title: 'E-post: '						
 		     	}],		     	     		
-	     	}, {	     		
+	     	}, {
 		     	name: 'pagaende_detaljplaner',
-		     	source: 'local',
-				style: 'fornminnen_ytor',	     		
 		     	title: 'Pågående detaljplaner',
-		     	type: 'WFS',
-		     	visible: false,
+				group: 'bestammelser',				
+		     	source: 'mdk',
+		     	type: 'WFS',				
+				style: 'pagaende_detaljplaner',	     		
 		     	attributes: [{
 		     			name: 'NAMN',
-		     			title: 'Namn',
+		     			title: 'Plannamn: ',
 		     			url: 'LANK'
-		     	}],		     	     		
-	     	}, {		     		     	     		
-	     		attribution: '&copy&nbspLantmäteriet&nbspGeodatasamverkan',		     		
-	     		format: 'image/png',
-	     		group: 'background',
-	     		name: 'topowebbkartan',	     		
-	     		source: 'basemap',
-	     		title: 'Karta',
-	     		type: 'WMTS',
-	     		visible: false     		
+		     	}],
+		     	visible: false				
 	     	}, {
+				name: 'gallande_detaljplaner',
+				title: 'Gällande detaljplaner',
+				group: 'bestammelser',
+				type: 'GROUP',
+				source: 'mdk',
+				style: 'gallande_detaljplaner',							
+				visible: false,
+				layers: [{
+						name: 'gallande_detaljplaner',
+						title: 'Gällande detaljplaner',
+						group: 'bestammelser',
+						source: 'mdk',
+						type: 'WFS',
+						style: 'gallande_detaljplaner',
+						maxScale: 35000,
+						attributes: [
+							{name: 'AKT_BET', title: 'Aktbeteckning: ', url: 'LANK'},				
+							{name: 'PLANTYP', title: 'Plantyp: '}
+						],				
+						visible: true				
+					}, {			
+						name: 'gallande_detaljplaner_en',
+						title: 'Gällande detaljplaner',
+						group: 'bestammelser',
+						source: 'mdk',
+						type: 'WMS',
+						style: 'fornminnen_ytor',
+						minScale: 35000,
+						queryable: false,
+						visible: true
+				}]
+	     	}, {
+				attributes: [
+					{name: 'NAMN', title: 'Namn: '},
+				],
+				name: 'cykelvagar',
+				group: 'kommunikation',
+				source: 'mdk',
+				style: 'cykelvagar',				
+				title: 'Cykelvägar',
+				type: 'WMS',
+				visible: false
+	     	}, {
+				name: 'fmis',
+				title: 'Fornminnen',
+				group: 'bestammelser',
+				type: 'GROUP',
+				style: 'fmis_punkt',							
+				visible: false,
+				layers: [{			
+						format: 'image/png', 
+						name: 'fmis_grupp',
+						source: 'mdk',
+						title: 'Fornminnen',
+						group: 'bestammelser',
+						type: 'WMS',
+						style: 'fmis_punkt',
+						gutter: 50,
+						minScale: 10000,						
+						visible: true
+					}, {	     		
+						name: 'fmis_punkt',
+						title: 'Fornminnen, punkt',						
+						group: 'bestammelser',				
+						source: 'mdk',
+						style: 'fmis_punkt',
+						type: 'WFS',
+						maxScale: 10000,
+						attributes: [{
+								name: 'RAA_NUMMER',
+								title: 'RAÄ-nummer: ',
+								url: 'URL'
+							},{
+								name: 'LAMNINGTYP',
+								title: 'Lämningstyp: '
+							}
+						],							
+						visible: true
+					}, {	     		
+						name: 'fmis_linje',
+						title: 'Fornminnen, linje',						
+						group: 'bestammelser',				
+						source: 'mdk',
+						style: 'fmis_linje',
+						type: 'WFS',
+						maxScale: 10000,
+						attributes: [{
+								name: 'RAA_NUMMER',
+								title: 'RAÄ-nummer: ',
+								url: 'URL'
+							},{
+								name: 'LAMNINGTYP',
+								title: 'Lämningstyp: '
+							}
+						],	 	     								
+						visible: true
+					}, {	     		
+						name: 'fmis_polygon',
+						title: 'Fornminnen, yta',						
+						group: 'bestammelser',				
+						source: 'mdk',
+						style: 'fmis_polygon',
+						type: 'WFS',
+						maxScale: 10000,
+						attributes: [{
+								name: 'RAA_NUMMER',
+								title: 'RAÄ-nummer: ',
+								url: 'URL'
+							},{
+								name: 'LAMNINGTYP',
+								title: 'Lämningstyp: '
+							}
+						],							
+						visible: true						
+					}
+				]
+			}, {
+	     		name: 'mdk',
+	     		opacity: 0.15,
+	     		title: 'Mdk',
+				queryable: false,
+	     		source: 'data/mdk.geojson',
+	     		style: 'mask',
+	     		type: 'GEOJSON',
+	     		visible: true
+	     	}, {				
 	     		attribution: '&copy Lantmäteriet Geodatasamverkan',		     		
 	     		format: 'image/png',
 	     		group: 'background',
 	     		name: 'topowebbkartan_nedtonad',	     		
 	     		source: 'basemap',
-	     		title: 'Karta nedtonad',
+	     		title: 'Karta, grå',
 	     		type: 'WMTS',
-	     		visible: true	     		   		
-	     	}		     			
+	     		style: 'karta_gra',				
+	     		visible: true
+	     	}, {
+	     		attribution: '&copy Lantmäteriet Geodatasamverkan',		     		
+	     		format: 'image/png',
+	     		group: 'background',
+	     		name: 'topowebbkartan',	
+	     		source: 'basemap',
+	     		title: 'Karta, färg',
+	     		type: 'WMTS',
+	     		style: 'karta_farg',					
+	     		visible: false 
+	     	}, {
+	     		attribution: '&copy Lantmäteriet Geodatasamverkan',		     		
+	     		format: 'image/jpeg',
+	     		group: 'background',
+	     		name: 'orto',	
+	     		source: 'basemap',
+	     		title: 'Flygfoto',
+	     		type: 'WMTS',
+	     		style: 'orto',				
+	     		visible: false 				
+	     	}		
 	     	]
         });
 
@@ -171,6 +303,7 @@
 </head>
 <body>
 <div id="app-wrapper">
+	<div id="no-map"><div class="no-map-message">Du använder en föråldrad webbläsare. Uppgradera din webbläsare för att visa kartan.</div></div>
 	<div id="wrapper">
 		<div id="map" class="map">
 			<div id="mapmenu-button" class="mdk-button">
@@ -181,7 +314,13 @@
 			</div>
 			<div id="geolocation-button" class="mdk-button">
 				<button class="geolocation-button"></button>
-			</div>											
+			</div>
+			<div id="search-wrapper">
+				<div id="search" class="search">
+					<input class="search-field typeahead" type="text" placeholder="Sök adress...">
+					<button id="search-button" class="search-false"></button>
+				</div>
+			</div>				
 			<div id="mapmenu">
 				<div class="block">
 					<ul id="menutools"> 
@@ -204,29 +343,44 @@
 			</div>
 			<div id="bottom-tools">
 		
-			</div>
+			</div>			
 			<div id="footer">
 				<div class="footer-left">&nbsp</div>
 				<div class="footer-middle">
 					<ul>				
-						<li><a id="enkoping" href="http://www.enkoping.se/" target="blank">Enköping</a></li>
-						<li><a id="eskilstuna" href="http://www.eskilstuna.se/" target="blank">Eskilstuna</a></li>
-						<li><a id="strangnas" href="http://www.strangnas.se/" target="blank">Strängnäs</a></li>
-						<li><a id="vasteras" href="http://www.vasteras.se/" target="blank">Västerås</a></li>
+						<li><a id="enkoping" href="http://www.enkoping.se/" target="blank">Enköping.se</a></li>
+						<li><a id="eskilstuna" href="http://www.eskilstuna.se/" target="blank">Eskilstuna.se</a></li>
+						<li><a id="strangnas" href="http://www.strangnas.se/" target="blank">Strängnäs.se</a></li>
+						<li><a id="vasteras" href="http://www.vasteras.se/" target="blank">Västerås.se</a></li>
 					</ul>
 				</div>
 				<div class="footer-right">
-				</div>
-			</div>				
+				</div>			
 		</div>
 	<!-- Wrapper -->
 	</div>
 <!-- app-wrapper	 -->
 </div>
+<script src="//ajax.googleapis.com/ajax/libs/webfont/1.5.6/webfont.js"></script>
+<script>
+  WebFont.load({
+    custom: {
+      families: ['FontAwesome'],
+      testStrings: {
+        'FontAwesome': '\uf00c\uf000'
+      }
+    },
+    timeout: 2000     
+  });
+</script>
 <script src="externs/es5-shim.min.js"></script>
+<script src="externs/typeahead.jquery.min.js"></script>
+<script src="externs/bloodhound.min.js"></script>
 <script src="externs/proj4.js"></script>
-<script src="externs/defs/EPSG3010.js"></script>		
+<script src="externs/defs/EPSG3010.js"></script>
+<script src="externs/defs/EPSG3006.js"></script>			
 <script src="externs/ol.js"></script>
+<script src="externs/placeholders.min.js"></script>				
 <script src="src/Viewer.js"></script>
 <script src="src/MapMenu.js"></script>
 <script src="src/Modal.js"></script>
@@ -235,5 +389,7 @@
 <script src="src/MapWindow.js"></script>
 <script src="src/Print.js"></script>
 <script src="src/Geoposition.js"></script>
+<script src="src/Search.js"></script>
+
 </body>
 </html>

@@ -19,8 +19,9 @@ var Popup = (function($){
     },
     bindUIActions: function() {
       var that = this;
-      $('#popup .popup .close-button').on('touchend click', function() {
+      $('#popup .popup .close-button').on('touchend click', function(evt) {
         that.closePopup();
+        evt.preventDefault();
       });   
     },    
     setVisibility: function(visible) {
