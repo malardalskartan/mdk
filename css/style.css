@@ -1134,3 +1134,17 @@ input.searchfield:focus {
   width: 200px;
 }
 }
+@media screen and (max-height: 300px) {
+.ol-rotate {
+  top: 7.5em;
+}  
+#home-button,  
+#geolocation-button,
+#map-legend,
+#mapmenu-button {
+  display: none;
+}
+#window-button {
+  top: 5em;   
+}
+}
