@@ -53,7 +53,7 @@ var Search = (function($){
           }
         });
 
-        this.bindUIActions();
+        Search.bindUIActions();
     },
     bindUIActions: function() {
         $('.typeahead').on('typeahead:selected', function(evt, data){
