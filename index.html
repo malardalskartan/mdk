@@ -16,6 +16,21 @@
 
 		//Init the viewer
         Viewer.init({
+        	modules: [{
+        			name: 'Viewer',
+					fn: 'addFeatureInfo'
+        		},{			
+        			name: 'MapMenu'
+        		},{
+        			name: 'ShareMap'
+        		},{
+        			name: 'Geoposition'
+        		},{
+        			name: 'Print'
+        		},{
+        			name: 'Search'					
+        		}
+        	],		
 	     	projectionCode: 'EPSG:3010',
 	     	projectionExtent: [-1678505.1838360203,4665380.0,2431912.7361639794,8775797.92],
 	     	extent: [-1678505.1838360203,4665380.0,2431912.7361639794,8775797.92],
@@ -25,16 +40,16 @@
 	     	resolutions: [1146.8799999999999, 573.4399999999999, 286.71999999999997, 143.35999999999999, 71.67999999999999, 35.839999999999996, 17.919999999999998, 8.959999999999999, 4.4799999999999995, 2.2399999999999998, 1.1199999999999999, 0.5599999999999999, 0.27999999999999997, 0.13999999999999999],
 	     	source: {
 	     		mdk: {
-	     			url: 'http://www.malardalskartan.se/geoserver/mdk/ows',
+	     			url: 'http://localhost/geoserver/ows',
 	     			type: 'WFS'
 	     		},				
 	     		local: {
-	     			url: 'http://www.malardalskartan.se/geoserver/mdk_test/wms',
+	     			url: 'http://localhost/geoserver/wms',
 	     			version: '1.1.1',
 	     			type: 'WMS'
 	     		},			
 	     		basemap: {
-	     			url: 'http://www.malardalskartan.se/geowebcache/service/wmts'
+	     			url: 'http://localhost/geowebcache/service/wmts'
 	     		}
 	     	},
 	     	groups: [{

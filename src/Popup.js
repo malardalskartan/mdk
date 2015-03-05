@@ -15,7 +15,7 @@ var Popup = (function($){
                     '</div>' +
                   '</div>';      
         $(target).append(pop);
-        this.bindUIActions();
+        Popup.bindUIActions();
     },
     bindUIActions: function() {
       var that = this;

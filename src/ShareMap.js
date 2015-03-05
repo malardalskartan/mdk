@@ -13,7 +13,7 @@ var ShareMap = (function($){
 
   return {
     init: function(){
-        this.bindUIActions();
+        ShareMap.bindUIActions();
     },
     bindUIActions: function() {
       var that = this;

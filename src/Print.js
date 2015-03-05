@@ -15,7 +15,7 @@ var Print = (function($){
   return {
     init: function(){
 
-      this.bindUIActions();
+      Print.bindUIActions();
     },
     bindUIActions: function() {
         settings.printButton.on('touchend click', function(e) {

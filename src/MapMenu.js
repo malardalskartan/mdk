@@ -13,10 +13,10 @@ var MapMenu = (function($){
   var symbolSize = 20;
 
   return {
-    init: function(menuSettings, groups){
-        this.loadMenuItems(menuSettings);
-        this.bindUIActions();
-        this.addLegend(groups);
+    init: function(){
+        // this.loadMenuItems(menuSettings);
+        MapMenu.bindUIActions();
+        MapMenu.addLegend(Viewer.getGroups());
     },
     bindUIActions: function() {
     	settings.menuButton.on('touchend click', function(e) {
@@ -48,9 +48,15 @@ var MapMenu = (function($){
       if (s[0].hasOwnProperty('icon')) {
         var src = s[0].icon.src;
         // var scale = style.icon.scale || undefined;
-        var o = '<object type="image/svg+xml" data="' + src + '" style="width: 20px;"></object>';               
-        var inlineStyle = 'background: url(' + src + ') no-repeat;width: 20px; height: 20px;background-size: 20px;';
-        symbol = '<div class="legend-item-img">' + o + '</div>';
+        var format = s[0].format || 'png';
+        if (format == 'png') {
+          symbol = '<div class="legend-item-img"><img style="width: 20px; height: 20px;" src="' + src + '"></div>'
+        }
+        else if (format == 'svg') {
+          var o = '<object type="image/svg+xml" data="' + src + '" style="width: 20px;"></object>';               
+          var inlineStyle = 'background: url(' + src + ') no-repeat;width: 20px; height: 20px;background-size: 20px;';
+          symbol = '<div class="legend-item-img">' + o + '</div>';
+        }
       }
       else if (s[0].hasOwnProperty('fill')) {
         var fill = '';
@@ -69,7 +75,16 @@ var MapMenu = (function($){
         symbol += '<div class="legend-item-img"><svg height="' + symbolSize + '" width="' + symbolSize + '">';              
         symbol += stroke;
         symbol += '</svg></div>';
-      }     
+      }
+      else if (s[0].hasOwnProperty('circle')) {
+        var circle = '';
+        for(var i=0; i<s.length; i++) {
+          circle += MapMenu.createCircle(s[i]);
+        }
+        symbol += '<div class="legend-item-img"><svg height="' + symbolSize + '" width="' + symbolSize + '">';              
+        symbol += circle;
+        symbol += '</svg></div>';
+      }         
       else if (s[0].hasOwnProperty('image')) {
         var src = s[0].image.src;
         var inlineStyle = 'background: url(' + src + ') no-repeat;width: 30px; height: 30px;background-size: 30px;';        
@@ -93,6 +108,21 @@ var MapMenu = (function($){
         fill += '"></rect>';
         return fill;  
     },
+    createCircle: function(circleProperties) {
+        var c = circleProperties.circle;
+        var strokeWidth = 0;
+        if(c.hasOwnProperty('stroke')) {
+          strokeWidth = c.stroke.width >=3 ? 3 : c.stroke.width;        
+          var stroke = 'stroke:' + c.stroke.color + ';' || 'stroke:none;';
+          stroke += 'stroke-width:' + strokeWidth + ';' || '';           
+        }        
+        var size = symbolSize/2;                         
+        var fill = '<circle cx="' + size + '" cy="' + size + '" r="' + c.radius + '" ';        
+        fill += c.hasOwnProperty('fill') ? 'style="fill:' + c.fill.color + ';' : 'style="fill:none;';
+        fill += stroke;
+        fill += '"></circle>';
+        return fill;  
+    },    
     createStroke: function(strokeProperties) {
         var s = strokeProperties;        
         var strokeWidth = s.stroke.width > 4 ? 4 : s.stroke.width;
@@ -188,6 +218,9 @@ var MapMenu = (function($){
             $('#overlay-list').append(item);                              
           }          
         }
+
+        //Check map legend to make sure minimize button appears
+        MapMenu.checkToggleOverlay();
 
         //Append class according to visiblity and if group is background
         if(layers[i].get('group') == 'background') {
@@ -320,9 +353,9 @@ var MapMenu = (function($){
         if($('#overlay-list li').length > 1 && $('#legend-overlay >li:first-child').hasClass('hidden')) {
             $('#legend-overlay > li:first-child').removeClass('hidden');          
         }     
-        else {
+        else if($('#overlay-list li').length < 2) {
             $('#legend-overlay > li:first-child').addClass('hidden');
-            if($('#overlay-list li').length == 1 && $('#overlay-list').hasClass('hidden')) {
+            if($('#overlay-list').length == 1 && $('#overlay-list').hasClass('hidden')) {
                 $('#overlay-list').removeClass('hidden');
                 MapMenu.toggleOverlay();          
             }                          

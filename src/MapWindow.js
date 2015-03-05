@@ -11,8 +11,8 @@ var MapWindow = (function($){
 
   return {
     init: function(){
-        this.createButton();
-        this.bindUIActions();
+        MapWindow.createButton();
+        MapWindow.bindUIActions();
     },
     bindUIActions: function() {
     	$('#window-button button').click(function() {

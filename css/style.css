@@ -423,6 +423,21 @@ button.ol-full-screen-true:after {
   top: 7.5em;
   z-index: 1;
 }
+#edit-draw-button {
+  left: .5em;
+  top: 12em;
+  z-index: 1;
+}
+#edit-attribute-button {
+  left: .5em;
+  top: 14.5em;
+  z-index: 1;
+}
+#edit-delete-button {
+  left: .5em;
+  top: 17em;
+  z-index: 1;
+}
 /*#geolocation-button.mdk-button {
   box-shadow: 0 0 5px rgba(0,0,0,0.45);
 }*/
@@ -432,6 +447,15 @@ button.ol-full-screen-true:after {
 }
 button.geolocation-button:after {
   content: "\f124";
+}
+button.edit-draw-button:after {
+  content: "\f040";
+}
+button.edit-attribute-button:after {
+  content: "\f031";
+}
+button.edit-delete-button:after {
+  content: "\f014";
 }
 /*remove the boxshadow when selected*/
 #mapmenu-button.mdk-button {
@@ -504,6 +528,10 @@ button.home-button:after {
 	-ms-transition: .3s ease all;
 	-webkit-transition: .3s ease all;	
 	transition: .3s ease all;	
+}
+.touch #mapmenu{
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 .no-boxshadow #mapmenu {
   border-left: 1px solid #C5C5C5;
@@ -619,6 +647,55 @@ li .menu-button:hover {
 }
 .modal-footer {
   
+}
+.modal label {
+  font-weight: bold;
+  font-size: 1em; 
+  line-height: 1.5em;  
+}
+.modal input {
+  border: 2px solid #ddd;  
+  border-radius: 3px;
+  font-size: 1em; 
+  line-height: 1.5em;
+}
+.modal input[type=text] {  
+  width: 95%;
+}
+.modal input[type=button] {
+  background-color: #FF3B30;
+  border: 1px solid #FF3B30;
+  color: #fff;
+  width: 8em;  
+}
+.modal input[type=checkbox] {
+  color: #fff;
+  vertical-align: middle;
+  width: 1em;  
+}
+.modal textarea {
+  border: 2px solid #ddd;  
+  border-radius: 3px;
+  font-size: 1em; 
+  line-height: 1.5em;
+  width: 92%;   
+}
+.modal select {
+  border-radius: 3px;
+  font-size: 1em; 
+  line-height: 1.5em;
+  width: 95%;  
+}
+.modal .mdk-form-save {
+  margin: 0;
+  left: 50%;
+  -ms-transform: translate(50%,0);
+  -webkit-transform: translate(50%,0);
+  transform: translate(50%,0);
+  width: 50%;
+}
+.modal .mdk-form-checkbox {
+  margin: 5px 0;
 }
 
 /*popup widget*/
@@ -883,11 +960,11 @@ li .legend-item-img {
   border-radius: 4px;
   -webkit-box-shadow: 0 2px 5px rgba(0,0,0,0.45);    
   box-shadow: 0 2px 5px rgba(0,0,0,0.45);  
-  margin: 0 0 0 -150px;
+  margin: 0 0 0 -155px;
   position: fixed;
   top: .5em;
   left: 50%;
-  width: 300px;
+  width: 310px;
   z-index: 10;
 }
 /*Search module*/
@@ -1132,19 +1209,5 @@ input.searchfield:focus {
 @media screen and (max-width: 240px) {
 #popup {
   width: 200px;
-}
-}
-@media screen and (max-height: 300px) {
-.ol-rotate {
-  top: 7.5em;
-}  
-#home-button,  
-#geolocation-button,
-#map-legend,
-#mapmenu-button {
-  display: none;
-}
-#window-button {
-  top: 5em;   
 }
 }

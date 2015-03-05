@@ -37,7 +37,7 @@ var Geoposition = (function($){
         }
       }));
 
-      this.bindUIActions();
+      Geoposition.bindUIActions();
     },
     bindUIActions: function() {
       settings.geolocateButtonId.on('touchend click', function(e) {

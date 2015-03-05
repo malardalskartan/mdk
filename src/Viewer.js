@@ -17,7 +17,9 @@ var Viewer = (function($){
     resolutions: null, 
     source: {},
     group: [],
-    layers: []
+    layers: [],
+    modules: [],
+    editLayer: null
   };
   var cqlQuery, queryFinished = false;
  
@@ -40,7 +42,9 @@ var Viewer = (function($){
         settings.source = mapSettings.source;
         settings.home = mapSettings.home;
         settings.groups = mapSettings.groups;
+        settings.editLayer = mapSettings.editLayer;
         this.createLayers(mapSettings.layers, settings.layers); //read layers from mapSettings      
+        settings.modules = mapSettings.modules;
 
         //If url arguments, parse this settings
         if (window.location.search) {
@@ -62,25 +66,25 @@ var Viewer = (function($){
         if(window.top!=window.self) {
             MapWindow.init();
         }
-        // else {
-        //     mapControls.push(new ol.control.FullScreen());
-        // }    
+  
       this.bindHome(settings.home);
     	this.loadMap();
-      this.addFeatureInfo();
 
       //Check size for attribution mode
       $(window).on('resize', this.checkSize);
       this.checkSize();
 
-      MapMenu.init([{
-        itemName: 'ShareMap'
+      // init modules
+      var module;
+      var options;
+      var fn,nsFn;
+      for (var i=0; i<settings.modules.length; i++) {
+        module = settings.modules[i].name;
+        options = settings.modules[i].options || undefined;
+        nsFn = settings.modules[i].fn || 'init';
+        fn = window[module][nsFn];
+        if (typeof fn === 'function') fn.apply(null, options);
       }
-      ], settings.groups);
-      ShareMap.init();
-      Geoposition.init();
-      Print.init();
-      Search.init();
 
     },
     createLayers: function(layerlist, layerTarget) {
@@ -109,6 +113,7 @@ var Viewer = (function($){
       return new ol.layer.Group({name: layersConfig.name, group: layersConfig.group, title: layersConfig.title, styleName: layersConfig.style || 'default', layers: group, mapSource: layersConfig.source, visible: layersConfig.visible});
     },
     loadMap: function(){
+
 	    map = new ol.Map({
 	      target: 'map',
 	      controls: mapControls,
@@ -211,12 +216,24 @@ var Viewer = (function($){
         }); 
         return layer[0];       
     },
+    getEditLayer: function() {
+      return settings.editLayer;
+    },
     getGroup: function(group) {    
         var group = $.grep(settings.layers, function(obj) {
             return (obj.get('group') == group);
         }); 
         return group;       
-    }, 
+    },
+    getGroups: function() {
+        return settings.groups;
+    },
+    getProjectionCode: function() {
+      return settings.projectionCode;
+    },
+    getMapSource: function() {
+      return settings.source;
+    },
     addWMS: function(layersConfig) {    
 
         return new ol.layer.Tile({
@@ -295,14 +312,16 @@ var Viewer = (function($){
     },  
     addWFS: function(layersConfig) {
         var vectorSource = null;
+        var geometryName = layersConfig.hasOwnProperty('geometryName') ? layersConfig.geometryName : 'geom';
+        var featureType = layersConfig.name.split('__').shift();
 
         vectorSource = new ol.source.ServerVector({
-          format: new ol.format.GeoJSON(),
+          format: new ol.format.GeoJSON({geometryName: geometryName}),
           loader: function(extent, resolution, projection) {
             var that = this;
             var url = settings.source[layersConfig.source].url + '?service=WFS&' +
-                'version=1.1.0&request=GetFeature&typeName=' + layersConfig.name +
-                '&outputFormat=json' +
+                'version=1.1.0&request=GetFeature&typeName=' + featureType +
+                '&outputFormat=application/json' +
                 '&srsname=' + settings.projectionCode + '&bbox=' + extent.join(',') + ',' + settings.projectionCode;
             $.ajax({
               url: url,
@@ -318,10 +337,12 @@ var Viewer = (function($){
           projection: settings.projectionCode
         });
         var options = {
+          featureType: featureType.split('__').shift(),
           name: layersConfig.name.split(':').pop(),
           title: layersConfig.title,
           group: layersConfig.group || 'default',
           opacity: layersConfig.opacity || 1,
+          geometryName: geometryName,
           relations: layersConfig.relations || undefined,
           legend: false,
           mapSource: layersConfig.source,
@@ -542,9 +563,19 @@ var Viewer = (function($){
       var styleOptions = {
         fill: styleParams.fill ? new ol.style.Fill(styleParams.fill) : undefined,
         stroke: styleParams.stroke ? new ol.style.Stroke(styleParams.stroke) : undefined,
-        image: styleParams.icon ? new ol.style.Icon(styleParams.icon) : undefined,
-        circle: styleParams.circle ? new ol.style.Circle(styleParams.circle) : undefined
+        image: undefined
       };
+      if (styleParams.hasOwnProperty('circle')) {
+        styleOptions.image = new ol.style.Circle({
+            radius: styleParams.circle.radius,
+            fill: new ol.style.Fill(styleParams.circle.fill) || undefined,
+            stroke: new ol.style.Stroke(styleParams.circle.stroke) || undefined
+        });
+      }
+      else if (styleParams.hasOwnProperty('icon')) {
+        styleOptions.image = new ol.style.Icon(styleParams.icon);        
+      }
+
       return styleOptions;
     },
     getScale: function(resolution) {

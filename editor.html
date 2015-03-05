@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="IE=Edge;chrome=1" >	
+	<title>Editor example</title>
+	<link href="css/style.css" rel="stylesheet">	
+	<link href="css/no-font.css" rel="stylesheet">		
+	<link href="data/attributes.css" rel="stylesheet">
+	<script src="externs/modernizr.js"></script>	
+	<script src="externs/jquery-1.11.0.min.js"></script>
+	<script src="data/style.js"></script>	
+	<script type="text/javascript">
+	$(function(){
+
+		//Init the viewer
+        Viewer.init({
+        	modules: [{
+        			name: 'MapMenu'
+        		},{
+        			name: 'ShareMap'
+        		},{
+        			name: 'Geoposition'
+        		},{
+        			name: 'Print'
+        		},{
+        			name: 'Editor'
+        		}
+        	],
+	     	projectionCode: 'EPSG:3010',
+	     	projectionExtent: [-1678505.1838360203,4665380.0,2431912.7361639794,8775797.92],
+	     	extent: [-1678505.1838360203,4665380.0,2431912.7361639794,8775797.92],
+	     	center: [185653, 6613775],
+	     	home: [162772,6585819,208374,6641395],
+	     	zoom: 4,
+	     	editLayer: {
+	     		name: 'intressepunkter',
+	     		geometryType:'Point',
+	     		workspace: 'ena_extern'
+	     	},
+	     	resolutions: [1146.8799999999999, 573.4399999999999, 286.71999999999997, 143.35999999999999, 71.67999999999999, 35.839999999999996, 17.919999999999998, 8.959999999999999, 4.4799999999999995, 2.2399999999999998, 1.1199999999999999, 0.5599999999999999, 0.27999999999999997, 0.13999999999999999],
+	     	source: {
+	     		local: {
+	     			url: 'http://localhost/geoserver/ows',
+	     		},	     		
+	     		basemap: {
+	     			url: 'http://localhost/geowebcache/service/wmts'
+	     		},
+	     		orto: {
+	     			url: 'http://localhost/geoserver/ena/gwc/service/wmts'
+	     		}	     		
+	     	},
+	     	groups: [{
+	     		name: 'edit',
+	     		title: 'Edit',
+	     		expanded: true
+	     	},{		     			     		     		
+	     		name: 'background',
+	     		title: 'Bakgrundskartor',
+	     		expanded: true,
+	     		defaultGroup: true	     		
+	     	}],
+	     	layers: [{	     		     		
+		     	name: 'intressepunkter',
+		     	source: 'local',
+				style: 'golf',	     		
+		     	title: 'Intressepunkter',
+		     	group: 'edit',
+		     	type: 'WFS',
+		     	visible: true,
+	     		attributes: [{
+		     			name: 'namn',
+		     			title: 'Namn: ',
+		     			type: 'textarea'
+	     			},{
+		     			name: 'typ',
+		     			title: 'Typ: ',
+		     			type: 'dropdown',
+		     			options: ['Café', 'Hotell', 'Shopping']
+	     			},{
+		     			name: 'mat',
+		     			title: 'Äta & fika: ',
+		     			type: 'checkbox'	
+	     		}]
+	     	}, {	     				     		     		     		     			     		
+	     		attribution: '&copy&nbspLantmäteriet&nbspGeodatasamverkan',
+	     		format: 'image/png',
+	     		group: 'background',
+	     		name: 'topowebbkartan',	     		
+	     		source: 'basemap',
+	     		style: 'karta_farg',	     		
+	     		title: 'Karta, färg',
+	     		type: 'WMTS',
+	     		visible: false     		
+	     	}, {
+	     		attribution: '&copy Lantmäteriet Geodatasamverkan',		     		
+	     		format: 'image/png',
+	     		group: 'background',
+	     		name: 'topowebbkartan_nedtonad',	     		
+	     		source: 'basemap',
+	     		style: 'karta_gra',	     		
+	     		title: 'Karta, grå',
+	     		type: 'WMTS',
+	     		visible: true	     		   		
+	     	},{
+	     		attribution: '&copy Enköpings kommmun',		     		
+	     		format: 'image/jpeg',
+	     		group: 'background',
+	     		name: 'orto2011',	     		
+	     		source: 'orto',
+	     		style: 'orto',	     		
+	     		title: 'Flygfoto',
+	     		type: 'WMTS',
+	     		visible: false	 	     		
+	     	}		     			
+	     	]
+        });
+
+	});
+
+	</script>
+</head>
+<body>
+<div id="app-wrapper">
+	<div id="no-map"><div class="no-map-message">Du använder en föråldrad webbläsare. Uppgradera din webbläsare för att visa kartan.</div></div>
+	<div id="wrapper">
+		<div id="map" class="map">
+			<div id="mapmenu-button" class="mdk-button">
+				<button class="mapmenu-button-true"></button>
+			</div>
+			<div id="home-button" class="mdk-button">
+				<button class="home-button"></button>
+			</div>
+			<div id="geolocation-button" class="mdk-button">
+				<button class="geolocation-button"></button>
+			</div>
+			<div id="edit-draw-button" class="mdk-button">
+				<button class="edit-draw-button"></button>
+			</div>
+			<div id="edit-attribute-button" class="mdk-button">
+				<button class="edit-attribute-button"></button>
+			</div>			
+			<div id="edit-delete-button" class="mdk-button">
+				<button class="edit-delete-button"></button>
+			</div>						
+			<div id="search-wrapper">
+				<div id="search" class="search">
+					<input class="search-field typeahead" type="text" placeholder="Sök adress...">
+					<button id="search-button" class="search-false"></button>
+				</div>
+			</div>													
+			<div id="mapmenu">
+				<div class="block">
+					<ul id="menutools"> 
+						<li></li>			
+						<li>
+							<div id='share-button' class="menu-button">
+								<div class="button-icon share-icon"></div>
+								Dela karta
+							</div>
+						</li>								
+		        		<li>
+		                	<div id="print-button" class="menu-button">
+			                  	<div class="button-icon print-icon"></div>
+			                  	Skriv ut
+		                	</div>
+		                </li>														
+						<li class="menu-item"><div class="menu-item-divider"></div><li>				
+					</ul>
+				</div>
+			</div>
+			<div id="bottom-tools">		
+			</div>
+			<div id="footer">
+				<div class="footer-left"><a href="http://www.enkoping.se/swwwing/app/cm/Browse.jsp?PAGE=1581067" target="_blank">Tävla och vinn biobiljetter <span style="font-size: 1.15em; vertical-align: top;">&raquo;</span></a></div>
+				<div class="footer-middle">
+					<div class="logo">			
+						<a id="enkoping" href="http://www.enkoping.se/" target="blank"><img src="css/logga.png"><span>Enköpings kommun</span></a>
+					</div>
+				</div>
+				<div class="footer-right">
+				</div>
+			</div>				
+		</div>
+	<!-- Wrapper -->
+	</div>
+<!-- app-wrapper	 -->
+</div>
+<script src="//ajax.googleapis.com/ajax/libs/webfont/1.5.6/webfont.js"></script>
+<script src="externs/es5-shim.min.js"></script>
+<script src="externs/typeahead.jquery.min.js"></script>
+<script src="externs/bloodhound.min.js"></script>
+<script src="externs/proj4.js"></script>
+<script src="externs/defs/EPSG3006.js"></script>
+<script src="externs/defs/EPSG3010.js"></script>
+<script src="externs/placeholders.min.js"></script>			
+<script src="externs/ol.js"></script>
+<script src="src/Viewer.js"></script>
+<script src="src/MapMenu.js"></script>
+<script src="src/Modal.js"></script>
+<script src="src/Popup.js"></script>
+<script src="src/ShareMap.js"></script>
+<script src="src/MapWindow.js"></script>
+<script src="src/Print.js"></script>
+<script src="src/Geoposition.js"></script>
+<script src="src/TransactionHandler.js"></script>
+<script src="src/Editor.js"></script>
+</body>
+</html>
