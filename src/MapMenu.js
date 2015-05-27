@@ -50,7 +50,7 @@ var MapMenu = (function($){
         // var scale = style.icon.scale || undefined;
         var format = s[0].format || 'png';
         if (format == 'png') {
-          symbol = '<div class="legend-item-img"><img style="width: 20px; height: 20px;" src="' + src + '"></div>'
+          symbol = '<div class="legend-item-img"><img style="width: auto; height: 20px;" src="' + src + '"></div>'
         }
         else if (format == 'svg') {
           var o = '<object type="image/svg+xml" data="' + src + '" style="width: 20px;"></object>';               

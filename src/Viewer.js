@@ -354,7 +354,7 @@ var Viewer = (function($){
           attributes: layersConfig.attributes     
         }
 
-        var styleOptions = Viewer.createStyle(layersConfig.style);
+        var styleOptions = Viewer.createStyle(layersConfig.style, layersConfig.clusterStyle);
 
         var layerType = layersConfig.vectorSource ? layersConfig.vectorSource : 'vector';
 
@@ -362,6 +362,14 @@ var Viewer = (function($){
           options.source = vectorSource;
           options.style = styleOptions;
           return new ol.layer.Vector(options);                                 
+        }
+        else if (layerType =='cluster') {
+          options.source = new ol.source.Cluster({
+            source: vectorSource,
+            distance: 40
+          });
+          options.style = styleOptions;
+          return new ol.layer.Vector(options);
         }
         else if (layerType == 'image') {
           options.source = new ol.source.ImageVector({
@@ -476,8 +484,9 @@ var Viewer = (function($){
         $('#querylist').append(queryListItems);
       }
     },
-    createStyle: function(styleName) {
+    createStyle: function(styleName, clusterStyleName) {
           var s = styleSettings[styleName];
+          var clusterSettings = styleSettings[clusterStyleName];
           var style = (function() {
             var styleList=[];
             //Create style for each rule
@@ -499,70 +508,136 @@ var Viewer = (function($){
 
               styleList.push(styleRule);
             }
-
-            return function(feature,resolution) {
-              var scale = Viewer.getScale(resolution);
-              for (var j=0; j<s.length; j++) {
-                var styleL;
-                if (s[j][0].hasOwnProperty('filter')) {  
-                  //find attribute vale between [] defined in styles
-                  var featAttr, expr, featMatch;
-                  var matches = s[j][0].filter.match(/\[(.*?)\]/);
-                  if (matches) {
-                      featAttr = matches[1];
-                      expr = s[j][0].filter.split(']')[1];
-                      featMatch = feature.get(featAttr);
-                      expr = typeof featMatch == 'number' ? featMatch + expr : '"' + featMatch + '"' + expr ;
-                  }
-                  if(eval(expr) && checkScale(s[j][0].maxScale, s[j][0].minScale)) {
-                    styleL = styleList[j];
-                  }
-                }
-                else if (checkScale(s[j][0].maxScale, s[j][0].minScale)) {
-                  styleL = styleList[j];                
-                }
-                     
-              }
-
-              // check if scale is defined
-              function checkScale(maxScale, minScale) {
-                if (maxScale || minScale) {
-                  // Alter 1: maxscale and minscale
-                  if(maxScale && minScale) {
-                    if ((scale > maxScale) && (scale < minScale)) {
-                      return true;
-                    }
-                  }
-                  // Alter 2: only maxscale
-                  else if (maxScale) {
-                    if(scale > maxScale) {
-                      return true;  
-                    }
-                  }
-                  // Alter 3: only minscale
-                  else if (minScale) {
-                    if(scale < minScale) {
-                      return true;  
-                    }
-                  }                  
-                }
-                // Alter 4: no scale limit
-                else {
-                    return true;
-                }
-              }
-              // end check scale 
-
-              return styleL;
+            if(clusterSettings) {
+              return Viewer.styleFunction(s, styleList, clusterSettings);                          
             }
+            else {
+              return Viewer.styleFunction(s,styleList);
+            }
+
           })()
           return style; 
           
+    },
+    styleFunction: function(styleSettings, styleList, clusterSettings) {
+      var s = styleSettings;
+      var cs = clusterSettings;
+      var cluster;
+      var fn = function(feature,resolution) {
+        var scale = Viewer.getScale(resolution);
+        var styleL;
+        //If size is larger than, it is a cluster
+        var size = cs ? feature.get('features').length : 1;
+        //If cluster
+        if (size > 1) {
+          if(checkScale(cs.maxScale, cs.minScale)) {
+            var textFill = new ol.style.Fill({
+              color: cs['textFill']['color']
+            });
+            var textStroke = new ol.style.Stroke({
+              color: cs['textStroke']['color'],
+              width: cs['textStroke']['width']
+            });
+            cluster = [new ol.style.Style({
+              image: new ol.style.Circle({
+                radius: cs['radius'],
+                fill: new ol.style.Fill({
+                  color: cs['fill']['color']
+                }),
+                stroke: new ol.style.Stroke({
+                  color: cs['stroke']['color'],
+                  width: cs['stroke']['width']
+                })
+              }),
+              text: new ol.style.Text({
+                text: size.toString(),
+                fill: textFill,
+                stroke: textStroke,
+                font: cs['font']                  
+              })
+            })];                       
+            if (cs.hasOwnProperty('filter')) {  
+              //find attribute vale between [] defined in styles
+              var featAttr, expr, featMatch;
+              var matches = cs.filter.match(/\[(.*?)\]/);
+              if (matches) {
+                  featAttr = matches[1];
+                  expr = cs.filter.split(']')[1];
+                  featMatch = feature.get(featAttr);
+                  expr = typeof featMatch == 'number' ? featMatch + expr : '"' + featMatch + '"' + expr ;
+              }
+              if(eval(expr)) {
+                styleL = cluster;
+              }
+            }
+            else {
+              styleL = cluster;                
+            }                
+          }
+        }
+        //If not cluster
+        else {        
+          for (var j=0; j<s.length; j++) {
+            var styleL;
+            if(checkScale(s[j][0].maxScale, s[j][0].minScale)) {                                        
+              if (s[j][0].hasOwnProperty('filter')) {  
+                //find attribute vale between [] defined in styles
+                var featAttr, expr, featMatch;
+                var matches = s[j][0].filter.match(/\[(.*?)\]/);
+                if (matches) {
+                    featAttr = matches[1];
+                    expr = s[j][0].filter.split(']')[1];
+                    featMatch = feature.get(featAttr);
+                    expr = typeof featMatch == 'number' ? featMatch + expr : '"' + featMatch + '"' + expr ;
+                }
+                if(eval(expr)) {
+                  styleL = styleList[j];
+                }
+              }
+              else {
+                styleL = styleList[j];                
+              }                
+            }
+          }
+        }
+        // check if scale is defined
+        function checkScale(maxScale, minScale) {
+          if (maxScale || minScale) {
+            // Alter 1: maxscale and minscale
+            if(maxScale && minScale) {
+              if ((scale > maxScale) && (scale < minScale)) {
+                return true;
+              }
+            }
+            // Alter 2: only maxscale
+            else if (maxScale) {
+              if(scale > maxScale) {
+                return true;  
+              }
+            }
+            // Alter 3: only minscale
+            else if (minScale) {
+              if(scale < minScale) {
+                return true;  
+              }
+            }                  
+          }
+          // Alter 4: no scale limit
+          else {
+              return true;
+          }
+        }
+        // end check scale 
+
+        return styleL;
+      }
+      return fn;     
     },
     createStyleOptions: function(styleParams) {
       var styleOptions = {
         fill: styleParams.fill ? new ol.style.Fill(styleParams.fill) : undefined,
         stroke: styleParams.stroke ? new ol.style.Stroke(styleParams.stroke) : undefined,
+        text: styleParams.text ? new ol.style.Text(styleParams.text) : undefined,
         image: undefined
       };
       if (styleParams.hasOwnProperty('circle')) {
@@ -638,14 +713,30 @@ var Viewer = (function($){
 
           map.addOverlay(overlay);
           var l;
+          var showOverlay = true;
           var feature = map.forEachFeatureAtPixel(evt.pixel,
               function(feature, layer) {
                 l = layer;
                 if(l.get('queryable') == true) {
-                  return feature;
-              }
+                  if(feature.get('features')) {
+                    if(feature.get('features').length == 1) {
+                      return feature.get('features')[0];
+                    }
+                    else if (feature.get('features').length > 1) {
+                      map.getView().setCenter(evt.coordinate);
+                      var zoom = map.getView().getZoom();
+                      if(zoom + 1 < settings.resolutions.length) {
+                        map.getView().setZoom(zoom + 1);                      
+                      }
+                      showOverlay =false;
+                    }
+                  }
+                  else {
+                    return feature;
+                  }
+                } 
               });
-          if (feature) {
+          if (feature && showOverlay) {
             var geometry = feature.getGeometry();
             var coord;
             geometry.getType() == 'Point' ? coord = geometry.getCoordinates() : coord = evt.coordinate;
