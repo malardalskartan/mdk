@@ -321,15 +321,18 @@
 	<div id="no-map"><div class="no-map-message">Du använder en föråldrad webbläsare. Uppgradera din webbläsare för att visa kartan.</div></div>
 	<div id="wrapper">
 		<div id="map" class="map">
-			<div id="mapmenu-button" class="mdk-button">
-				<button class="mapmenu-button-true"></button>
-			</div>
-			<div id="home-button" class="mdk-button">
-				<button class="home-button"></button>
-			</div>
-			<div id="geolocation-button" class="mdk-button">
-				<button class="geolocation-button"></button>
-			</div>
+	        <div id="mapmenu-button" class="mdk-button-container mdk-tooltip">
+	        	<button class="mapmenu-button-true mdk-button"></button>
+	        	<span data-tooltip="Meny" data-placement="west"></span>
+	        </div>			
+            <div id="home-button" class="mdk-button-container mdk-tooltip">
+            	<button class="home-button mdk-button"></button>
+            	<span data-tooltip="Zooma till hela kartan" data-placement="east"></span>       
+            </div>
+	        <div id="geolocation-button" class="mdk-button-container mdk-tooltip">
+	        	<button class="geolocation-button mdk-button"></button>
+	        	<span data-tooltip="Visa nuvarande position i kartan" data-placement="east"></span>
+	        </div>
 			<div id="search-wrapper">
 				<div id="search" class="search">
 					<input class="search-field typeahead" type="text" placeholder="Sök adress...">

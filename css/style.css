@@ -373,8 +373,13 @@ button.ol-full-screen-true:after {
   border-right: none;
   padding-right:0;
 }
+.mdk-button-container {
+  display: inline-block;
+  position: absolute;   
+}
 .mdk-button {
-  position: absolute;
+  display: inline-block;
+  position: relative;
   border-radius: 4px;
   background-color: #fff;
   -webkit-box-shadow: 0 2px 5px rgba(0,0,0,0.45);    
@@ -386,7 +391,7 @@ button.ol-full-screen-true:after {
 .mdk-button:hover {
   background-color: rgba(255,255,255,0.6);
 }
-.mdk-button button {
+button.mdk-button {
   border-radius: 4px;
   display: inline-block; 
   font-family: 'FontAwesome';  
@@ -402,8 +407,8 @@ button.ol-full-screen-true:after {
   background-color: white;
   border: none;
 }
-.mdk-button button:hover,
-.mdk-button button:focus {
+button.mdk-button:hover,
+button.mdk-button:focus {
   color: #EEEEEE;
   text-decoration: none;
   background-color: #424242;
@@ -458,24 +463,18 @@ button.edit-delete-button:after {
   content: "\f014";
 }
 /*remove the boxshadow when selected*/
-#mapmenu-button.mdk-button {
-  box-shadow: none;
-  height: 2em;
-}
-.mdk-button .mapmenu-button-true {
-  background-color: transparent;
+.mdk-button.mapmenu-button-true {
   -webkit-box-shadow: 0 2px 5px rgba(0,0,0,0.45);  
   box-shadow: 0 2px 5px rgba(0,0,0,0.45);
 }
-.mdk-button .mapmenu-button-false {
-  background-color: #fff;
+.mdk-button.mapmenu-button-false {
   background-color: rgba(255,255,255,0.5);
   box-shadow: none;
 }
-.no-boxshadow #mapmenu-button.mdk-button {
+.no-boxshadow #mdk-mapmenu-button .mdk-button {
   border: none;
 }
-.no-boxshadow .mdk-button .mapmenu-button-true {
+.no-boxshadow .mdk-button.mapmenu-button-true {
   border: 1px solid #C5C5C5;
 }
 /**/

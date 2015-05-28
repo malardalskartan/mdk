@@ -58,7 +58,7 @@ var Viewer = (function($){
 
         //Set map controls
         mapControls = [
-                new ol.control.Zoom({zoomInTipLabel: null, zoomOutTipLabel:null,zoomInLabel: '', zoomOutLabel:''}),
+                new ol.control.Zoom({zoomInTipLabel: '', zoomOutTipLabel:'',zoomInLabel: '', zoomOutLabel:''}),
                 attribution,
                 new ol.control.Rotate({label: ''}), /*Override default label for compass*/
                 new ol.control.ScaleLine({target: 'bottom-tools'})
