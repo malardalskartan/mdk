@@ -28,11 +28,10 @@
         		},{
         			name: 'Print'
         		},{
-        			name: 'Search'
-        		},{
-        			name: 'Draw'	        								
+        			name: 'Search'	        								
         		}
-        	],		
+        	],
+			projectionCode: 'EPSG:3857',
 	     	center: [1851236, 8275180],
 	     	home: [1831236, 8255180, 1902675, 8323222],			
 	     	zoom: 4,
@@ -49,15 +48,15 @@
 	     		expanded: true	
 	     	}],			
 	     	layers: [{	     									
-	   //   		name: 'test',
-	   //   		opacity: 0.15,
-	   //   		title: 'Mdk',
-				// queryable: false,
-	   //   		source: 'data/test.geojson',
-	   //   		style: 'mask',
-	   //   		type: 'GEOJSON',
-	   //   		visible: true
-	   //   	}, {				
+	      		name: 'points',
+	      		/* opacity: 0.15, */
+	      		title: 'Points',
+				queryable: false,
+	      		source: 'data/points.geojson',
+	      		style: 'cirkel',
+	      		type: 'GEOJSON',
+	      		visible: true
+	      	}, {				
 	     		group: 'background',
 	     		name: 'osm',	
 	     		title: 'MapQuest',
@@ -158,7 +157,6 @@
 <script src="src/Print.js"></script>
 <script src="src/Geoposition.js"></script>
 <script src="src/Search.js"></script>
-<script src="src/Draw.js"></script>
 
 </body>
 </html>
