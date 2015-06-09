@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+	<meta http-equiv="X-UA-Compatible" content="IE=Edge;chrome=1">		
+	<title>Mälardalskartan</title>
+	<link href="css/style.css" rel="stylesheet">
+	<link href="css/no-font.css" rel="stylesheet">	
+	<link href="data/attributes.css" rel="stylesheet">		
+	<script src="externs/modernizr.js"></script>	
+	<script src="externs/jquery-1.11.0.min.js"></script>
+	<script src="data/style.js"></script>	
+	<script type="text/javascript">
+	$(function(){
+
+		//Init the viewer
+        Viewer.init({
+        	modules: [{
+        			name: 'Viewer',
+					fn: 'addFeatureInfo'
+        		},{			
+        			name: 'MapMenu'
+        		},{
+        			name: 'ShareMap'
+        		},{
+        			name: 'Geoposition'
+        		},{
+        			name: 'Print'
+        		},{
+        			name: 'Search'
+        		},{
+        			name: 'Draw'	        								
+        		}
+        	],		
+	     	center: [1851236, 8275180],
+	     	home: [1831236, 8255180, 1902675, 8323222],			
+	     	zoom: 4,
+	     	source: {			
+	     		local: {
+	     			url: 'http://localhost/geoserver/wms',
+	     			version: '1.1.1',
+	     			type: 'WMS'
+	     		}
+	     	},
+	     	groups: [{			    		
+	     		name: 'background',
+	     		title: 'Bakgrundskartor',
+	     		expanded: true	
+	     	}],			
+	     	layers: [{	     									
+	   //   		name: 'test',
+	   //   		opacity: 0.15,
+	   //   		title: 'Mdk',
+				// queryable: false,
+	   //   		source: 'data/test.geojson',
+	   //   		style: 'mask',
+	   //   		type: 'GEOJSON',
+	   //   		visible: true
+	   //   	}, {				
+	     		group: 'background',
+	     		name: 'osm',	
+	     		title: 'Flygfoto',
+	     		type: 'MAPQUEST',
+	     		style: 'karta_farg',				
+	     		visible: true 				
+	     	}		
+	     	]
+        });
+
+	});
+
+	</script>
+</head>
+<body>
+<div id="app-wrapper">
+	<div id="no-map"><div class="no-map-message">Du använder en föråldrad webbläsare. Uppgradera din webbläsare för att visa kartan.</div></div>
+	<div id="wrapper">
+		<div id="map" class="map">
+	        <div id="mapmenu-button" class="mdk-button-container mdk-tooltip">
+	        	<button class="mapmenu-button-true mdk-button"></button>
+	        	<span data-tooltip="Meny" data-placement="west"></span>
+	        </div>			
+            <div id="home-button" class="mdk-button-container mdk-tooltip">
+            	<button class="home-button mdk-button"></button>
+            	<span data-tooltip="Zooma till hela kartan" data-placement="east"></span>       
+            </div>
+	        <div id="geolocation-button" class="mdk-button-container mdk-tooltip">
+	        	<button class="geolocation-button mdk-button"></button>
+	        	<span data-tooltip="Visa nuvarande position i kartan" data-placement="east"></span>
+	        </div>	
+			<div id="search-wrapper">
+				<div id="search" class="search">
+					<input class="search-field typeahead" type="text" placeholder="Sök adress...">
+					<button id="search-button" class="search-false"></button>
+				</div>
+			</div>
+			<div id="mdk-draw-toolbar" class="mdk-toolbar">
+				<ul id="mdk-draw-tools">
+					<li>
+						<a id="mdk-draw-point" class="mdk-tool-button">
+							<div class="mdk-tool-icon mdk-draw-point"></div>
+							<div class="mdk-tool-button-subtext">Punkt</div>
+						</a>
+					</li>
+					<li>
+						<a id="mdk-draw-linestring" class="mdk-tool-button">
+							<div class="mdk-tool-icon mdk-draw-linestring"></div>
+							<div class="mdk-tool-button-subtext">Linje</div>
+						</a>
+					</li>									
+					<li>
+						<a id="mdk-draw-polygon" class="mdk-tool-button">
+							<div class="mdk-tool-icon mdk-draw-polygon"></div>
+							<div class="mdk-tool-button-subtext">Yta</div>
+						</a>
+					</li>
+					<li>
+						<a id="mdk-draw-clear" class="mdk-tool-button">
+							<div class="mdk-tool-icon mdk-draw-clear"></div>
+							<div class="mdk-tool-button-subtext">Rensa</div>
+						</a>
+					</li>
+					<li>
+						<a id="mdk-draw-close" class="mdk-tool-button">
+							<div class="mdk-tool-icon mdk-draw-close"></div>
+							<div class="mdk-tool-button-subtext">Avsluta</div>
+						</a>
+					</li>															
+				</ul>
+			</div>				
+			<div id="mapmenu">
+				<div class="block">
+					<ul id="menutools"> 
+						<li></li>			
+						<li>
+							<div id='share-button' class="menu-button">
+								<div class="button-icon share-icon"></div>
+								Dela karta
+							</div>
+						</li>								
+		        		<li>
+		                	<div id="print-button" class="menu-button">
+			                  	<div class="button-icon print-icon"></div>
+			                  	Skriv ut
+		                	</div>
+		                </li>														
+						<li class="menu-item"><div class="menu-item-divider"></div><li>				
+					</ul>
+				</div>
+			</div>
+			<div id="bottom-tools">
+		
+			</div>			
+			<div id="footer">
+				<div class="footer-left">&nbsp</div>
+				<div class="footer-middle">
+					<ul>				
+						<li><a id="enkoping" href="http://www.enkoping.se/" target="blank">Enköping.se</a></li>
+						<li><a id="eskilstuna" href="http://www.eskilstuna.se/" target="blank">Eskilstuna.se</a></li>
+						<li><a id="strangnas" href="http://www.strangnas.se/" target="blank">Strängnäs.se</a></li>
+						<li><a id="vasteras" href="http://www.vasteras.se/" target="blank">Västerås.se</a></li>
+					</ul>
+				</div>
+				<div class="footer-right">
+				</div>			
+		</div>
+	<!-- Wrapper -->
+	</div>
+<!-- app-wrapper	 -->
+</div>
+<script src="//ajax.googleapis.com/ajax/libs/webfont/1.5.6/webfont.js"></script>
+<script>
+  WebFont.load({
+    custom: {
+      families: ['FontAwesome'],
+      testStrings: {
+        'FontAwesome': '\uf00c\uf000'
+      }
+    },
+    timeout: 2000     
+  });
+</script>
+<script src="externs/es5-shim.min.js"></script>
+<script src="externs/typeahead.jquery.min.js"></script>
+<script src="externs/bloodhound.min.js"></script>
+<script src="externs/proj4.js"></script>
+<script src="externs/defs/EPSG3010.js"></script>
+<script src="externs/defs/EPSG3006.js"></script>			
+<script src="externs/ol.js"></script>
+<script src="externs/placeholders.min.js"></script>				
+<script src="src/Viewer.js"></script>
+<script src="src/MapMenu.js"></script>
+<script src="src/Modal.js"></script>
+<script src="src/Popup.js"></script>
+<script src="src/ShareMap.js"></script>
+<script src="src/MapWindow.js"></script>
+<script src="src/Print.js"></script>
+<script src="src/Geoposition.js"></script>
+<script src="src/Search.js"></script>
+<script src="src/Draw.js"></script>
+
+</body>
+</html>

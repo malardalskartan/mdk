@@ -31,14 +31,16 @@ var Viewer = (function($){
           return;
         }
         //Map settings to use for this viewer       
-        settings.projectionCode = mapSettings.projectionCode;
-        settings.projectionExtent = mapSettings.projectionExtent;
-        settings.projection = ol.proj.get(settings.projectionCode);
-        settings.projection.setExtent(settings.projectionExtent);
-        settings.extent = mapSettings.extent;                 
+        settings.projectionCode = mapSettings.projectionCode || undefined;
+        settings.projectionExtent = mapSettings.projectionExtent || undefined;
+        settings.projection = ol.proj.get(settings.projectionCode) || undefined;
+        if (settings.projectionExtent) {
+          settings.projection.setExtent(settings.projectionExtent)          
+        }
+        settings.extent = mapSettings.extent || undefined;                 
         settings.center = mapSettings.center;
         settings.zoom = mapSettings.zoom;
-        settings.resolutions = mapSettings.resolutions;
+        settings.resolutions = mapSettings.resolutions || undefined;
         settings.source = mapSettings.source;
         settings.home = mapSettings.home;
         settings.groups = mapSettings.groups;
@@ -100,7 +102,10 @@ var Viewer = (function($){
             }
             else if(layerlist[i].type == 'GEOJSON') {
                 layerTarget.push(Viewer.addGeoJson(layerlist[i]));
-            } 
+            }
+            else if(layerlist[i].type == 'MAPQUEST') {
+                layerTarget.push(Viewer.addMapQuest(layerlist[i]));
+            }             
             else if(layerlist[i].type == 'GROUP') {
                 layerTarget.push(Viewer.createLayerGroup(layerlist[i].layers, layerlist[i]));
             }          
@@ -119,10 +124,10 @@ var Viewer = (function($){
 	      controls: mapControls,
 	      layers: settings.layers,
 	      view: new ol.View({
-          extent: settings.extent,
-	      	projection: settings.projection,
+          extent: settings.extent || undefined,
+	      	projection: settings.projection || undefined,
 	        center: settings.center,
-          resolutions: settings.resolutions,
+          resolutions: settings.resolutions || undefined,
 	        zoom: settings.zoom
 	      })
 	    });    	
@@ -378,6 +383,24 @@ var Viewer = (function($){
           });
           return new ol.layer.Image(options);
         }
+    },
+    addMapQuest: function(layersConfig) {
+        // layersConfig.hasOwnProperty('attribution') ? attr=[new ol.Attribution({html: layersConfig.attribution})] : [attr = null];
+
+        return new ol.layer.Tile({
+           group: layersConfig.group || 'background',          
+           name: layersConfig.name.split(':').pop(), //remove workspace part of name
+           opacity: layersConfig.opacity || 1,
+           title: layersConfig.title,
+           styleName: layersConfig.style || 'default',
+           minResolution: layersConfig.hasOwnProperty('minScale') ? Viewer.scaleToResolution(layersConfig.minScale): undefined,
+           maxResolution: layersConfig.hasOwnProperty('maxScale') ? Viewer.scaleToResolution(layersConfig.maxScale): undefined,             
+           visible: layersConfig.visible,
+           source: new ol.source.MapQuest({
+             layer: layersConfig.name,                      
+             style: 'default'
+           })
+        })
     },
     wfsCql: function(relations, coordinates) {
             var url, finishedQueries = 0;
