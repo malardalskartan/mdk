@@ -31,6 +31,20 @@ var styleSettings = {
 			}
 		}]
 	],
+	cirkel: [
+		[{
+			circle: {
+				radius: 5,
+				stroke: {
+					color: 'rgba(0,0,0,1)',
+					width: 2
+				},
+				fill: {
+					color: 'rgba(255,255,255,1)'
+				}				
+			}			
+		}]
+	],	
 	pagaende_detaljplaner: [
 		[{
 			maxScale: 10000,
