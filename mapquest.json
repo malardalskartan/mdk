@@ -1,0 +1,104 @@
+{
+  "controls": [
+    {
+      "name": "geoposition"
+    },
+    {
+      "name": "mapmenu"
+    },
+    {
+      "name": "sharemap"
+    },    
+    {
+      "name": "print"
+    },
+    {
+      "name": "legend"
+    }
+  ],
+  "projectionCode": "EPSG:3857",
+  "center": [1851236,8275180],
+  "home": [1831236,8255180,1902675,8323222],
+  "zoom": 4,
+  "source": {
+    "local": {
+      "url": "http://localhost/geoserver/wms",
+      "version": "1.1.1",
+      "type": "WMS"
+    }
+  },
+  "groups": [
+    {
+      "name": "background",
+      "title": "Bakgrundskartor",
+      "expanded": true
+    }
+  ],
+  "layers": [
+    {
+      "group": "background",
+      "name": "osm",
+      "title": "MapQuest",
+      "type": "MAPQUEST",
+      "style": "karta_farg",
+      "visible": true
+    }
+  ],
+  "styles": {
+      "mask": [
+        [
+          {
+            "stroke": {
+              "color": "rgba(0,0,0,1.0)"
+            },
+            "fill": {
+              "color": "rgba(0,0,0,1.0)"
+            }
+          }
+        ]
+      ],
+      "cirkel": [
+        [
+          {
+            "circle": {
+              "radius": 5,
+              "stroke": {
+                "color": "rgba(0,0,0,1)",
+                "width": 2
+              },
+              "fill": {
+                "color": "rgba(255,255,255,1)"
+              }
+            }
+          }
+        ]
+      ],
+      "karta_gra": [
+        [
+          {
+            "image": {
+              "src": "img/png/gra.png"
+            }
+          }
+        ]
+      ],
+      "karta_farg": [
+        [
+          {
+            "image": {
+              "src": "img/png/farg.png"
+            }
+          }
+        ]
+      ],
+      "orto": [
+        [
+          {
+            "image": {
+              "src": "img/png/orto.png"
+            }
+          }
+        ]
+      ]
+  }
+}

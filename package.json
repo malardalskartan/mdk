@@ -1,0 +1,34 @@
+{
+  "name": "mdk",
+  "version": "1.0.0",
+  "description": "",
+  "main": "mdk.js",
+  "scripts": {
+    "start": "watchify mdk.js --s mdk --d --outfile dist/mdk.js",
+    "build": "browserify mdk.js --s mdk | uglifyjs --compress --output dist/mdk.min.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "browserify": "^11.0.1",
+    "jquery": "^1.11.3",
+    "openlayers": "^3.9.0",
+    "proj4": "^2.3.10"
+  },
+  "devDependencies": {
+    "browser-sync": "^2.9.5",
+    "browserify": "^11.0.1",
+    "browserify-shim": "^3.8.10",
+    "gulp": "^3.9.0",
+    "openlayers": "^3.9.0",
+    "uglify-js": "^2.4.24",
+    "vinyl-source-stream": "^1.1.0",
+    "watchify": "^3.3.1"
+  },
+  "browserify": {
+    "transform": "browserify-shim"
+  },
+  "browserify-shim": {
+    "./externs/modernizr.js": "modernizr"
+  }
+}
