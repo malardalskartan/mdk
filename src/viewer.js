@@ -116,10 +116,11 @@ function init (mapOptions){
       checkSize();
 
       //Init controls
-      var controlName;
+      var controlName, controlOptions;
       for (var i=0; i<settings.controls.length; i++) {
           controlName = settings.controls[i].name;
-          controls[controlName].init();
+          controlOptions = settings.controls[i].options || undefined;
+          controlOptions ? controls[controlName].init(controlOptions) : controls[controlName].init();
       }
       addFeatureInfo();
 

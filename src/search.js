@@ -12,9 +12,18 @@ var typeahead = require("typeahead.js-browserify");
 typeahead.loadjQueryPlugin();
 var Bloodhound = require("typeahead.js-browserify").Bloodhound;
 
-var adress; 
+var adress;
+var name, northing, easting, url, title; 
 
-function init(){
+function init(options){
+
+    name = options.searchAttribute;
+    northing = options.northing;
+    easting = options.easting;
+    url = options.url;
+    title = options.title || '';
+
+    console.log(name);
 
     var el = '<div id="search-wrapper">' +
                 '<div id="search" class="search">' +
@@ -29,11 +38,11 @@ function init(){
         // fix for internet explorer
     $.support.cors = true;
     adress = new Bloodhound({
-      datumTokenizer: Bloodhound.tokenizers.obj.whitespace('NAMN'),
+      datumTokenizer: Bloodhound.tokenizers.obj.whitespace(name),
       queryTokenizer: Bloodhound.tokenizers.whitespace,
       limit: 10,
       remote: {
-        url: 'http://localhost:3000/adressok?q=&QUERY',
+        url: url + '?q=&QUERY',
         wildcard: '&QUERY',
         ajax: {
           contentType:'application/json',
@@ -41,7 +50,7 @@ function init(){
           crossDomain: true,
           success: function(data) {
             data.sort(function(a, b) {
-              return a.NAMN.localeCompare(b.NAMN);
+              return a[name].localeCompare(b[name]);
             });
           },
           error: function(jqXHR, textStatus, errorThrown) {
@@ -62,7 +71,7 @@ function init(){
     {
       name: 'adress',
       limit: 9,
-      displayKey: 'NAMN',
+      displayKey: name,
       source: adress.ttAdapter()
       // templates: {
       //   suggestion: function(data) {
@@ -85,15 +94,14 @@ function bindUIActions() {
 
           map.addOverlay(overlay);
 
-          var coord = [data.E, data.N];
+          var coord = [data[easting], data[northing]];
           overlay.setPosition(coord);
-          var content = data.NAMN;
+          var content = data[name];
           // content += '<br>' + data.postnr + '&nbsp;' + data.postort;
-          var title = 'Adress';
           Popup.setContent({content: content, title: title});            
           Popup.setVisibility(true);
 
-          map.getView().setCenter([data.E, data.N]);
+          map.getView().setCenter([data[easting], data[northing]]);
           map.getView().setZoom(11);          
         });
 
