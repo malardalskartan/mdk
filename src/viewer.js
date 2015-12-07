@@ -10,6 +10,7 @@ var Modernizr = require('../externs/modernizr');
 var Popup = require('./popup');
 var Modal = require('./modal');
 var utils = require('./utils');
+var sidebar = require('./sidebar');
 var controls = {};
 controls.geoposition = require('./geoposition');
 controls.mapmenu = require('./mapmenu');
@@ -17,6 +18,7 @@ controls.print = require('./print');
 controls.sharemap = require('./sharemap');
 controls.legend = require('./legend');
 controls.search = require('./search');
+
 
 var map, mapControls, attribution;
 
@@ -33,6 +35,7 @@ var settings = {
   layers: [],
   styles: {},
   controls: [],
+  featureInfoOverlay: undefined,
   editLayer: null
 };
 var cqlQuery, queryFinished = false;
@@ -87,6 +90,7 @@ function init (mapOptions){
         settings.styles = mapOptions.styles;        
         createLayers(mapOptions.layers, settings.layers); //read layers from mapOptions      
         settings.controls = mapOptions.controls;
+        settings.featureInfoOverlay = mapOptions.hasOwnProperty('featureInfoOverlay') ? mapOptions.featureInfoOverlay : true;
         //If url arguments, parse this settings
         if (window.location.search) {
             parseArg();
@@ -122,6 +126,8 @@ function init (mapOptions){
           controlOptions = settings.controls[i].options || undefined;
           controlOptions ? controls[controlName].init(controlOptions) : controls[controlName].init();
       }
+      sidebar.init();
+      Popup.init('#map');      
       addFeatureInfo();
 
     }
@@ -822,17 +828,17 @@ function init (mapOptions){
         return content;
     }
     function addFeatureInfo() {
-        Popup.init('#map');
+
 
         map.on('click', function(evt) {
-          removeOverlays();     
+          removeOverlays();    
           var overlay = new ol.Overlay({
             element: $('#popup')
           });
 
           map.addOverlay(overlay);
           var l;
-          var showOverlay = true;
+          var identify = true;
           var feature = map.forEachFeatureAtPixel(evt.pixel,
               function(feature, layer) {
                 l = layer;
@@ -847,41 +853,52 @@ function init (mapOptions){
                       if(zoom + 1 < settings.resolutions.length) {
                         map.getView().setZoom(zoom + 1);                      
                       }
-                      showOverlay =false;
+                      identify =false;
                     }
                   }
                   else {
                     return feature;
                   }
                 } 
-              });
-          if (feature && showOverlay) {
-            var geometry = feature.getGeometry();
-            var coord;
-            geometry.getType() == 'Point' ? coord = geometry.getCoordinates() : coord = evt.coordinate;
-            overlay.setPosition(coord);
-            var content = getAttributes(feature,l);
-            //If layer have relations to be queried, ie more information
-            if(l.get('relations')) {
-              var format = new ol.format.WKT();
-              var featureCoord = format.writeGeometry(feature.getGeometry()); 
-              wfsCql(l.get('relations'), featureCoord);
-              content += '<br><div class="mdk-more-button">Mer information</div>';
-              Popup.setContent({content: content, title: l.get('title')});            
-              Popup.setVisibility(true);              
-              $('.mdk-more-button').on('click touchend', function(e) {
-                modalMoreInfo();               
-                e.preventDefault();              
-              });
-            }
-            else {
-              Popup.setContent({content: content, title: l.get('title')});            
-              Popup.setVisibility(true);              
-            }           
-            autoPan();
-         
-          } else {
-            Popup.setVisibility(false);
+          });
+
+          if (feature && identify) {
+              console.log(settings.featureInfoOverlay);
+              switch (settings.featureInfoOverlay) {
+                  case true:
+                      var geometry = feature.getGeometry();
+                      var coord;
+                      geometry.getType() == 'Point' ? coord = geometry.getCoordinates() : coord = evt.coordinate;
+                      overlay.setPosition(coord);
+                      var content = getAttributes(feature,l);
+                      //If layer have relations to be queried, ie more information
+                      if(l.get('relations')) {
+                        var format = new ol.format.WKT();
+                        var featureCoord = format.writeGeometry(feature.getGeometry()); 
+                        wfsCql(l.get('relations'), featureCoord);
+                        content += '<br><div class="mdk-more-button">Mer information</div>';
+                        Popup.setContent({content: content, title: l.get('title')});            
+                        Popup.setVisibility(true);              
+                        $('.mdk-more-button').on('click touchend', function(e) {
+                          modalMoreInfo();               
+                          e.preventDefault();              
+                        });
+                      }
+                      else {
+                        Popup.setContent({content: content, title: l.get('title')});            
+                        Popup.setVisibility(true);              
+                      }           
+                      autoPan();
+                      break;                     
+                  case false:
+                      var content = getAttributes(feature,l);
+                      sidebar.setContent({content: content, title: l.get('title')});
+                      sidebar.setVisibility(true);
+                      break;                                 
+              }  
+          }
+          else {
+            console.log('No features identified');
           }
           evt.preventDefault();
         });      
