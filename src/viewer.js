@@ -11,6 +11,9 @@ var Popup = require('./popup');
 var Modal = require('./modal');
 var utils = require('./utils');
 var sidebar = require('./sidebar');
+var owlCarousel = require('../externs/owlcarousel-browserify');
+owlCarousel.loadjQueryPlugin();
+
 var controls = {};
 controls.geoposition = require('./geoposition');
 controls.mapmenu = require('./mapmenu');
@@ -510,12 +513,19 @@ function init (mapOptions){
            })
         })
     }
-    function afterFeatureNavigation(currentItem,layers) {
-        var currentItem = this.owl.currentItem;
-        s
-        Popup.setTitle(layers[currentItem].get('title'));
+    function initCarousel(id, options, cb) {
+        var carouselOptions = options || {
+          navigation : true, // Show next and prev buttons
+          slideSpeed : 300,
+          paginationSpeed : 400,
+          singleItem:true,
+          rewindSpeed:200,
+          navigationText: ["&#xf053;", "&#xf054;"],
+          afterAction: cb
+        };
+        return $(id).owlCarousel(carouselOptions);
     }
-    function select(selection, feature) {
+    function clearAndSelect(selection, feature) {
         selection.getFeatures().clear();
         selection.getFeatures().push(feature);
     }
@@ -808,8 +818,9 @@ function init (mapOptions){
           for(var i=0; i<layer.get('attributes').length; i++) {
             attribute = layer.get('attributes')[i];
             title = '';
+            val = '';
             if (attribute['name']) {
-              val = feature.get(attribute['name']) || 'uppgift saknas';
+              val = feature.get(attribute['name']) || '';
               if (attribute['title']) {
                 title = '<b>' + attribute['title'] + '</b>';
               }
@@ -823,6 +834,24 @@ function init (mapOptions){
                       feature.get(attribute['name']) +
                       '</a>';
               }
+                var url = createUrl(attribute['urlPrefix'], attribute['urlSuffix'], feature.get(attribute['url']));
+                val = '<a href="' + url + '" target="_blank">' +
+                      feature.get(attribute['name']) +
+                      '</a>';
+            }
+            else if (attribute['url']) {
+                var text = attribute['html'] || attribute['url'];
+                var url = createUrl(attribute['urlPrefix'], attribute['urlSuffix'], feature.get(attribute['url']));
+                val = '<a href="' + url + '" target="_blank">' +
+                      text +
+                      '</a>';
+            }
+            else if (attribute['img']) {
+                var url = createUrl(attribute['urlPrefix'], attribute['urlSuffix'], feature.get(attribute['img']));
+                var attribution = attribute['attribution'] ? '<div class="image-attribution">' + attribute['attribution'] + '</div>' : '';
+                val = '<div class="image-container">' +
+                          '<img src="' + url + '">' + attribution +
+                      '</div>';
             }
             else if (attribute['html']) {
               val = attribute['html'];
@@ -835,6 +864,11 @@ function init (mapOptions){
         }
         content += li + '</ul></div>';
         return content;
+    }
+    function createUrl(prefix, suffix, url) {
+        var p = prefix || '';
+        var s = suffix || '';
+        return p + url + s;
     }
     function addFeatureInfo() {
 
@@ -877,29 +911,30 @@ function init (mapOptions){
                     else if(feature.get('features').length == 1 && queryable) {
                         layers.push(l);
                         features.push(feature.get('features')[0]);
-                        content += Viewer.getAttributes(feature.get('features')[0],l);
+                        content += getAttributes(feature.get('features')[0],l);
                     }
                 }
                 else if(queryable) {
                     layers.push(l);
                     features.push(feature);
-                    content += Viewer.getAttributes(feature,l);
+                    content += getAttributes(feature,l);
                 }
               });
 
-          if (feature && identify) {
-
+          if (features && identify) {
+              select = new ol.interaction.Select({layers: layers});
+              map.addInteraction(select);
+              content = '<div id="identify"><div id="mdk-identify-carousel" class="owl-carousel owl-theme">' + content + '</div></div>';
               switch (settings.featureInfoOverlay) {
                   case true:
-                      var geometry = feature.getGeometry();
+                      var geometry = features[0].getGeometry();
                       var coord;
                       geometry.getType() == 'Point' ? coord = geometry.getCoordinates() : coord = evt.coordinate;
                       overlay.setPosition(coord);
-                      var content = getAttributes(feature,l);
                       //If layer have relations to be queried, ie more information
                       if(l.get('relations')) {
                         var format = new ol.format.WKT();
-                        var featureCoord = format.writeGeometry(feature.getGeometry());
+                        var featureCoord = format.writeGeometry(features[0].getGeometry());
                         wfsCql(l.get('relations'), featureCoord);
                         content += '<br><div class="mdk-more-button">Mer information</div>';
                         Popup.setContent({content: content, title: l.get('title')});
@@ -913,12 +948,17 @@ function init (mapOptions){
                         Popup.setContent({content: content, title: l.get('title')});
                         Popup.setVisibility(true);
                       }
+                      var owl = initCarousel('#mdk-identify-carousel');
                       autoPan();
                       break;
                   case false:
-                      var content = getAttributes(feature,l);
                       sidebar.setContent({content: content, title: l.get('title')});
                       sidebar.setVisibility(true);
+                      var owl = initCarousel('#mdk-identify-carousel', undefined, function(){
+                          var currentItem = this.owl.currentItem;
+                          clearAndSelect(select, features[currentItem]);
+                          sidebar.setTitle(layers[currentItem].get('title'));
+                      });
                       break;
               }
           }
