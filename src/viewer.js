@@ -26,10 +26,10 @@ var settings = {
   projection: '',
   projectionCode: '',
   projectionExtent: '',
-  extent: [],    
+  extent: [],
   center: [0, 0],
   zoom: 0,
-  resolutions: null, 
+  resolutions: null,
   source: {},
   group: [],
   layers: [],
@@ -39,7 +39,7 @@ var settings = {
   editLayer: null
 };
 var cqlQuery, queryFinished = false;
- 
+
 function init (mapOptions){
 
         // if(!(Modernizr.canvas)) {
@@ -47,7 +47,7 @@ function init (mapOptions){
         //   return;
         // }
         //Map settings to use for this module
-        if (typeof(mapOptions) === 'object') {       
+        if (typeof(mapOptions) === 'object') {
             setMapOptions(mapOptions);
         }
         else if (typeof(mapOptions) === 'string') {
@@ -59,7 +59,7 @@ function init (mapOptions){
 
 
     }
-    function setMapOptions(mapOptions) {    
+    function setMapOptions(mapOptions) {
         // Read and set projection
         if(mapOptions.hasOwnProperty('proj4Defs')) {
             var proj = mapOptions['proj4Defs'];
@@ -87,14 +87,14 @@ function init (mapOptions){
         settings.home = mapOptions.home;
         settings.groups = mapOptions.groups;
         settings.editLayer = mapOptions.editLayer;
-        settings.styles = mapOptions.styles;        
-        createLayers(mapOptions.layers, settings.layers); //read layers from mapOptions      
+        settings.styles = mapOptions.styles;
+        createLayers(mapOptions.layers, settings.layers); //read layers from mapOptions
         settings.controls = mapOptions.controls;
         settings.featureInfoOverlay = mapOptions.hasOwnProperty('featureInfoOverlay') ? mapOptions.featureInfoOverlay : true;
         //If url arguments, parse this settings
         if (window.location.search) {
             parseArg();
-        }    
+        }
 
         //Create attribution
         attribution = new ol.control.Attribution({
@@ -111,7 +111,7 @@ function init (mapOptions){
         if(window.top!=window.self) {
             MapWindow.init();
         }
-  
+
       createHome(settings.home);
       loadMap();
 
@@ -127,14 +127,14 @@ function init (mapOptions){
           controlOptions ? controls[controlName].init(controlOptions) : controls[controlName].init();
       }
       sidebar.init();
-      Popup.init('#map');      
+      Popup.init('#map');
       addFeatureInfo();
 
     }
     function createLayers(layerlist, layers) {
         for(var i=layerlist.length-1; i>=0; i--) {
             var layer = layerlist[i];
-            var layerOptions = setLayerOptions(layer);          
+            var layerOptions = setLayerOptions(layer);
             if(layer.type == 'WMTS') {
                 layers.push(addWMTS(layer));
             }
@@ -143,27 +143,27 @@ function init (mapOptions){
             }
             else if(layer.type == 'WFS') {
                 var wfsSource = wfs(layerOptions);
-                layers.push(createVectorLayer(layerOptions, wfsSource));                
+                layers.push(createVectorLayer(layerOptions, wfsSource));
             }
             else if(layer.type == 'AGS_FEATURE') {
                 var agsFeatureSource = agsFeature(layerOptions);
-                layers.push(createVectorLayer(layerOptions, agsFeatureSource));                
-            }            
+                layers.push(createVectorLayer(layerOptions, agsFeatureSource));
+            }
             else if(layer.type == 'GEOJSON') {
                 layers.push(createVectorLayer(layerOptions, geojson(layerOptions.source)));
             }
             else if(layer.type == 'MAPQUEST') {
                 layers.push(addMapQuest(layer));
-            }             
+            }
             else if(layer.type == 'GROUP') {
                 layers.push(createLayerGroup(layer.layers, layer));
-            }          
+            }
         }
         return layers;
     }
     function setLayerOptions(options) {
         var geometryName = options.hasOwnProperty('geometryName') ? options.geometryName : 'geom';
-        var featureType = options.name.split('__').shift();      
+        var featureType = options.name.split('__').shift();
         var layerOptions = {
             featureType: featureType.split('__').shift(),
             name: options.name.split(':').pop(),
@@ -178,12 +178,12 @@ function init (mapOptions){
             legend: false,
             source: options.source,
             style: options.style || 'default',
-            styleName: options.style,        
+            styleName: options.style,
             queryable: options.hasOwnProperty('queryable') ? options.queryable : true,
             minResolution: options.hasOwnProperty('minScale') ? scaleToResolution(options.minScale): undefined,
-            maxResolution: options.hasOwnProperty('maxScale') ? scaleToResolution(options.maxScale): undefined,                  
-            visible: options.visible,          
-            attributes: options.attributes     
+            maxResolution: options.hasOwnProperty('maxScale') ? scaleToResolution(options.maxScale): undefined,
+            visible: options.visible,
+            attributes: options.attributes
         }
         if (options.hasOwnProperty('clusterStyle')) {
             layerOptions.clusterStyle = options.clusterStyle;
@@ -216,11 +216,11 @@ function init (mapOptions){
           resolutions: settings.resolutions || undefined,
 	        zoom: settings.zoom
 	      })
-	    });    	
+	    });
     }
     function parseArg(){
     	var str = window.location.search.substring(1);
-    	var elements = str.split("&");          
+    	var elements = str.split("&");
 
     	for (var i = 0; i < elements.length; i++) {
           //center coordinates
@@ -231,13 +231,13 @@ function init (mapOptions){
          }
          else if (i==1) {
              settings.zoom = parseInt(elements[i]);
-         }             
+         }
     		else if (i==2) {
                 var l = elements[i].split(";");
                 var layers = settings.layers;
                 var la, match;
                 for (var j = 0; j < layers.length; j++) {
-                    match = 0; 
+                    match = 0;
                     $.each(l, function(index, el) {
                       la = el.split(",");
                       if(layers[j].get('group')) {
@@ -245,25 +245,25 @@ function init (mapOptions){
                           layers[j].setVisible(true);
                           match = 1;
                         }
-                        else if ((layers[j].get('group') == 'background') && (match == 0)) {                    
+                        else if ((layers[j].get('group') == 'background') && (match == 0)) {
                           layers[j].setVisible(false);
                         }
                         else if (la[0] == layers[j].get('name')) {
                           if (la[1] == 1) {
                             layers[j].set('legend', true);
-                            layers[j].setVisible(false);                            
+                            layers[j].setVisible(false);
                           }
                           else {
-                            layers[j].set('legend', true);                            
-                            layers[j].setVisible(true);                         
-                          }   
+                            layers[j].set('legend', true);
+                            layers[j].setVisible(true);
+                          }
                         }
-                      }                                           
-                    })                    
+                      }
+                    })
     		        }
-    	    }              
+    	    }
         }
-    	 	
+
     }
     function getSettings() {
         return settings;
@@ -278,7 +278,7 @@ function init (mapOptions){
           url = window.location.href.replace(window.location.search, '?');
       }
       else {
-          url = window.location.href + '?';    
+          url = window.location.href + '?';
       }
       var mapView = map.getView();
       var center = mapView.getCenter();
@@ -293,7 +293,7 @@ function init (mapOptions){
             layerNames += el.get('name') + ';';
         }
         else if(el.get('legend') == true) {
-            layerNames += el.get('name') + ',1;';          
+            layerNames += el.get('name') + ',1;';
         }
       })
       return url + center + '&' + zoom + '&' + layerNames.slice(0, layerNames.lastIndexOf(";"));
@@ -304,20 +304,20 @@ function init (mapOptions){
     function getLayers() {
       return settings.layers;
     }
-    function getLayer(layername) {    
+    function getLayer(layername) {
         var layer = $.grep(settings.layers, function(obj) {
            return (obj.get('name') == layername);
-        }); 
-        return layer[0];       
+        });
+        return layer[0];
     }
     function getEditLayer() {
       return settings.editLayer;
     }
-    function getGroup(group) {    
+    function getGroup(group) {
         var group = $.grep(settings.layers, function(obj) {
             return (obj.get('group') == group);
-        }); 
-        return group;       
+        });
+        return group;
     }
     function getGroups() {
         return settings.groups;
@@ -357,20 +357,20 @@ function init (mapOptions){
     function createTileLayer(options) {
 
     }
-    function addWMS(layersConfig) {    
+    function addWMS(layersConfig) {
 
         return new ol.layer.Tile({
           name: layersConfig.name.split(':').pop(), //remove workspace part of name
           group: layersConfig.group || 'default',
-          opacity: layersConfig.opacity || 1,          
+          opacity: layersConfig.opacity || 1,
           title: layersConfig.title,
           styleName: layersConfig.style || 'default',
 		      extent: layersConfig.extent || undefined,
           minResolution: layersConfig.hasOwnProperty('minScale') ? scaleToResolution(layersConfig.minScale): undefined,
-          maxResolution: layersConfig.hasOwnProperty('maxScale') ? scaleToResolution(layersConfig.maxScale): undefined,            
+          maxResolution: layersConfig.hasOwnProperty('maxScale') ? scaleToResolution(layersConfig.maxScale): undefined,
           type: layersConfig.type,
           visible: layersConfig.visible,
-          legend: false,          
+          legend: false,
           source: new ol.source.TileWMS(({
             url: settings.source[layersConfig.source].url,
             gutter: layersConfig.gutter || 0,
@@ -378,7 +378,7 @@ function init (mapOptions){
             projection: settings.projection,
             params: {'LAYERS': layersConfig.name, 'TILED': true, VERSION: settings.source[layersConfig.source].version}
           }))
-        })        
+        })
     }
     function addWMTS(layersConfig) {
         var matrixIds = [], attr = null;
@@ -389,13 +389,13 @@ function init (mapOptions){
         layersConfig.hasOwnProperty('attribution') ? attr=[new ol.Attribution({html: layersConfig.attribution})] : [attr = null];
 
         return new ol.layer.Tile({
-           group: layersConfig.group || 'background',          
+           group: layersConfig.group || 'background',
            name: layersConfig.name.split(':').pop(), //remove workspace part of name
            opacity: layersConfig.opacity || 1,
            title: layersConfig.title,
            styleName: layersConfig.style || 'default',
            minResolution: layersConfig.hasOwnProperty('minScale') ? scaleToResolution(layersConfig.minScale): undefined,
-           maxResolution: layersConfig.hasOwnProperty('maxScale') ? scaleToResolution(layersConfig.maxScale): undefined,             
+           maxResolution: layersConfig.hasOwnProperty('maxScale') ? scaleToResolution(layersConfig.maxScale): undefined,
            visible: layersConfig.visible,
            source: new ol.source.WMTS({
              crossOrigin: 'anonymous',
@@ -409,7 +409,7 @@ function init (mapOptions){
                origin: ol.extent.getTopLeft(settings.projectionExtent),
                resolutions: settings.resolutions,
                matrixIds: matrixIds
-             }),                       
+             }),
              extent: settings.extent, //layer extent to avoid bad requests out of range
              style: 'default'
            })
@@ -420,7 +420,7 @@ function init (mapOptions){
             url: source,
             format: new ol.format.GeoJSON()
         })
-    }  
+    }
     function wfs(options) {
         var vectorSource = null;
         var serverUrl = settings.source[options.source].url;
@@ -436,8 +436,8 @@ function init (mapOptions){
                   '?service=WFS&' +
                   'version=1.1.0&request=GetFeature&typeName=' + options.name +
                   '&outputFormat=application/json' +
-                  '&srsname=' + settings.projectionCode + 
-                  queryFilter + extent.join(',') + ',' + bboxProjectionCode;          
+                  '&srsname=' + settings.projectionCode +
+                  queryFilter + extent.join(',') + ',' + bboxProjectionCode;
           },
           strategy: ol.loadingstrategy.tile(ol.tilegrid.createXYZ({
               maxZoom: settings.resolutions.length
@@ -484,31 +484,40 @@ function init (mapOptions){
                         if (features.length > 0) {
                             that.addFeatures(features);
                         }
-                    }           
+                    }
                 }
               });
             },
             strategy: ol.loadingstrategy.bbox
         });
-        return vectorSource;      
+        return vectorSource;
     }
     function addMapQuest(layersConfig) {
         // layersConfig.hasOwnProperty('attribution') ? attr=[new ol.Attribution({html: layersConfig.attribution})] : [attr = null];
 
         return new ol.layer.Tile({
-           group: layersConfig.group || 'background',          
+           group: layersConfig.group || 'background',
            name: layersConfig.name.split(':').pop(), //remove workspace part of name
            opacity: layersConfig.opacity || 1,
            title: layersConfig.title,
            styleName: layersConfig.style || 'default',
            minResolution: layersConfig.hasOwnProperty('minScale') ? scaleToResolution(layersConfig.minScale): undefined,
-           maxResolution: layersConfig.hasOwnProperty('maxScale') ? scaleToResolution(layersConfig.maxScale): undefined,             
+           maxResolution: layersConfig.hasOwnProperty('maxScale') ? scaleToResolution(layersConfig.maxScale): undefined,
            visible: layersConfig.visible,
            source: new ol.source.MapQuest({
-             layer: layersConfig.name,                      
+             layer: layersConfig.name,
              style: 'default'
            })
         })
+    }
+    function afterFeatureNavigation(currentItem,layers) {
+        var currentItem = this.owl.currentItem;
+        s
+        Popup.setTitle(layers[currentItem].get('title'));
+    }
+    function select(selection, feature) {
+        selection.getFeatures().clear();
+        selection.getFeatures().push(feature);
     }
     function wfsCql(relations, coordinates) {
             var url, finishedQueries = 0;
@@ -518,7 +527,7 @@ function init (mapOptions){
             for(var i=0; i < relations.length; i++) {
               (function(index) {
                 var layer = relations[index].layer;
-                var mapServer = settings.source[getLayer(layer).get('mapSource')].url;           
+                var mapServer = settings.source[getLayer(layer).get('mapSource')].url;
                 url = mapServer + '?';
                 data = 'service=WFS&' +
                     'version=1.0.0&request=GetFeature&typeName=' + layer +
@@ -538,21 +547,21 @@ function init (mapOptions){
                     for(var j=0; j<response.features.length; j++) {
                       var f = {};
                       f.attribute = response.features[j]['properties'][relations[index].attribute];
-                      f.url = response.features[j]['properties'][relations[index].url] || undefined;                      
+                      f.url = response.features[j]['properties'][relations[index].url] || undefined;
                       result.features.push(f);
                     }
                     cqlQuery.push(result);
                     finishedQueries++;
                     if (finishedQueries >= relations.length) {
                       queryFinished = true;
-                    }                  
+                    }
                   },
                   error: function(jqXHR, textStatus, errorThrown) {
                     console.log(errorThrown);
-                  }              
+                  }
                 });
             })(i);
-          } 
+          }
     }
     function getCqlQuery() {
       return cqlQuery;
@@ -563,9 +572,9 @@ function init (mapOptions){
       Popup.setVisibility(false);
 
       var queryList = '<ul id="querylist">';
-      queryList += '</ul>';   
+      queryList += '</ul>';
 
-      var modal = Modal('#map', {title: title, content: content + queryList});          
+      var modal = Modal('#map', {title: title, content: content + queryList});
       modal.showModal();
       $('.modal li').removeClass('hidden');
 
@@ -586,15 +595,15 @@ function init (mapOptions){
               nrTries ++;
               checkQuery();
             }
-          }, 100);          
-        }        
+          }, 100);
+        }
       }
 
       //append query results to modal
       function appendQuery() {
         cqlQuery.sort(function(a, b) {
           return a.layer.localeCompare(b.layer);
-        });        
+        });
         for (var i=0; i < cqlQuery.length; i++) {
           if(cqlQuery[i].features.length) {
             var l = getLayer(cqlQuery[i].layer);
@@ -603,16 +612,16 @@ function init (mapOptions){
                   var attr = cqlQuery[i].features[j].attribute;
                   if (cqlQuery[i].features[j].url) {
                     queryListItems += '<li><div class="query-item"><a href="' + cqlQuery[i].features[j].url + '" target="_blank">' +
-                          attr + 
+                          attr +
                           '</a></div></li>';
                   }
                   else {
-                    queryListItems += '<li><div class="query-item">' + attr + '</div></li>';//<div class="icon-expand icon-expand-false"></div></li>';                        
-                  }        
+                    queryListItems += '<li><div class="query-item">' + attr + '</div></li>';//<div class="icon-expand icon-expand-false"></div></li>';
+                  }
             }
             queryListItems += '</ul>';
           }
-        }      
+        }
         $('#querylist').append(queryListItems);
       }
     }
@@ -627,14 +636,14 @@ function init (mapOptions){
             var styleList = createStyleList(styleSettings);
             if(clusterStyleSettings) {
                 var clusterStyleList = createStyleList(clusterStyleSettings);
-                return styleFunction(styleSettings, styleList, clusterStyleSettings, clusterStyleList);                          
+                return styleFunction(styleSettings, styleList, clusterStyleSettings, clusterStyleList);
             }
             else {
                 return styleFunction(styleSettings,styleList);
             }
 
           })()
-          return style;        
+          return style;
     }
     //Create list of ol styles based on style settings
     function createStyleList(styleSettings) {
@@ -676,7 +685,7 @@ function init (mapOptions){
         }
         return styleL;
       }
-      return fn;     
+      return fn;
     }
     function checkScale(scale, maxScale, minScale) {
         if (maxScale || minScale) {
@@ -689,15 +698,15 @@ function init (mapOptions){
           // Alter 2: only maxscale
           else if (maxScale) {
             if(scale > maxScale) {
-              return true;  
+              return true;
             }
           }
           // Alter 3: only minscale
           else if (minScale) {
             if(scale < minScale) {
-              return true;  
+              return true;
             }
-          }                  
+          }
         }
         // Alter 4: no scale limit
         else {
@@ -713,8 +722,8 @@ function init (mapOptions){
                 if (element.hasOwnProperty('text') && size) {
                     styleList[j][index].getText().setText(size);
                 }
-            });                               
-            if (s[j][0].hasOwnProperty('filter')) {  
+            });
+            if (s[j][0].hasOwnProperty('filter')) {
               //find attribute vale between [] defined in styles
               var featAttr, expr, featMatch;
               var matches = s[j][0].filter.match(/\[(.*?)\]/);
@@ -731,8 +740,8 @@ function init (mapOptions){
             }
             else {
               styleL = styleList[j];
-              return styleL;                
-            }                
+              return styleL;
+            }
           }
         }
     }
@@ -746,36 +755,36 @@ function init (mapOptions){
                         return new ol.geom.Point(coordinates);
                     }
                 break;
-            } 
+            }
         }
         if(styleParams.hasOwnProperty('zIndex')) {
             styleOptions.zIndex = styleParams.zIndex;
-        }                
+        }
         if(styleParams.hasOwnProperty('fill')) {
             styleOptions.fill = new ol.style.Fill(styleParams.fill);
         }
         if(styleParams.hasOwnProperty('stroke')) {
             styleOptions.stroke = new ol.style.Stroke(styleParams.stroke);
         }
-        if(styleParams.hasOwnProperty('text')) {         
+        if(styleParams.hasOwnProperty('text')) {
             styleOptions.text = new ol.style.Text(styleParams.text);
             if(styleParams.text.hasOwnProperty('fill')) {
                 styleOptions.text.setFill(new ol.style.Fill(styleParams.text.fill));
             }
             if(styleParams.text.hasOwnProperty('stroke')) {
                 styleOptions.text.setStroke(new ol.style.Stroke(styleParams.text.stroke));
-            }                       
+            }
         }
         if(styleParams.hasOwnProperty('icon')) {
-            styleOptions.image = new ol.style.Icon(styleParams.icon);        
+            styleOptions.image = new ol.style.Icon(styleParams.icon);
         }
         if(styleParams.hasOwnProperty('circle')) {
             styleOptions.image = new ol.style.Circle({
                 radius: styleParams.circle.radius,
                 fill: new ol.style.Fill(styleParams.circle.fill) || undefined,
                 stroke: new ol.style.Stroke(styleParams.circle.stroke) || undefined
-            });          
-        }                     
+            });
+        }
         return styleOptions;
     }
     function getScale(resolution) {
@@ -789,7 +798,7 @@ function init (mapOptions){
       var dpi = 25.4 / 0.28;
       var mpu = settings.projection.getMetersPerUnit();
       var resolution = scale / (mpu * 39.37 * dpi);
-      return resolution;      
+      return resolution;
     }
     function getAttributes(feature, layer) {
         var content = '<div id="identify"><ul>';
@@ -806,14 +815,14 @@ function init (mapOptions){
               }
               if (attribute['url']) {
                 val = '<a href="' + feature.get(attribute['url']) + '" target="_blank">' +
-                      feature.get(attribute['name']) + 
+                      feature.get(attribute['name']) +
                       '</a>';
               }
               if (attribute['urlPrefix'] && attribute['url']) {
-                val = '<a href="' + attribute['urlPrefix'] + feature.get(attribute['url']) + (attribute['urlSuffix'] || '') +'" target="_blank">' + 
+                val = '<a href="' + attribute['urlPrefix'] + feature.get(attribute['url']) + (attribute['urlSuffix'] || '') +'" target="_blank">' +
                       feature.get(attribute['name']) +
                       '</a>';
-              }                
+              }
             }
             else if (attribute['html']) {
               val = attribute['html'];
@@ -829,41 +838,57 @@ function init (mapOptions){
     }
     function addFeatureInfo() {
 
+        var select;
 
         map.on('click', function(evt) {
-          removeOverlays();    
+
+          if(select) {
+              select.getFeatures().clear();
+              map.removeInteraction(select);
+          }
+
+          removeOverlays();
           var overlay = new ol.Overlay({
             element: $('#popup')
           });
 
           map.addOverlay(overlay);
-          var l;
+
           var identify = true;
-          var feature = map.forEachFeatureAtPixel(evt.pixel,
+          var l, layers = [];
+          var features = [];
+          var content ='';
+          map.forEachFeatureAtPixel(evt.pixel,
               function(feature, layer) {
                 l = layer;
-                if(l.get('queryable') == true) {
-                  if(feature.get('features')) {
-                    if(feature.get('features').length == 1 || map.getView().getResolution() == settings.resolutions[settings.resolutions.length-1]) {
-                      return feature.get('features')[0];
-                    }
-                    else if (feature.get('features').length > 1) {
+                var queryable = false;
+                if(layer) {
+                    queryable = layer.get('queryable');
+                }
+                if(feature.get('features')) {
+                    if (feature.get('features').length > 1) {
                       map.getView().setCenter(evt.coordinate);
                       var zoom = map.getView().getZoom();
                       if(zoom + 1 < settings.resolutions.length) {
-                        map.getView().setZoom(zoom + 1);                      
+                        map.getView().setZoom(zoom + 1);
                       }
-                      identify =false;
+                      showOverlay =false;
                     }
-                  }
-                  else {
-                    return feature;
-                  }
-                } 
-          });
+                    else if(feature.get('features').length == 1 && queryable) {
+                        layers.push(l);
+                        features.push(feature.get('features')[0]);
+                        content += Viewer.getAttributes(feature.get('features')[0],l);
+                    }
+                }
+                else if(queryable) {
+                    layers.push(l);
+                    features.push(feature);
+                    content += Viewer.getAttributes(feature,l);
+                }
+              });
 
           if (feature && identify) {
-              console.log(settings.featureInfoOverlay);
+
               switch (settings.featureInfoOverlay) {
                   case true:
                       var geometry = feature.getGeometry();
@@ -874,34 +899,34 @@ function init (mapOptions){
                       //If layer have relations to be queried, ie more information
                       if(l.get('relations')) {
                         var format = new ol.format.WKT();
-                        var featureCoord = format.writeGeometry(feature.getGeometry()); 
+                        var featureCoord = format.writeGeometry(feature.getGeometry());
                         wfsCql(l.get('relations'), featureCoord);
                         content += '<br><div class="mdk-more-button">Mer information</div>';
-                        Popup.setContent({content: content, title: l.get('title')});            
-                        Popup.setVisibility(true);              
+                        Popup.setContent({content: content, title: l.get('title')});
+                        Popup.setVisibility(true);
                         $('.mdk-more-button').on('click touchend', function(e) {
-                          modalMoreInfo();               
-                          e.preventDefault();              
+                          modalMoreInfo();
+                          e.preventDefault();
                         });
                       }
                       else {
-                        Popup.setContent({content: content, title: l.get('title')});            
-                        Popup.setVisibility(true);              
-                      }           
+                        Popup.setContent({content: content, title: l.get('title')});
+                        Popup.setVisibility(true);
+                      }
                       autoPan();
-                      break;                     
+                      break;
                   case false:
                       var content = getAttributes(feature,l);
                       sidebar.setContent({content: content, title: l.get('title')});
                       sidebar.setVisibility(true);
-                      break;                                 
-              }  
+                      break;
+              }
           }
           else {
             console.log('No features identified');
           }
           evt.preventDefault();
-        });      
+        });
     }
     function addGetFeatureInfo() {
         Popup.init('#map');
@@ -928,7 +953,7 @@ function init (mapOptions){
                       queryLayers.push(data);
 
                       overlay.setPosition(coordinate);
-                      
+
                       Popup.setContent({content: data, title: l.get('title')});
                       Popup.setVisibility(true);
                       autoPan();
@@ -946,11 +971,11 @@ function init (mapOptions){
               })(layer) //end post function
               } //end if
               } //end for
-          
+
           map.addOverlay(overlay);
           evt.preventDefault();
         });
-          
+
     }
     function autoPan() {
     /*Workaround to remove when autopan implemented for overlays */
@@ -964,7 +989,7 @@ function init (mapOptions){
       // Check if mapmenu widget is used and opened
       var menuSize = 0;
       if(controls.hasOwnProperty('mapmenu')) {
-        menuSize = controls.mapmenu.getTarget().offset().left > 0 ? mapSize[0]- controls.mapmenu.getTarget().offset().left : menuSize = 0;                 
+        menuSize = controls.mapmenu.getTarget().offset().left > 0 ? mapSize[0]- controls.mapmenu.getTarget().offset().left : menuSize = 0;
       }
       if (offsetY < 0 || offsetX < 0 + menuSize || offsetX > (mapSize[0]-$(el).outerWidth(true))) {
         var dx = 0, dy = 0;
@@ -973,7 +998,7 @@ function init (mapOptions){
         }
         if (offsetX > (mapSize[0]-$(el).outerWidth(true))) {
           dx = -($(el).outerWidth(true)-(mapSize[0]-offsetX))*map.getView().getResolution();
-        }                         
+        }
         if (offsetY < 0) {
           dy = (-offsetY)*map.getView().getResolution();
         }
@@ -993,25 +1018,25 @@ function init (mapOptions){
             for (var i=0; i < overlays.length; i++) {
               map.removeOverlay(overlays[i]);
             }
-        }   
-    } 
+        }
+    }
     function createHome(home) {
         var el = utils.createButton({
             buttonName: 'home-button',
             tooltipText: 'Zooma till hela kartan'
         });
-        $('#map').append(el); 
+        $('#map').append(el);
         $('#home-button').on('touchend click', function(e) {
           map.getView().fit(home, map.getSize());
           $('#home-button button').blur();
           e.preventDefault();
-        });                                
+        });
     }
     function checkSize() {
         var small = map.getSize()[0] < 768;
         attribution.setCollapsible(small);
-        attribution.setCollapsed(small);      
-    }  
+        attribution.setCollapsed(small);
+    }
 
 module.exports.init = init;
 module.exports.createLayers = createLayers;
