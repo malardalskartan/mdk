@@ -849,7 +849,7 @@ function init (mapOptions){
                   val = '<div class="image-container">' +
                             '<img src="' + url + '">' + attribution +
                         '</div>';
-              }           
+              }
           }
           else if (attribute['html']) {
             val = attribute['html'];
@@ -904,7 +904,7 @@ function init (mapOptions){
                       if(zoom + 1 < settings.resolutions.length) {
                         map.getView().setZoom(zoom + 1);
                       }
-                      showOverlay =false;
+                      identify =false;
                     }
                     else if(feature.get('features').length == 1 && queryable) {
                         layers.push(l);
@@ -930,19 +930,19 @@ function init (mapOptions){
                       geometry.getType() == 'Point' ? coord = geometry.getCoordinates() : coord = evt.coordinate;
                       overlay.setPosition(coord);
                       //If layer have relations to be queried, ie more information
-                      if(l.get('relations')) {
-                        var format = new ol.format.WKT();
-                        var featureCoord = format.writeGeometry(features[0].getGeometry());
-                        wfsCql(l.get('relations'), featureCoord);
-                        content += '<br><div class="mdk-more-button">Mer information</div>';
-                        Popup.setContent({content: content, title: l.get('title')});
-                        Popup.setVisibility(true);
-                        $('.mdk-more-button').on('click touchend', function(e) {
-                          modalMoreInfo();
-                          e.preventDefault();
-                        });
-                      }
-                      else {
+                      // if(l.get('relations')) {
+                      //   var format = new ol.format.WKT();
+                      //   var featureCoord = format.writeGeometry(features[0].getGeometry());
+                      //   wfsCql(l.get('relations'), featureCoord);
+                      //   content += '<br><div class="mdk-more-button">Mer information</div>';
+                      //   Popup.setContent({content: content, title: l.get('title')});
+                      //   Popup.setVisibility(true);
+                      //   $('.mdk-more-button').on('click touchend', function(e) {
+                      //     modalMoreInfo();
+                      //     e.preventDefault();
+                      //   });
+                      // }
+                      // else {
                         Popup.setContent({content: content, title: l.get('title')});
                         Popup.setVisibility(true);
                         var owl = initCarousel('#mdk-identify-carousel', undefined, function(){
@@ -950,7 +950,7 @@ function init (mapOptions){
                             clearAndSelect(select, features[currentItem]);
                             Popup.setTitle(layers[currentItem].get('title'));
                         });
-                      }
+                      // }
                       var owl = initCarousel('#mdk-identify-carousel');
                       autoPan();
                       break;
