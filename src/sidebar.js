@@ -34,7 +34,7 @@ function setVisibility(visible) {
     visible == true ? $('#sidebar').addClass('sidebar-show') : $('#sidebar').removeClass('sidebar-show');
 }
 function setTitle(title) {
-    $('#popup .popup-title').html(title);
+    $('#sidebar .sidebar-title').html(title);
 }
 function setContent(config) {
     config.title ? $('#sidebar .sidebar .sidebar-title').html(config.title): $('#sidebar .sidebar .sidebar-title').html('');

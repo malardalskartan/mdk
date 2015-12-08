@@ -811,59 +811,57 @@ function init (mapOptions){
       return resolution;
     }
     function getAttributes(feature, layer) {
-        var content = '<div id="identify"><ul>';
-        var attribute, li = '', title, val;
-        //If layer is configured with attributes
-        if(layer.get('attributes')) {
-          for(var i=0; i<layer.get('attributes').length; i++) {
-            attribute = layer.get('attributes')[i];
-            title = '';
-            val = '';
-            if (attribute['name']) {
-              val = feature.get(attribute['name']) || '';
-              if (attribute['title']) {
-                title = '<b>' + attribute['title'] + '</b>';
-              }
-              if (attribute['url']) {
-                val = '<a href="' + feature.get(attribute['url']) + '" target="_blank">' +
-                      feature.get(attribute['name']) +
-                      '</a>';
-              }
-              if (attribute['urlPrefix'] && attribute['url']) {
-                val = '<a href="' + attribute['urlPrefix'] + feature.get(attribute['url']) + (attribute['urlSuffix'] || '') +'" target="_blank">' +
-                      feature.get(attribute['name']) +
-                      '</a>';
-              }
-                var url = createUrl(attribute['urlPrefix'], attribute['urlSuffix'], feature.get(attribute['url']));
-                val = '<a href="' + url + '" target="_blank">' +
-                      feature.get(attribute['name']) +
-                      '</a>';
+      var content = '<div><ul>';
+      var attribute, li = '', title, val;
+      //If layer is configured with attributes
+      if(layer.get('attributes')) {
+        for(var i=0; i<layer.get('attributes').length; i++) {
+          attribute = layer.get('attributes')[i];
+          title = '';
+          val = '';
+          if (attribute['name']) {
+            if(feature.get(attribute['name'])) {
+                val = feature.get(attribute['name']);
+                if (attribute['title']) {
+                  title = '<b>' + attribute['title'] + '</b>';
+                }
+                if (attribute['url']) {
+                  var url = createUrl(attribute['urlPrefix'], attribute['urlSuffix'], feature.get(attribute['url']));
+                  val = '<a href="' + url + '" target="_blank">' +
+                        feature.get(attribute['name']) +
+                        '</a>';
+                }
             }
-            else if (attribute['url']) {
-                var text = attribute['html'] || attribute['url'];
-                var url = createUrl(attribute['urlPrefix'], attribute['urlSuffix'], feature.get(attribute['url']));
-                val = '<a href="' + url + '" target="_blank">' +
-                      text +
-                      '</a>';
-            }
-            else if (attribute['img']) {
-                var url = createUrl(attribute['urlPrefix'], attribute['urlSuffix'], feature.get(attribute['img']));
-                var attribution = attribute['attribution'] ? '<div class="image-attribution">' + attribute['attribution'] + '</div>' : '';
-                val = '<div class="image-container">' +
-                          '<img src="' + url + '">' + attribution +
-                      '</div>';
-            }
-            else if (attribute['html']) {
-              val = attribute['html'];
-            }
-
-            var cls = ' class="' + attribute['cls'] + '" ' || '';
-
-            li += '<li' + cls +'>' + title + val + '</li>';
           }
+          else if (attribute['url']) {
+              if(feature.get(attribute['url'])) {
+                  var text = attribute['html'] || attribute['url'];
+                  var url = createUrl(attribute['urlPrefix'], attribute['urlSuffix'], feature.get(attribute['url']));
+                  val = '<a href="' + url + '" target="_blank">' +
+                        text +
+                        '</a>';
+              }
+          }
+          else if (attribute['img']) {
+              if(feature.get(attribute['img'])) {
+                  var url = createUrl(attribute['urlPrefix'], attribute['urlSuffix'], feature.get(attribute['img']));
+                  var attribution = attribute['attribution'] ? '<div class="image-attribution">' + attribute['attribution'] + '</div>' : '';
+                  val = '<div class="image-container">' +
+                            '<img src="' + url + '">' + attribution +
+                        '</div>';
+              }           
+          }
+          else if (attribute['html']) {
+            val = attribute['html'];
+          }
+
+          var cls = ' class="' + attribute['cls'] + '" ' || '';
+
+          li += '<li' + cls +'>' + title + val + '</li>';
         }
-        content += li + '</ul></div>';
-        return content;
+      }
+      content += li + '</ul></div>';
+      return content;
     }
     function createUrl(prefix, suffix, url) {
         var p = prefix || '';
@@ -947,6 +945,11 @@ function init (mapOptions){
                       else {
                         Popup.setContent({content: content, title: l.get('title')});
                         Popup.setVisibility(true);
+                        var owl = initCarousel('#mdk-identify-carousel', undefined, function(){
+                            var currentItem = this.owl.currentItem;
+                            clearAndSelect(select, features[currentItem]);
+                            Popup.setTitle(layers[currentItem].get('title'));
+                        });
                       }
                       var owl = initCarousel('#mdk-identify-carousel');
                       autoPan();
