@@ -23,8 +23,6 @@ function init(options){
     url = options.url;
     title = options.title || '';
 
-    console.log(name);
-
     var el = '<div id="search-wrapper">' +
                 '<div id="search" class="search">' +
                     '<input class="search-field typeahead form-control" type="text" placeholder="Sök adress...">' +
