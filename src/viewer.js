@@ -793,21 +793,32 @@ function init (mapOptions){
           for(var i=0; i<layer.get('attributes').length; i++) {
             attribute = layer.get('attributes')[i];
             title = '';
+            val = '';
             if (attribute['name']) {
-              val = feature.get(attribute['name']) || 'uppgift saknas';
+              val = feature.get(attribute['name']) || '';
               if (attribute['title']) {
                 title = '<b>' + attribute['title'] + '</b>';
               }
               if (attribute['url']) {
-                val = '<a href="' + feature.get(attribute['url']) + '" target="_blank">' +
+                var url = createUrl(attribute['urlPrefix'], attribute['urlSuffix'], feature.get(attribute['url']));                
+                val = '<a href="' + url + '" target="_blank">' +
                       feature.get(attribute['name']) + 
                       '</a>';
-              }
-              if (attribute['urlPrefix'] && attribute['url']) {
-                val = '<a href="' + attribute['urlPrefix'] + feature.get(attribute['url']) + (attribute['urlSuffix'] || '') +'" target="_blank">' + 
-                      feature.get(attribute['name']) +
-                      '</a>';
-              }                
+              }              
+            }
+            else if (attribute['url']) {
+                var text = attribute['html'] || attribute['url'];
+                var url = createUrl(attribute['urlPrefix'], attribute['urlSuffix'], feature.get(attribute['url']));                
+                val = '<a href="' + url + '" target="_blank">' +
+                      text + 
+                      '</a>';                
+            }
+            else if (attribute['img']) {
+                var url = createUrl(attribute['urlPrefix'], attribute['urlSuffix'], feature.get(attribute['img']));
+                var attribution = attribute['attribution'] ? '<div class="image-attribution">' + attribute['attribution'] + '</div>' : '';
+                val = '<div class="image-container">' +
+                          '<img src="' + url + '">' + attribution +
+                      '</div>';              
             }
             else if (attribute['html']) {
               val = attribute['html'];
@@ -820,6 +831,11 @@ function init (mapOptions){
         }
         content += li + '</ul></div>';
         return content;
+    }
+    function createUrl(prefix, suffix, url) {
+        var p = prefix || '';
+        var s = suffix || '';
+        return p + url + s;
     }
     function addFeatureInfo() {
         Popup.init('#map');

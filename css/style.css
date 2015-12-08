@@ -844,6 +844,31 @@ li .menu-button:hover {
   padding: 9px 14px;
   width: 90%;  
 }
+.popup .image-container{
+  margin-bottom: 10px;
+  margin-left: -14px;
+  margin-right: -14px;
+  margin-top: -9px;
+  position: relative;
+}
+.popup .image-container img{
+  vertical-align: top;
+  width: 100%;
+}
+.popup .image-attribution{
+  background-color: rgba(0,0,0,0.5);
+  box-sizing: border-box;
+  color: rgb(220,220,220);
+  text-align: right;  
+  font-size: 0.7em;
+  font-style: italic;
+  height: 15px;
+  line-height: 15px;
+  padding-right: 5px;
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+}
 /*generic close button*/
 .mdk-close-button {
   color: #A6A6A6;
