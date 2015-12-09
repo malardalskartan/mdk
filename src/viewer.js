@@ -919,7 +919,7 @@ function init (mapOptions){
                 }
               });
 
-          if (features && identify) {
+          if (features.length > 0 && identify) {
               select = new ol.interaction.Select({layers: layers});
               map.addInteraction(select);
               content = '<div id="identify"><div id="mdk-identify-carousel" class="owl-carousel owl-theme">' + content + '</div></div>';

@@ -1218,7 +1218,7 @@ li .menu-button:hover {
   margin-top: -9px;
   position: relative;
 }
-.sidebar .image-container,
+.sidebar .image-container img,
 .popup .image-container img{
   vertical-align: top;
   width: 100%;
