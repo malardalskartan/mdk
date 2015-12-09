@@ -967,6 +967,7 @@ function init (mapOptions){
           }
           else {
             console.log('No features identified');
+            sidebar.setVisibility(false);
           }
           evt.preventDefault();
         });
