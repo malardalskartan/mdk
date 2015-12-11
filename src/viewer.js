@@ -10,9 +10,7 @@ var Modernizr = require('../externs/modernizr');
 var Popup = require('./popup');
 var Modal = require('./modal');
 var utils = require('./utils');
-var sidebar = require('./sidebar');
-var owlCarousel = require('../externs/owlcarousel-browserify');
-owlCarousel.loadjQueryPlugin();
+var featureinfo = require('./featureinfo');
 
 var controls = {};
 controls.geoposition = require('./geoposition');
@@ -93,7 +91,7 @@ function init (mapOptions){
         settings.styles = mapOptions.styles;
         createLayers(mapOptions.layers, settings.layers); //read layers from mapOptions
         settings.controls = mapOptions.controls;
-        settings.featureInfoOverlay = mapOptions.hasOwnProperty('featureInfoOverlay') ? mapOptions.featureInfoOverlay : true;
+        settings.featureinfoOptions = mapOptions.featureinfoOptions || undefined;
         //If url arguments, parse this settings
         if (window.location.search) {
             parseArg();
@@ -129,9 +127,8 @@ function init (mapOptions){
           controlOptions = settings.controls[i].options || undefined;
           controlOptions ? controls[controlName].init(controlOptions) : controls[controlName].init();
       }
-      sidebar.init();
-      Popup.init('#map');
-      addFeatureInfo();
+
+      featureinfo(settings.featureinfoOptions);
 
     }
     function createLayers(layerlist, layers) {
@@ -273,6 +270,9 @@ function init (mapOptions){
     }
     function getStyleSettings() {
         return settings.styles;
+    }
+    function getResolutions() {
+        return settings.resolutions;
     }
     function getMapUrl() {
       var layerNames = '', url;
@@ -513,22 +513,22 @@ function init (mapOptions){
            })
         })
     }
-    function initCarousel(id, options, cb) {
-        var carouselOptions = options || {
-          navigation : true, // Show next and prev buttons
-          slideSpeed : 300,
-          paginationSpeed : 400,
-          singleItem:true,
-          rewindSpeed:200,
-          navigationText: ["&#xf053;", "&#xf054;"],
-          afterAction: cb
-        };
-        return $(id).owlCarousel(carouselOptions);
-    }
-    function clearAndSelect(selection, feature) {
-        selection.getFeatures().clear();
-        selection.getFeatures().push(feature);
-    }
+    // function initCarousel(id, options, cb) {
+    //     var carouselOptions = options || {
+    //       navigation : true, // Show next and prev buttons
+    //       slideSpeed : 300,
+    //       paginationSpeed : 400,
+    //       singleItem:true,
+    //       rewindSpeed:200,
+    //       navigationText: ["&#xf053;", "&#xf054;"],
+    //       afterAction: cb
+    //     };
+    //     return $(id).owlCarousel(carouselOptions);
+    // }
+    // function clearAndSelect(selection, feature) {
+    //     selection.getFeatures().clear();
+    //     selection.getFeatures().push(feature);
+    // }
     function wfsCql(relations, coordinates) {
             var url, finishedQueries = 0;
             cqlQuery = [];
@@ -810,168 +810,168 @@ function init (mapOptions){
       var resolution = scale / (mpu * 39.37 * dpi);
       return resolution;
     }
-    function getAttributes(feature, layer) {
-      var content = '<div><ul>';
-      var attribute, li = '', title, val;
-      //If layer is configured with attributes
-      if(layer.get('attributes')) {
-        for(var i=0; i<layer.get('attributes').length; i++) {
-          attribute = layer.get('attributes')[i];
-          title = '';
-          val = '';
-          if (attribute['name']) {
-            if(feature.get(attribute['name'])) {
-                val = feature.get(attribute['name']);
-                if (attribute['title']) {
-                  title = '<b>' + attribute['title'] + '</b>';
-                }
-                if (attribute['url']) {
-                  var url = createUrl(attribute['urlPrefix'], attribute['urlSuffix'], feature.get(attribute['url']));
-                  val = '<a href="' + url + '" target="_blank">' +
-                        feature.get(attribute['name']) +
-                        '</a>';
-                }
-            }
-          }
-          else if (attribute['url']) {
-              if(feature.get(attribute['url'])) {
-                  var text = attribute['html'] || attribute['url'];
-                  var url = createUrl(attribute['urlPrefix'], attribute['urlSuffix'], feature.get(attribute['url']));
-                  val = '<a href="' + url + '" target="_blank">' +
-                        text +
-                        '</a>';
-              }
-          }
-          else if (attribute['img']) {
-              if(feature.get(attribute['img'])) {
-                  var url = createUrl(attribute['urlPrefix'], attribute['urlSuffix'], feature.get(attribute['img']));
-                  var attribution = attribute['attribution'] ? '<div class="image-attribution">' + attribute['attribution'] + '</div>' : '';
-                  val = '<div class="image-container">' +
-                            '<img src="' + url + '">' + attribution +
-                        '</div>';
-              }
-          }
-          else if (attribute['html']) {
-            val = attribute['html'];
-          }
-
-          var cls = ' class="' + attribute['cls'] + '" ' || '';
-
-          li += '<li' + cls +'>' + title + val + '</li>';
-        }
-      }
-      content += li + '</ul></div>';
-      return content;
-    }
+    // function getAttributes(feature, layer) {
+    //   var content = '<div><ul>';
+    //   var attribute, li = '', title, val;
+    //   //If layer is configured with attributes
+    //   if(layer.get('attributes')) {
+    //     for(var i=0; i<layer.get('attributes').length; i++) {
+    //       attribute = layer.get('attributes')[i];
+    //       title = '';
+    //       val = '';
+    //       if (attribute['name']) {
+    //         if(feature.get(attribute['name'])) {
+    //             val = feature.get(attribute['name']);
+    //             if (attribute['title']) {
+    //               title = '<b>' + attribute['title'] + '</b>';
+    //             }
+    //             if (attribute['url']) {
+    //               var url = createUrl(attribute['urlPrefix'], attribute['urlSuffix'], feature.get(attribute['url']));
+    //               val = '<a href="' + url + '" target="_blank">' +
+    //                     feature.get(attribute['name']) +
+    //                     '</a>';
+    //             }
+    //         }
+    //       }
+    //       else if (attribute['url']) {
+    //           if(feature.get(attribute['url'])) {
+    //               var text = attribute['html'] || attribute['url'];
+    //               var url = createUrl(attribute['urlPrefix'], attribute['urlSuffix'], feature.get(attribute['url']));
+    //               val = '<a href="' + url + '" target="_blank">' +
+    //                     text +
+    //                     '</a>';
+    //           }
+    //       }
+    //       else if (attribute['img']) {
+    //           if(feature.get(attribute['img'])) {
+    //               var url = createUrl(attribute['urlPrefix'], attribute['urlSuffix'], feature.get(attribute['img']));
+    //               var attribution = attribute['attribution'] ? '<div class="image-attribution">' + attribute['attribution'] + '</div>' : '';
+    //               val = '<div class="image-container">' +
+    //                         '<img src="' + url + '">' + attribution +
+    //                     '</div>';
+    //           }
+    //       }
+    //       else if (attribute['html']) {
+    //         val = attribute['html'];
+    //       }
+    //
+    //       var cls = ' class="' + attribute['cls'] + '" ' || '';
+    //
+    //       li += '<li' + cls +'>' + title + val + '</li>';
+    //     }
+    //   }
+    //   content += li + '</ul></div>';
+    //   return content;
+    // }
     function createUrl(prefix, suffix, url) {
         var p = prefix || '';
         var s = suffix || '';
         return p + url + s;
     }
-    function addFeatureInfo() {
-
-        var select;
-
-        map.on('click', function(evt) {
-
-          if(select) {
-              select.getFeatures().clear();
-              map.removeInteraction(select);
-          }
-
-          removeOverlays();
-          var overlay = new ol.Overlay({
-            element: $('#popup')
-          });
-
-          map.addOverlay(overlay);
-
-          var identify = true;
-          var l, layers = [];
-          var features = [];
-          var content ='';
-          map.forEachFeatureAtPixel(evt.pixel,
-              function(feature, layer) {
-                l = layer;
-                var queryable = false;
-                if(layer) {
-                    queryable = layer.get('queryable');
-                }
-                if(feature.get('features')) {
-                    if (feature.get('features').length > 1) {
-                      map.getView().setCenter(evt.coordinate);
-                      var zoom = map.getView().getZoom();
-                      if(zoom + 1 < settings.resolutions.length) {
-                        map.getView().setZoom(zoom + 1);
-                      }
-                      identify =false;
-                    }
-                    else if(feature.get('features').length == 1 && queryable) {
-                        layers.push(l);
-                        features.push(feature.get('features')[0]);
-                        content += getAttributes(feature.get('features')[0],l);
-                    }
-                }
-                else if(queryable) {
-                    layers.push(l);
-                    features.push(feature);
-                    content += getAttributes(feature,l);
-                }
-              });
-
-          if (features.length > 0 && identify) {
-              select = new ol.interaction.Select({layers: layers});
-              map.addInteraction(select);
-              content = '<div id="identify"><div id="mdk-identify-carousel" class="owl-carousel owl-theme">' + content + '</div></div>';
-              switch (settings.featureInfoOverlay) {
-                  case true:
-                      var geometry = features[0].getGeometry();
-                      var coord;
-                      geometry.getType() == 'Point' ? coord = geometry.getCoordinates() : coord = evt.coordinate;
-                      overlay.setPosition(coord);
-                      //If layer have relations to be queried, ie more information
-                      // if(l.get('relations')) {
-                      //   var format = new ol.format.WKT();
-                      //   var featureCoord = format.writeGeometry(features[0].getGeometry());
-                      //   wfsCql(l.get('relations'), featureCoord);
-                      //   content += '<br><div class="mdk-more-button">Mer information</div>';
-                      //   Popup.setContent({content: content, title: l.get('title')});
-                      //   Popup.setVisibility(true);
-                      //   $('.mdk-more-button').on('click touchend', function(e) {
-                      //     modalMoreInfo();
-                      //     e.preventDefault();
-                      //   });
-                      // }
-                      // else {
-                        Popup.setContent({content: content, title: l.get('title')});
-                        Popup.setVisibility(true);
-                        var owl = initCarousel('#mdk-identify-carousel', undefined, function(){
-                            var currentItem = this.owl.currentItem;
-                            clearAndSelect(select, features[currentItem]);
-                            Popup.setTitle(layers[currentItem].get('title'));
-                        });
-                      // }
-                      var owl = initCarousel('#mdk-identify-carousel');
-                      autoPan();
-                      break;
-                  case false:
-                      sidebar.setContent({content: content, title: l.get('title')});
-                      sidebar.setVisibility(true);
-                      var owl = initCarousel('#mdk-identify-carousel', undefined, function(){
-                          var currentItem = this.owl.currentItem;
-                          clearAndSelect(select, features[currentItem]);
-                          sidebar.setTitle(layers[currentItem].get('title'));
-                      });
-                      break;
-              }
-          }
-          else {
-            console.log('No features identified');
-            sidebar.setVisibility(false);
-          }
-          evt.preventDefault();
-        });
-    }
+    // function addFeatureInfo() {
+    //
+    //     var select;
+    //
+    //     map.on('click', function(evt) {
+    //
+    //       if(select) {
+    //           select.getFeatures().clear();
+    //           map.removeInteraction(select);
+    //       }
+    //
+    //       removeOverlays();
+    //       var overlay = new ol.Overlay({
+    //         element: $('#popup')
+    //       });
+    //
+    //       map.addOverlay(overlay);
+    //
+    //       var identify = true;
+    //       var l, layers = [];
+    //       var features = [];
+    //       var content ='';
+    //       map.forEachFeatureAtPixel(evt.pixel,
+    //           function(feature, layer) {
+    //             l = layer;
+    //             var queryable = false;
+    //             if(layer) {
+    //                 queryable = layer.get('queryable');
+    //             }
+    //             if(feature.get('features')) {
+    //                 if (feature.get('features').length > 1) {
+    //                   map.getView().setCenter(evt.coordinate);
+    //                   var zoom = map.getView().getZoom();
+    //                   if(zoom + 1 < settings.resolutions.length) {
+    //                     map.getView().setZoom(zoom + 1);
+    //                   }
+    //                   identify =false;
+    //                 }
+    //                 else if(feature.get('features').length == 1 && queryable) {
+    //                     layers.push(l);
+    //                     features.push(feature.get('features')[0]);
+    //                     content += getAttributes(feature.get('features')[0],l);
+    //                 }
+    //             }
+    //             else if(queryable) {
+    //                 layers.push(l);
+    //                 features.push(feature);
+    //                 content += getAttributes(feature,l);
+    //             }
+    //           });
+    //
+    //       if (features.length > 0 && identify) {
+    //           select = new ol.interaction.Select({layers: layers});
+    //           map.addInteraction(select);
+    //           content = '<div id="identify"><div id="mdk-identify-carousel" class="owl-carousel owl-theme">' + content + '</div></div>';
+    //           switch (settings.featureInfoOverlay) {
+    //               case true:
+    //                   var geometry = features[0].getGeometry();
+    //                   var coord;
+    //                   geometry.getType() == 'Point' ? coord = geometry.getCoordinates() : coord = evt.coordinate;
+    //                   overlay.setPosition(coord);
+    //                   //If layer have relations to be queried, ie more information
+    //                   // if(l.get('relations')) {
+    //                   //   var format = new ol.format.WKT();
+    //                   //   var featureCoord = format.writeGeometry(features[0].getGeometry());
+    //                   //   wfsCql(l.get('relations'), featureCoord);
+    //                   //   content += '<br><div class="mdk-more-button">Mer information</div>';
+    //                   //   Popup.setContent({content: content, title: l.get('title')});
+    //                   //   Popup.setVisibility(true);
+    //                   //   $('.mdk-more-button').on('click touchend', function(e) {
+    //                   //     modalMoreInfo();
+    //                   //     e.preventDefault();
+    //                   //   });
+    //                   // }
+    //                   // else {
+    //                     Popup.setContent({content: content, title: l.get('title')});
+    //                     Popup.setVisibility(true);
+    //                     var owl = initCarousel('#mdk-identify-carousel', undefined, function(){
+    //                         var currentItem = this.owl.currentItem;
+    //                         clearAndSelect(select, features[currentItem]);
+    //                         Popup.setTitle(layers[currentItem].get('title'));
+    //                     });
+    //                   // }
+    //                   var owl = initCarousel('#mdk-identify-carousel');
+    //                   autoPan();
+    //                   break;
+    //               case false:
+    //                   sidebar.setContent({content: content, title: l.get('title')});
+    //                   sidebar.setVisibility(true);
+    //                   var owl = initCarousel('#mdk-identify-carousel', undefined, function(){
+    //                       var currentItem = this.owl.currentItem;
+    //                       clearAndSelect(select, features[currentItem]);
+    //                       sidebar.setTitle(layers[currentItem].get('title'));
+    //                   });
+    //                   break;
+    //           }
+    //       }
+    //       else {
+    //         console.log('No features identified');
+    //         sidebar.setVisibility(false);
+    //       }
+    //       evt.preventDefault();
+    //     });
+    // }
     function addGetFeatureInfo() {
         Popup.init('#map');
 
@@ -1098,6 +1098,7 @@ module.exports.getGroup = getGroup;
 module.exports.getGroups = getGroups;
 module.exports.getProjectionCode = getProjectionCode;
 module.exports.getMapSource = getMapSource;
+module.exports.getResolutions = getResolutions;
 module.exports.addWMS = addWMS;
 module.exports.addWMTS = addWMTS;
 module.exports.geojson = geojson;
@@ -1111,8 +1112,6 @@ module.exports.styleFunction = styleFunction;
 module.exports.createStyleOptions = createStyleOptions;
 module.exports.getScale = getScale;
 module.exports.scaleToResolution = scaleToResolution;
-module.exports.getAttributes = getAttributes;
-module.exports.addFeatureInfo = addFeatureInfo;
 module.exports.addGetFeatureInfo = addGetFeatureInfo;
 module.exports.autoPan = autoPan;
 module.exports.removeOverlays = removeOverlays;
