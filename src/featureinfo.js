@@ -18,7 +18,8 @@ module.exports = function(options) {
     var select;
     var map = Viewer.getMap();
 
-    var showOverlay = options.hasOwnProperty('overlay') ? options.overlay : true;
+    var settings = options ? options : {};
+    var showOverlay = settings.hasOwnProperty('overlay') ? settings.overlay : true;
 
     sidebar.init();
     Popup.init('#map');
