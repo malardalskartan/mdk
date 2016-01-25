@@ -1622,8 +1622,14 @@ input.search-field::-ms-clear {
 	height: 1em;
   padding-right: 0;
 }
-.search-field:focus {
+.search-field.tt-hint {
+	width: 100%;
+}
+.search-field.tt-input:focus {
 	width: 258px;
+}
+.tt-menu {
+	max-width: calc(258px + 2em);
 }
 #search-button-close,
 #search-button {
