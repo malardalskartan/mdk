@@ -16,8 +16,11 @@ var styleSettings;
 function init() {
     styleSettings = viewer.getStyleSettings();
     var el = utils.createButton({
-        buttonName: 'mapmenu-button',
-        className: 'mapmenu-button-true',
+        text: 'Meny',
+        id: 'mapmenu-button',
+        cls: 'mapmenu-button-true',
+        iconCls: 'mdk-icon-fa-bars',
+        src: 'css/svg/fa-icons.svg#fa-bars',
         tooltipText: 'Meny',
         tooltipPlacement: 'west'
     });
@@ -32,7 +35,7 @@ function init() {
                     '</div>' +
                   '</div>';
     $('#map').append(menuEl);
-    mapMenu = $('#mapmenu');    
+    mapMenu = $('#mapmenu');
 
     bindUIActions();
     // addLegend(viewer.getGroups());

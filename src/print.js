@@ -19,7 +19,9 @@ function init() {
     map = viewer.getMap();
 
     var el = utils.createListButton({
-        name: 'print',
+        id: 'print',
+        iconCls: 'mdk-icon-fa-print',
+        src: 'css/svg/fa-icons.svg#fa-print',
         text: 'Skriv ut'
     });
     $('#menutools').append(el);
@@ -44,20 +46,20 @@ function imageToPrint(printCanvas) {
     }
     finally {
         var pw = '<html><head><link href="img/print.css" rel="stylesheet"></head><body>';
-        pw += '<div class="print-logo"><img src="print/logo_print.png"></div>';        
+        pw += '<div class="print-logo"><img src="print/logo_print.png"></div>';
         pw += '<div class="map-canvas"><img src="' + imageCrop.src + '"/></div>';
         pw += '<div class="print-attribution">&copy&nbsp;Lantmäteriet&nbsp;Geodatasamverkan</div>'
         pw += '</body></html>';
         var logoUrl = '&quot;css/logo_print.png&quot;';
         var printWindow = window.open('','','width=800,height=820');
-        printWindow.document.write(pw); 
+        printWindow.document.write(pw);
         printWindow.document.close();
         setTimeout(function() {
             printWindow.print();
             setTimeout(function(){
                 printWindow.close();
                 $('#print').remove();
-            }, 10); 
+            }, 10);
         },200);
     }
 }
@@ -67,14 +69,14 @@ function createImage() {
     // image.crossOrigin = 'Anonymous';
 
     try {
-        var imageUrl = canvas.get(0).toDataURL("image/png");        
+        var imageUrl = canvas.get(0).toDataURL("image/png");
     }
     catch (e) {
         console.log(e);
     }
     finally {
       // printCanvas = copy of original map canvas
-      var printCanvas = $('#print'); 
+      var printCanvas = $('#print');
       image.onload = function() {
           var ctxCanvas = printCanvas[0].getContext('2d');
           var sourceWidth = canvas[0].width; //width of map canvas
@@ -94,10 +96,10 @@ function createImage() {
             printCanvas[0].height = settings.printWith;
           }
 
-          ctxCanvas.drawImage(image, (sourceWidth/2 - printCanvas[0].width/2), 0, printCanvas[0].width, printCanvas[0].height, 0, 0, printCanvas[0].width, printCanvas[0].height);       
-          imageToPrint(printCanvas);  
-      };    
-      image.src = imageUrl;      
+          ctxCanvas.drawImage(image, (sourceWidth/2 - printCanvas[0].width/2), 0, printCanvas[0].width, printCanvas[0].height, 0, 0, printCanvas[0].width, printCanvas[0].height);
+          imageToPrint(printCanvas);
+      };
+      image.src = imageUrl;
     }
 }
 

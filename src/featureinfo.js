@@ -130,7 +130,7 @@ module.exports = function(options) {
           paginationSpeed : 400,
           singleItem:true,
           rewindSpeed:200,
-          navigationText: ["&#xf053;", "&#xf054;"],
+          navigationText: ['<svg class="mdk-icon-fa-chevron-left"><use xlink:href="css/svg/fa-icons.svg#fa-chevron-left"></use></svg>', '<svg class="mdk-icon-fa-chevron-right"><use xlink:href="css/svg/fa-icons.svg#fa-chevron-right"></use></svg>'],
           afterAction: cb
         };
         return $(id).owlCarousel(carouselOptions);
@@ -187,5 +187,10 @@ module.exports = function(options) {
       }
       content += li + '</ul></div>';
       return content;
+    }
+    function createUrl(prefix, suffix, url) {
+        var p = prefix || '';
+        var s = suffix || '';
+        return p + url + s;
     }
 }

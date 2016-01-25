@@ -6,6 +6,10 @@ body, html {
   -ms-touch-action: manipulation;
   touch-action: manipulation;
 }
+svg,
+object{
+  width: 100%;
+}
 body {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: #333333;
@@ -18,16 +22,6 @@ b, strong{
 }
 button {
   border: none;
-}
-@font-face {
-	font-family: 'FontAwesome';
-	src: url('../fonts/fontawesome-webfont.eot');
-	src: url('../fonts/fontawesome-webfont.eot?iefix') format('eot'),
-	url('../fonts/fontawesome-webfont.woff') format('woff'),
-	url('../fonts/fontawesome-webfont.ttf') format('truetype'),
-	url('../fonts/fontawesome-webfont.svg#FontAwesome') format('svg');
-  	font-weight: normal;
-  	font-style: normal;
 }
 #no-map {
   display: none;
@@ -96,7 +90,6 @@ button {
 }
 .ol-control button {
   border-radius: 4px;
-  font-family: 'FontAwesome';
   display: block;
   padding: 0;
   color: #424242;
@@ -106,7 +99,6 @@ button {
   text-align: center;
   height: 2em;
   width: 2em;
-  line-height: 1em;
   background-color: white;
   border: none;
 }
@@ -114,8 +106,7 @@ button {
   border: none;
   padding: 0;
 }
-.ol-control button:hover,
-.ol-control button:focus {
+.ol-control button:hover {
   color: #EEEEEE;
   text-decoration: none;
   background-color: #424242;
@@ -126,20 +117,6 @@ button.ol-zoom-in {
 }
 button.ol-zoom-out {
   border-radius: 0 0 4px 4px;
-}
-button.ol-zoom-in:after{
-  content: '\f067';
-  font-size: 0.75em;
-}
-button.ol-zoom-out:after{
-  content: '\f068';
-  font-size: 0.75em;
-}
-button.ol-full-screen-false:after {
-  content: "\f065";
-}
-button.ol-full-screen-true:after {
-  content: "\f066";
 }
 .ol-control.ol-rotate button {
   border-radius: 0;
@@ -274,9 +251,6 @@ button.ol-full-screen-true:after {
 .ol-attribution img {
   display: none;
 }
-.ol-attribution span {
-  font-family: 'FontAwesome';
-}
 
 /*end openlayers style*/
 
@@ -370,24 +344,19 @@ button.ol-full-screen-true:after {
 .owl-theme .owl-controls .owl-buttons div{
 	color: #FFF;
 	display: inline-block;
-	font-family: "FontAwesome";
 	zoom: 1;
 	*display: inline;/*IE7 life-saver */
-	margin: 5px;
-	padding: 5px 10px;
-	font-size: 12px;
+	margin: .3125em;
+	padding: .3125em;
 	-webkit-border-radius: 50%;
 	-moz-border-radius: 50%;
 	border-radius: 50%;
-	background: rgba(0,0,0,0.5);
-	filter: Alpha(Opacity=50);/*IE7 fix*/
-	opacity: 0.5;
+	background: rgba(0,0,0,0.15);
 }
 /* Clickable class fix problem with hover on touch devices */
 /* Use it for non-touch hover action */
 .owl-theme .owl-controls.clickable .owl-buttons div:hover{
-	filter: Alpha(Opacity=100);/*IE7 fix*/
-	opacity: 1;
+	background: rgba(0,0,0,0.3);
 	text-decoration: none;
 }
 
@@ -714,7 +683,6 @@ button.ol-full-screen-true:after {
 button.mdk-button {
   border-radius: 4px;
   display: inline-block;
-  font-family: 'FontAwesome';
   padding: 0;
   color: #424242;
   color: rgba(66,66,66,1.0);
@@ -732,6 +700,17 @@ button.mdk-button:focus {
   color: #EEEEEE;
   text-decoration: none;
   background-color: #424242;
+}
+.mdk-button span.mdk-button-text {
+	height: 2em;
+	left: 0;
+	line-height: 2em;
+	padding-left: 0.625em;
+	position: absolute;
+	vertical-align: middle;
+}
+.mdk-button.mapmenu-button-false span.mdk-button-text {
+	display: none;
 }
 /*Tooltip arrow*/
 .mdk-tooltip span[data-tooltip] {
@@ -752,7 +731,7 @@ button.mdk-button:focus {
   visibility: visible;
 }
 .mdk-tooltip:hover span[data-tooltip]:after {
-  background:rgba(51,51,51,0.75);
+  background:rgba(51,51,51,0.85);
   -moz-border-radius:4px;
   -webkit-border-radius:4px;
   border-radius:4px;
@@ -769,7 +748,7 @@ button.mdk-button:focus {
   z-index:10;
 }
 .mdk-tooltip:hover span[data-tooltip][data-placement="east"] {
-  border-color: transparent rgba(51,51,51,0.75) transparent transparent;
+  border-color: transparent rgba(51,51,51,0.85) transparent transparent;
   right: -10px;
   top: 35%;
 }
@@ -777,7 +756,7 @@ button.mdk-button:focus {
   margin-top: -11px;
 }
 .mdk-tooltip span[data-tooltip][data-placement="west"] {
-  border-color: transparent transparent transparent rgba(51,51,51,0.75);
+  border-color: transparent transparent transparent rgba(51,51,51,0.85);
   left: -10px;
   top: 35%;
 }
@@ -786,7 +765,7 @@ button.mdk-button:focus {
   margin-top: -11px; /*vertical align to arrow*/
 }
 .mdk-tooltip span[data-tooltip][data-placement="northwest"] {
-  border-color: rgba(51,51,51,0.75) transparent transparent transparent;
+  border-color: rgba(51,51,51,0.85) transparent transparent transparent;
   top: -10px;
   left: 14px;
 }
@@ -795,7 +774,7 @@ button.mdk-button:focus {
   margin-left: -10px;
 }
 .mdk-tooltip span[data-tooltip][data-placement="north"] {
-  border-color: rgba(51,51,51,0.75) transparent transparent transparent;
+  border-color: rgba(51,51,51,0.85) transparent transparent transparent;
   top: -10px;
   left: 50%;
 }
@@ -809,6 +788,13 @@ button.mdk-button:focus {
   right: .5em;
   top: .5em;
   z-index: 5;
+}
+#mapmenu-button button.mdk-button:hover .mdk-icon-fa-bars{
+	fill: #fff;
+}
+#mapmenu-button button.mdk-button {
+	padding-right: 0;
+	width: 5.3125em;
 }
 #home-button {
   left: .5em;
@@ -835,16 +821,6 @@ button.mdk-button:focus {
   top: 17em;
   z-index: 1;
 }
-/*#geolocation-button.mdk-button {
-  box-shadow: 0 0 5px rgba(0,0,0,0.45);
-}*/
-.mdk-button .geolocation-button-true {
-  color: #47B9EB;
-  background-color: #424242;
-}
-button.geolocation-button:after {
-  content: "\f124";
-}
 button.edit-draw-button:after {
   content: "\f040";
 }
@@ -863,6 +839,9 @@ button.edit-delete-button:after {
   background-color: rgba(255,255,255,0.5);
   box-shadow: none;
 }
+#mapmenu-button .mdk-button.mapmenu-button-false {
+	width: 2em;
+}
 .no-boxshadow #mdk-mapmenu-button .mdk-button {
   border: none;
 }
@@ -875,16 +854,6 @@ button.edit-delete-button:after {
   top: 10em;
   z-index: 5;
 }
-button.mapmenu-button-true:after {
-  font-size: 1.3em;
-  line-height: 1.3em;
-  content: "\f0c9";
-}
-button.mapmenu-button-false:after {
-  font-size: 1.3em;
-  line-height: 1.3em;
-  content: "\f0c9";
-}
 button.window-button:after {
   font-size: 1.2em;
   content: "\f065";
@@ -896,14 +865,8 @@ button.home-button:after {
   content: "\f015";
   line-height: 1.2em;
 }
-#home:after {
-  content: "\f015";
-  font-size: 1.0em;
-  font-family: 'FontAwesome';
-}
 #mapmenu {
-  background-color: #FFF;
-	background-color: rgba(255,255,255,0.95);
+  background-color: #fff;
   border-radius: 1px; /*workaround for box-shadow bug in ios*/
   -webkit-box-shadow: 0 0 5px rgba(0,0,0,0.45);
 	box-shadow: 0 0 5px rgba(0,0,0,0.45);
@@ -972,22 +935,11 @@ li .menu-button:hover {
 .menu-button .button-icon {
   display: inline;
   float: left;
+	height: 1.5em;
   padding: 0 4px;
+	vertical-align: middle;
+	width: 1.5em;
 /*  width: 1.375em; */
-}
-.menu-button .button-icon:after {
-  width: 1.5em;
-  font-size: 1em;
-  height: 1.5em;
-  vertical-align: middle;
-}
-.menu-button .share-icon:after {
-  content: "\f045";
-  font-family: 'FontAwesome';
-}
-.menu-button .print-icon:after {
-  content: "\f02f";
-  font-family: 'FontAwesome';
 }
 .hidden {
   display: none;
@@ -1240,21 +1192,12 @@ li .menu-button:hover {
 }
 /*generic close button*/
 .mdk-close-button {
-  color: #A6A6A6;
-  font-weight: bold;
-  position: absolute;
-  right: 5px;
-  top: 5px;
-  width: 1em;
-  font-size: 1.3em;
+	height: 2.429em;
+	float: right;
+  width: 2.429em;
 }
 .mdk-close-button:hover {
-  color: #636363;
   cursor: pointer;
-}
-.mdk-close-button:after {
-  content: "\00d7";
-  font-family: 'FontAwesome';
 }
 /*share map module*/
 .share-link input[type=text] {
@@ -1294,19 +1237,8 @@ li .icon-expand {
   display: inline;
   float: right;
   padding: 0 4px;
-}
-li .icon-expand:after {
-  font-family: 'FontAwesome';
-  font-size: 0.9em;
-  height: 1.3em;
-  vertical-align: middle;
-  width: 1.5em;
-}
-li .icon-expand-false:after {
-  content: "\f054";
-}
-li .icon-expand-true:after {
-  content: "\f078";
+  height: 1.1em;
+  width: 1.1em;
 }
 .ul-expand-false .legend {
   display: none;
@@ -1341,29 +1273,8 @@ li .legend-item-img {
   height: 1.1em;
   padding: 0 4px;
   padding-top: 3px;
-  width: 1em;
+  width: 1.1em;
 /*  width: 1.375em; */
-}
-.checkbox:after {
-  font-family: 'FontAwesome';
-  font-size: 14px;
-  padding-top: 3px;
-  vertical-align: top;
-  width: 1.5em;
-}
-.checkbox-true:after {
-  content: "\f046";
-}
-.checkbox-false:after {
-  content: "\f096";
-  padding-right: 2px;
-}
-.check-true:after {
-  content: "\f00c";
-}
-.check-false:after {
-  content: "\f00c";
-  visibility: hidden;
 }
 #map-legend .legend-item {
   padding-left: 0;
@@ -1398,19 +1309,11 @@ li .legend-item-img {
   height: 1.2em;
   padding: 0 4px;
   padding-top: 2px;
-  width: 0.8em;
+  width: 1.2em;
 }
 #legend-overlay .toggle-button:hover {
   color: #636363;
   cursor: pointer;
-}
-#legend-overlay .toggle-button-max:after {
-  content: "\f103";
-  font-family: 'FontAwesome';
-}
-#legend-overlay .toggle-button-min:after {
-  content: "\f102";
-  font-family: 'FontAwesome';
 }
 .menu-item-divider {
   /*border-bottom: 1px solid #C5C5C5;*/
@@ -1426,6 +1329,7 @@ li .legend-item-img {
   border-radius: 4px;
   -webkit-box-shadow: 0 2px 5px rgba(0,0,0,0.45);
   box-shadow: 0 2px 5px rgba(0,0,0,0.45);
+	height: 2.5em;
   margin: 0 0 0 -155px;
   position: fixed;
   top: .5em;
@@ -1433,16 +1337,12 @@ li .legend-item-img {
   width: 310px;
   z-index: 10;
 }
-/*Search module*/
-#search {
-
-}
-
 .search-field {
   border: none;
-  font-size: 20px;
+  font-size: 1.25em;
+	height: 1em;
   overflow: hidden;
-  padding: 10px;
+  padding: .5em;
   padding-right: 0;
 /*  position: relative;
   float: left;*/
@@ -1454,29 +1354,17 @@ input.search-field:focus {
 input.search-field::-ms-clear {
     display: none;
 }
+#search-button-close,
 #search-button {
   background-color: transparent;
   color: #424242;
+	font-size: 1em;
   position: relative;
   float: right;
-  height: 40px;
+  height: 2.5em;
   outline: none;
-  min-width: 40px;
-  max-width: 40px;
-  width: 40px;
-  padding: 10px;
-}
-#search-button.search-false:after {
-  content: "\f002";
-  font-family: 'FontAwesome';
-  font-size: 20px;
-}
-#search-button.search-true:after {
-  content: "\00d7";
-  font-family: 'FontAwesome';
-  font-size: 16px;
-  line-height: 20px;
-  vertical-align: baseline;
+  width: 2.5em;
+  padding: .25em;
 }
 #search-button.search-true:hover {
   color: black;
@@ -1487,10 +1375,6 @@ input.search-field::-ms-clear {
 }
 .tt-hint {
     display: block;
-/*    width: 100%;*/
-    padding: 10px;
-    font-size: 20px;
-/*    line-height: 1.15;*/
     color: #999;
     vertical-align: middle;
     background-color: #ffffff;
@@ -1583,6 +1467,106 @@ input.search-field::-ms-clear {
   color: #2a6496;
   text-decoration: underline;
 }
+[class^="mdk-icon-"],
+[class*=" mdk-icon-"] {
+	background: rgba(0,0,0,0);
+  padding: .35em;
+  height: 1.3em;
+  width: 1.3em;
+  float: right;
+  fill: #424242;
+}
+.ol-control [class^="mdk-icon-"]:hover,
+.ol-control [class*=" mdk-icon-"]:hover,
+.mdk-button [class^="mdk-icon-"]:hover,
+.mdk-button [class*="mdk-icon-"]:hover {
+	fill: #fff;
+}
+.mdk-icon-fa-location-arrow {
+	padding: 0.45em;
+	height: 1.1em;
+	width: 1.1em;
+}
+.geolocation-button-true .mdk-icon-fa-location-arrow {
+	fill: #007AFF;
+}
+.mdk-icon-fa-chevron-down,
+.mdk-icon-fa-chevron-right {
+	height: .9em;
+	padding: .1em;
+	width: .9em;
+}
+.mdk-icon-fa-check {
+	height: 1em;
+	padding: 0.05em;
+	width: 1em;
+}
+.mdk-icon-fa-square-o,
+.mdk-icon-fa-check-square-o {
+	height: 1em;
+	padding: 0.1em;
+	width: 1em;
+}
+.mdk-icon-fa-bars {
+	padding: .4em;
+  height: 1.2em;
+  width: 1.2em;
+}
+.mdk-icon-fa-plus,
+.mdk-icon-fa-minus {
+	padding: .65em;
+	height: .7em;
+	width: .7em;
+}
+.mdk-icon-fa-print,
+.mdk-icon-fa-share-square-o {
+	padding: 0.25em;
+	height: 1em;
+	width: 1em;
+}
+.mdk-icon-fa-times {
+	padding: .65em;
+	height: 1.129em;
+	width: 1.129em;
+}
+.mdk-icon-search-fa-times {
+	padding: .5em;
+	height: 1em;
+	width: 1em;
+}
+.mdk-icon-fa-angle-double-down,
+.mdk-icon-fa-angle-double-up {
+	padding: .05em;
+	height: 1em;
+	width: 1em;
+}
+.mdk-icon-fa-angle-double-right,
+.ol-collapsed .mdk-icon-fa-info {
+	fill: #fff;
+	height: .9em;
+	padding: .3em;
+	width: .9em;
+}
+.owl-prev .mdk-icon-fa-chevron-left,
+.owl-next .mdk-icon-fa-chevron-right {
+	fill: #424242;
+	height: 1em;
+	padding: .3em;
+	width: 1em;
+}
+.ol-collapsed .mdk-icon-fa-angle-double-right,
+.ol-attribution:not(.ol-collapsed) .mdk-icon-fa-info,
+.toggle-button-max .mdk-icon-fa-angle-double-up,
+.toggle-button-min .mdk-icon-fa-angle-double-down,
+.checkbox-true .mdk-icon-fa-square-o,
+.checkbox-false .mdk-icon-fa-check-square-o,
+.check-false .mdk-icon-fa-check,
+.icon-expand-false .mdk-icon-fa-chevron-down,
+.icon-expand-true .mdk-icon-fa-chevron-right,
+.search-true #search-button,
+.search-false #search-button-close {
+	display: none
+}
 @media screen and (max-width: 768px) {
 .ol-scale-line, .ol-scale-line-inner {
   display: none;
@@ -1626,18 +1610,42 @@ input.search-field::-ms-clear {
 	margin: 0;
   right: 3em;
 	max-width: calc(100% - 3.5em);
+	width: auto;
 	z-index: 1;
 }
-#search-button {
-	height: 26px;
-	padding: 5px;
-}
 .search-field {
+	-webkit-transition: width .35s ease-in-out;
+  transition: width .35s ease-in-out;
+	width: 100px;
 	border: none;
-  font-size: 16px;
-	line-height: 20px;
-  padding: 5px;
+	font-size: 1em;
+	height: 1em;
   padding-right: 0;
+}
+.search-field:focus {
+	width: 258px;
+}
+#search-button-close,
+#search-button {
+	height: 2em;
+	padding: 0;
+	width: 2em;
+}
+.mdk-icon-fa-search {
+	padding: .5em;
+	height: 1em;
+	width: 1em;
+}
+.mdk-icon-search-fa-times {
+	padding: .6em;
+	height: .8em;
+	width: .8em;
+}
+#mapmenu-button button.mdk-button {
+	width: 2em;
+}
+#mapmenu-button .mdk-button-text {
+	display: none;
 }
 #bottom-tools {
   bottom: 0;
@@ -1669,9 +1677,6 @@ input.search-field::-ms-clear {
 #geolocation-button {
 	bottom: .5em;
 	top: auto;
-}
-.search-field {
-	width: 100%;
 }
 }
 @media screen and (max-width: 320px) {

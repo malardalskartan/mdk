@@ -17,22 +17,22 @@ function init() {
 function bindUIActions() {
     $('.mdk-modal-screen, .mdk-close-button').click(function() {
         closeModal();
-    });   
+    });
 }
 function createModal(modalTarget, options) {
     var title = options.title || undefined;
     var content = options.content || undefined;
-    var footer = options.footer || undefined;    
+    var footer = options.footer || undefined;
     settings.target = $(modalTarget);
 
     settings.modal = '<div id="mdk-modal">' +
               '<div class="mdk-modal-screen"></div>' +
               '<div class="mdk-modal">' +
-              '<div class="mdk-close-button"></div>' +
+              '<div class="mdk-close-button"><svg class="mdk-icon-fa-times"><use xlink:href="css/svg/fa-icons.svg#fa-times"></use></svg></div>' +
               '<div class="mdk-modal-title">' + title + '</div>' +
               '<div class="mdk-modal-content">' + content +'</div>' +
               '</div>' +
-            '</div>';           
+            '</div>';
 }
 function showModal() {
     settings.target.prepend(settings.modal);

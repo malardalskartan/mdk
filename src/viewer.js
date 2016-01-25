@@ -102,9 +102,15 @@ function init (mapOptions){
           collapsible: false
         });
 
+        var zoomControl = new ol.control.Zoom({
+            zoomInTipLabel: '',
+            zoomOutTipLabel:'',
+            zoomInLabel: $.parseHTML('<svg class="mdk-icon-fa-plus"><use xlink:href="css/svg/fa-icons.svg#fa-plus"></use></svg>'),
+            zoomOutLabel: $.parseHTML('<svg class="mdk-icon-fa-minus"><use xlink:href="css/svg/fa-icons.svg#fa-minus"></use></svg>')
+        });
         //Set map controls
         mapControls = [
-                new ol.control.Zoom({zoomInTipLabel: ' ', zoomOutTipLabel:' ',zoomInLabel: ' ', zoomOutLabel:' '}),
+                zoomControl,
                 attribution,
                 new ol.control.Rotate({label: ''}), /*Override default label for compass*/
                 new ol.control.ScaleLine({target: 'bottom-tools'})
@@ -794,11 +800,6 @@ function init (mapOptions){
       var resolution = scale / (mpu * 39.37 * dpi);
       return resolution;
     }
-    function createUrl(prefix, suffix, url) {
-        var p = prefix || '';
-        var s = suffix || '';
-        return p + url + s;
-    }
     function addGetFeatureInfo() {
         Popup.init('#map');
 
@@ -893,7 +894,9 @@ function init (mapOptions){
     }
     function createHome(home) {
         var el = utils.createButton({
-            buttonName: 'home-button',
+            id: 'home-button',
+            iconCls: 'mdk-icon-fa-home',
+            src: 'css/svg/fa-icons.svg#fa-home',
             tooltipText: 'Zooma till hela kartan'
         });
         $('#map').append(el);

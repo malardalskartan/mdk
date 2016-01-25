@@ -8,7 +8,7 @@ var $ = require('jquery');
 function init(target){
     var pop = '<div id="popup">' +
                 '<div class="popup">' +
-                '<div class="mdk-close-button"></div>' +
+                '<div class="mdk-close-button"><svg class="mdk-icon-fa-times"><use xlink:href="css/svg/fa-icons.svg#fa-times"></use></svg></div>' +
                 '<div class="popup-title"></div>' +
                 '<div class="popup-content"></div>' +
                 '</div>' +

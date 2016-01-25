@@ -16,7 +16,9 @@ var shareButton;
 
 function init(){
     var el = utils.createListButton({
-        name: 'share',
+        id: 'share',
+        iconCls: 'mdk-icon-fa-share-square-o',
+        src: 'css/svg/fa-icons.svg#fa-share-square-o',
         text: 'Dela karta'
     });
     $('#menutools').append(el);
@@ -34,7 +36,7 @@ function bindUIActions() {
 }
 function createContent() {
     return '<div class="share-link"><input type="text"></div>' +
-           '<i>Kopiera och klistra in länken för att dela kartan.</i>';              
+           '<i>Kopiera och klistra in länken för att dela kartan.</i>';
 }
 function createLink() {
     $('.share-link input').val(viewer.getMapUrl());

@@ -7,6 +7,7 @@
 var ol = require('openlayers');
 var $ = require('jquery');
 var viewer = require('./viewer');
+var utils = require('./utils');
 
 var settings = {
     geolocateButtonId: undefined,
@@ -19,20 +20,21 @@ var enabled = false;
 
 function init() {
     map = viewer.getMap();
-    
+
     var tooltipText = "Visa nuvarande position i kartan";
     //Element for control
-    var el = {
-        buttonContainer: $('<div>', {id: "geolocation-button", "class": 'mdk-button-container mdk-tooltip'}),
-        button: $('<button>', {"class": 'geolocation-button mdk-button'}),
-        toolTip: $('<span>', {'data-tooltip': tooltipText, 'data-placement': "east"})
-    };
-    el.buttonContainer.append(el.button);
-    el.buttonContainer.append(el.toolTip);
-    $('#map').append(el.buttonContainer);
+    var el = utils.createButton({
+        id: 'geolocation-button',
+        cls: 'geolocation-button',
+        iconCls: 'mdk-icon-fa-location-arrow',
+        src: 'css/svg/fa-icons.svg#fa-location-arrow',
+        tooltipText: tooltipText,
+        tooltipPlacement: 'east'
+    });
+    $('#map').append(el);
 
-    settings.geolocateButtonId = el.buttonContainer;
-    settings.geolocateButton = $('#geolocation-button button');    
+    settings.geolocateButtonId = $('#geolocation-button');
+    settings.geolocateButton = $('#geolocation-button button');
 
     var markerImg = '<img id="geolocation_marker" src="img/geolocation_marker.png" />';
     $('#map').prepend(markerImg);
@@ -62,11 +64,11 @@ function bindUIActions() {
     toggle();
     settings.geolocateButton.blur();
     e.preventDefault();
-  });      
+  });
 }
 function toggle() {
   if(settings.geolocateButton.hasClass('geolocation-button-true')){
-    settings.geolocateButton.removeClass('geolocation-button-true');        
+    settings.geolocateButton.removeClass('geolocation-button-true');
     geolocation.setTracking(false);
 
     geolocation.un('change', getPositionVal);
@@ -74,7 +76,7 @@ function toggle() {
     map.removeOverlay(marker);
   }
   else {
-    settings.geolocateButton.addClass('geolocation-button-true');       
+    settings.geolocateButton.addClass('geolocation-button-true');
     map.addOverlay(marker);
 
     // Listen to position changes
@@ -82,7 +84,7 @@ function toggle() {
     geolocation.setTracking(true); // Start position tracking
     map.on('postcompose', render);
     map.render();
-  }        
+  }
 }
 function getPositionVal() {
       var position = geolocation.getPosition();
@@ -119,7 +121,7 @@ function addPosition(position, heading, m, speed) {
     markerEl.src = 'img/geolocation_marker_heading.png';
   } else {
     markerEl.src = 'img/geolocation_marker.png';
-  } 
+  }
 
   var previousM = 0;
   // change center and rotation before render
@@ -157,10 +159,10 @@ function getCenterWithHeading(position, rotation, resolution) {
     position[0] - Math.sin(rotation) * height * resolution * 1 / 4,
     position[1] + Math.cos(rotation) * height * resolution * 1 / 4
   ];
-}    
+}
 function render() {
   map.render;
-}     
+}
 
 module.exports.init = init;
 module.exports.bindUIActions = bindUIActions;
