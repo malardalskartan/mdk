@@ -155,6 +155,10 @@ function init (mapOptions){
                 var agsFeatureSource = agsFeature(layerOptions);
                 layers.push(createVectorLayer(layerOptions, agsFeatureSource));
             }
+            else if(layer.type == 'AGS_TILE') {
+                var agsTileSource = agsTile(layerOptions);
+                layers.push(createTileLayer(layerOptions, agsTileSource));
+            }
             else if(layer.type == 'GEOJSON') {
                 layers.push(createVectorLayer(layerOptions, geojson(layerOptions.source)));
             }
@@ -189,6 +193,7 @@ function init (mapOptions){
             minResolution: options.hasOwnProperty('minScale') ? scaleToResolution(options.minScale): undefined,
             maxResolution: options.hasOwnProperty('maxScale') ? scaleToResolution(options.maxScale): undefined,
             visible: options.visible,
+            extent: options.extent || undefined,
             attributes: options.attributes
         }
         if (options.hasOwnProperty('clusterStyle')) {
@@ -337,6 +342,12 @@ function init (mapOptions){
     function getMapSource() {
       return settings.source;
     }
+    function createTileLayer(options, source) {
+        var tileLayer;
+        options.source = source;
+        tileLayer =  new ol.layer.Tile(options);
+        return tileLayer;
+    }
     function createVectorLayer(options, source) {
         var vectorLayer;
         switch(options.layerType) {
@@ -362,9 +373,6 @@ function init (mapOptions){
                 break;
         }
         return vectorLayer;
-    }
-    function createTileLayer(options) {
-
     }
     function addWMS(layersConfig) {
 
@@ -500,6 +508,17 @@ function init (mapOptions){
             strategy: ol.loadingstrategy.bbox
         });
         return vectorSource;
+    }
+    function agsTile(options) {
+        var url = settings.source[options.source].url;
+        var params = options.params || {};
+        params.layers = "show:" + options.id;
+        var tileSource = new ol.source.TileArcGISRest({
+            projection: settings.projection,
+            params: params,
+            url: url
+        });
+        return tileSource;
     }
     function addMapQuest(layersConfig) {
         // layersConfig.hasOwnProperty('attribution') ? attr=[new ol.Attribution({html: layersConfig.attribution})] : [attr = null];
