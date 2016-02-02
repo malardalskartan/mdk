@@ -33,7 +33,7 @@ module.exports = function(options) {
 
       Viewer.removeOverlays();
       var overlay = new ol.Overlay({
-        element: $('#popup')
+        element: $('#popup').get(0)
       });
 
       map.addOverlay(overlay);
@@ -44,6 +44,7 @@ module.exports = function(options) {
       var content ='';
       map.forEachFeatureAtPixel(evt.pixel,
           function(feature, layer) {
+
             l = layer;
             var queryable = false;
             if(layer) {
@@ -69,6 +70,7 @@ module.exports = function(options) {
                 features.push(feature);
                 content += getAttributes(feature,l);
             }
+          
           });
 
       if (features.length > 0 && identify) {

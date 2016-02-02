@@ -38,7 +38,7 @@ function init() {
 
     var markerImg = '<img id="geolocation_marker" src="img/geolocation_marker.png" />';
     $('#map').prepend(markerImg);
-    markerEl = $('#geolocation_marker');
+    markerEl = $('#geolocation_marker').get(0);
     marker = new ol.Overlay({
       positioning: 'center-center',
       element: markerEl,

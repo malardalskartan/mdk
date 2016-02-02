@@ -251,7 +251,16 @@ button.ol-zoom-out {
 .ol-attribution img {
   display: none;
 }
-
+.ol-box {
+  box-sizing: border-box;
+  border-radius: 2px;
+  border: 2px solid blue;
+}
+.ol-dragzoom {
+  border-color: #007AFF;
+  border-width: 3px;
+  background-color: rgba(255,255,255,0.4);
+}
 /*end openlayers style*/
 
 /*owl-carousel*/

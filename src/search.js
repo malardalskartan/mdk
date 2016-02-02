@@ -96,7 +96,7 @@ function bindUIActions() {
           Viewer.removeOverlays();
           var map = Viewer.getMap();
           var overlay = new ol.Overlay({
-            element: $('#popup')
+            element: $('#popup').get(0)
           });
 
           map.addOverlay(overlay);
