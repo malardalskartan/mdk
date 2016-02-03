@@ -1,5 +1,5 @@
 /* ========================================================================
- * Copyright 2015 Mälardalskartan
+ * Copyright 2016 Mälardalskartan
  * Licensed under BSD 2-Clause (https://github.com/malardalskartan/mdk/blob/master/LICENSE.txt)
  * ======================================================================== */
 "use strict";
@@ -26,7 +26,7 @@ function createButton() {
     $('#map').append(button);
 }
 function openMapWindow() {
-    var url = viewer.getMapUrl();   
+    var url = viewer.getMapUrl();
     window.open(url);
 }
 

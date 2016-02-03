@@ -1,5 +1,5 @@
 /* ========================================================================
- * Copyright 2015 Mälardalskartan
+ * Copyright 2016 Mälardalskartan
  * Licensed under BSD 2-Clause (https://github.com/malardalskartan/mdk/blob/master/LICENSE.txt)
  * ======================================================================== */
 
@@ -35,29 +35,29 @@ var Editor = (function($){
     },
     attributeFeature: function() {
       TransactionHandler.attributeSelected();
-    },    
+    },
     drawFeature: function() {
       TransactionHandler.activateInsert();
       //turnOnCursor();
 
       //TransactionHandler.draw.on('drawend', turnOffCursor, this);
-    },   
+    },
     bindUIActions: function() {
       $('#edit-draw-button').on('touchend click', function(e) {
-        Editor.drawFeature();        
+        Editor.drawFeature();
         $('#edit-draw-button button').blur();
         e.preventDefault();
       });
       $('#edit-attribute-button').on('touchend click', function(e) {
-        Editor.attributeFeature();        
+        Editor.attributeFeature();
         $('#edit-attribute-button button').blur();
         e.preventDefault();
-      });        
+      });
       $('#edit-delete-button').on('touchend click', function(e) {
-        Editor.deleteFeature();        
+        Editor.deleteFeature();
         $('#edit-delete-button button').blur();
         e.preventDefault();
-      });             
+      });
     }
   };
-})(jQuery);	
+})(jQuery);

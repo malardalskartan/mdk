@@ -1,5 +1,5 @@
 /* ========================================================================
- * Copyright 2015 Mälardalskartan
+ * Copyright 2016 Mälardalskartan
  * Licensed under BSD 2-Clause (https://github.com/malardalskartan/mdk/blob/master/LICENSE.txt)
  * ======================================================================== */
 
@@ -45,12 +45,12 @@ var TransactionHandler = (function($){
       settings.select = new ol.interaction.Select({layers: [Viewer.getLayer(Viewer.getEditLayer().name)]});
       settings.modify = new ol.interaction.Modify({
         features: settings.select.getFeatures()
-      });   
-      settings.select.getFeatures().on('add', TransactionHandler.onSelectAdd, this);      
+      });
+      settings.select.getFeatures().on('add', TransactionHandler.onSelectAdd, this);
       settings.select.getFeatures().on('remove', TransactionHandler.onSelectRemove, this);
-      settings.dirty = {};      
+      settings.dirty = {};
       settings.map.addInteraction(settings.select);
-      settings.map.addInteraction(settings.modify);     
+      settings.map.addInteraction(settings.modify);
       settings.format = new ol.format.WFS();
       settings.serializer = new XMLSerializer();
       settings.draw.on('drawend', TransactionHandler.onDrawEnd, this);
@@ -67,14 +67,14 @@ var TransactionHandler = (function($){
       return result;
     },
     getSelect: function() {
-      return settings.select;      
+      return settings.select;
     },
     onSelectAdd: function(evt) {
       var feature = evt.element;
       var fid = feature.getId();
       feature.on('change', function(evt) {
         settings.dirty[evt.target.getId()] = true;
-      }, this);      
+      }, this);
     },
     onSelectRemove: function(evt) {
       var feature = evt.element;
@@ -105,7 +105,7 @@ var TransactionHandler = (function($){
           },
           context: this
         });
-      }      
+      }
     },
     onDrawEnd: function(evt) {
       var feature = evt.feature;
@@ -141,7 +141,7 @@ var TransactionHandler = (function($){
             + errorMsg);
         },
         context: this
-      });      
+      });
     },
     onAttributeSave: function(f, el) {
         var formEl = el;
@@ -152,7 +152,7 @@ var TransactionHandler = (function($){
         for (var i=0; i<settings.attributes.length; i++) {
           if (formEl.hasOwnProperty(settings.attributes[i].name)) {
             feature.set(settings.attributes[i].name, formEl[settings.attributes[i].name]);
-            clone.set(settings.attributes[i].name, formEl[settings.attributes[i].name]);      
+            clone.set(settings.attributes[i].name, formEl[settings.attributes[i].name]);
           }
         }
 
@@ -170,13 +170,13 @@ var TransactionHandler = (function($){
             //alert('success');
           },
           context: this
-        });   
+        });
     },
     activateInsert: function() {
       if (settings.hasDraw !== true) {
         settings.map.addInteraction(settings.draw);
         settings.hasDraw = true;
-      }      
+      }
     },
     attributeSelected: function() {
       var field = '', formElement= '', val = '', type = '';
@@ -191,12 +191,12 @@ var TransactionHandler = (function($){
             val = feature.get(settings.attributes[i].name) || '';
             type = settings.attributes[i].type;
             options = settings.attributes[i].options || [];
-            formElement += TransactionHandler.createFormElement(label, field, val, type, options); 
+            formElement += TransactionHandler.createFormElement(label, field, val, type, options);
           }
         }
-        var form = '<form>' + formElement +'<br><div class="mdk-form-save"><input id="mdk-save-button" type="button" value="Spara"></input></div></form>';      
-        var modal = Modal('#map', {title: 'Information', content: form});     
-        modal.showModal(); 
+        var form = '<form>' + formElement +'<br><div class="mdk-form-save"><input id="mdk-save-button" type="button" value="Spara"></input></div></form>';
+        var modal = Modal('#map', {title: 'Information', content: form});
+        modal.showModal();
 
         $('#mdk-save-button').on('touchend click', function(e) {
           var editEl = {};
@@ -212,13 +212,13 @@ var TransactionHandler = (function($){
             }
           }
           modal.closeModal();
-          TransactionHandler.onAttributeSave(feature, editEl);       
+          TransactionHandler.onAttributeSave(feature, editEl);
           $('#mdk-save-button').blur();
           e.preventDefault();
-        });                
+        });
       }
 
-           
+
     },
     deleteSelected: function() {
       var features = settings.select.getFeatures();
@@ -250,7 +250,7 @@ var TransactionHandler = (function($){
             });
           }
 
-      }      
+      }
     },
     createFormElement: function(label, field, val, type, options) {
       var el;
@@ -260,7 +260,7 @@ var TransactionHandler = (function($){
           break;
         case 'textarea':
           el = '<div><label>' + label +'</label><br><textarea id="input-' + field + '" rows="3">' + val + '</textarea></div>';
-          break;          
+          break;
         case 'checkbox':
           var checked = val == true ? ' checked' : '';
           el = '<div class="mdk-form-checkbox"><label>' + label + '</label><input type="checkbox" id="input-' + field + '" value="' + val +'"' + checked + '></div>';
@@ -278,9 +278,9 @@ var TransactionHandler = (function($){
             el += '<option value="' + options[i] + ' ">' + options[i] + '</option>';
           }
           el += '</select></div>';
-          break;          
+          break;
       }
       return el;
-    }        
+    }
   };
-})(jQuery);	
+})(jQuery);

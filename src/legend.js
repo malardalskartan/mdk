@@ -1,5 +1,5 @@
 /* ========================================================================
- * Copyright 2015 Mälardalskartan
+ * Copyright 2016 Mälardalskartan
  * Licensed under BSD 2-Clause (https://github.com/malardalskartan/mdk/blob/master/LICENSE.txt)
  * ======================================================================== */
 "use strict";
@@ -170,7 +170,7 @@ function addLegend(groups) {
       //Add map legend
       var mapLegend = '<div id="map-legend"><ul id="legend-overlay"><li class="legend hidden"><div class ="toggle-button toggle-button-max">' +
                           '<svg class="mdk-icon-fa-angle-double-down"><use xlink:href="css/svg/fa-icons.svg#fa-angle-double-down"></use></svg>' +
-                          '<svg class="mdk-icon-fa-angle-double-up"><use xlink:href="css/svg/fa-icons.svg#fa-angle-double-up"></use></svg>' +                          
+                          '<svg class="mdk-icon-fa-angle-double-up"><use xlink:href="css/svg/fa-icons.svg#fa-angle-double-up"></use></svg>' +
                       '</div></li><li><ul id="overlay-list"></li></ul></ul><ul id="map-legend-background"></ul></div>';
       $('#map').append(mapLegend);
       //Add divider to map legend if not only background
