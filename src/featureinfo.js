@@ -14,7 +14,7 @@ var owlCarousel = require('../externs/owlcarousel-browserify');
 owlCarousel.loadjQueryPlugin();
 
 module.exports = function(options) {
-    alert('featureinfo');
+
     var select;
     var map = Viewer.getMap();
 
@@ -38,48 +38,20 @@ module.exports = function(options) {
 
       map.addOverlay(overlay);
 
-      var identify = true;
+      var result = {};
       var l, layers = [];
       var features = [];
       var content ='';
-      map.forEachFeatureAtPixel(evt.pixel,
-          function(feature, layer) {
 
-            l = layer;
-            var queryable = false;
-            if(layer) {
-                queryable = layer.get('queryable');
-            }
-            if(feature.get('features')) {
-                if (feature.get('features').length > 1) {
-                  map.getView().setCenter(evt.coordinate);
-                  var zoom = map.getView().getZoom();
-                  if(zoom + 1 < Viewer.getResolutions().length) {
-                    map.getView().setZoom(zoom + 1);
-                  }
-                  identify =false;
-                }
-                else if(feature.get('features').length == 1 && queryable) {
-                    layers.push(l);
-                    features.push(feature.get('features')[0]);
-                    content += getAttributes(feature.get('features')[0],l);
-                }
-            }
-            else if(queryable) {
-                layers.push(l);
-                features.push(feature);
-                content += getAttributes(feature,l);
-            }
+      var result = forEachFeatureAtPixel(evt);
 
-          });
-
-      if (features.length > 0 && identify) {
-          select = new ol.interaction.Select({layers: layers});
+      if (result.features.length > 0 && result.identify) {
+          select = new ol.interaction.Select({layers: result.layers});
           map.addInteraction(select);
-          content = '<div id="identify"><div id="mdk-identify-carousel" class="owl-carousel owl-theme">' + content + '</div></div>';
+          content = '<div id="identify"><div id="mdk-identify-carousel" class="owl-carousel owl-theme">' + result.content + '</div></div>';
           switch (showOverlay) {
               case true:
-                  var geometry = features[0].getGeometry();
+                  var geometry = result.features[0].getGeometry();
                   var coord;
                   geometry.getType() == 'Point' ? coord = geometry.getCoordinates() : coord = evt.coordinate;
                   overlay.setPosition(coord);
@@ -97,24 +69,24 @@ module.exports = function(options) {
                   //   });
                   // }
                   // else {
-                    Popup.setContent({content: content, title: l.get('title')});
+                    Popup.setContent({content: result.content, title: result.layers[0].get('title')});
                     Popup.setVisibility(true);
                     var owl = initCarousel('#mdk-identify-carousel', undefined, function(){
                         var currentItem = this.owl.currentItem;
-                        maputils.clearAndSelect(select, features[currentItem]);
-                        Popup.setTitle(layers[currentItem].get('title'));
+                        maputils.clearAndSelect(select, result.features[currentItem]);
+                        Popup.setTitle(result.layers[currentItem].get('title'));
                     });
                   // }
                   var owl = initCarousel('#mdk-identify-carousel');
                   Viewer.autoPan();
                   break;
               case false:
-                  sidebar.setContent({content: content, title: l.get('title')});
+                  sidebar.setContent({content: result.content, title: result.layers[0].get('title')});
                   sidebar.setVisibility(true);
                   var owl = initCarousel('#mdk-identify-carousel', undefined, function(){
                       var currentItem = this.owl.currentItem;
-                      maputils.clearAndSelect(select, features[currentItem]);
-                      sidebar.setTitle(layers[currentItem].get('title'));
+                      maputils.clearAndSelect(select, result.features[currentItem]);
+                      sidebar.setTitle(result.layers[currentItem].get('title'));
                   });
                   break;
           }
@@ -125,6 +97,45 @@ module.exports = function(options) {
       }
       evt.preventDefault();
     });
+    function forEachFeatureAtPixel(evt) {
+        var result = {};
+        result.identify = true;
+        result.layers = [];
+        result.features = [];
+        result.content ='';
+        result.identify = true;
+        map.forEachFeatureAtPixel(evt.pixel,
+            function(feature, layer) {
+
+              var l = layer;
+              var queryable = false;
+              if(layer) {
+                  queryable = layer.get('queryable');
+              }
+              if(feature.get('features')) {
+                  if (feature.get('features').length > 1) {
+                    map.getView().setCenter(evt.coordinate);
+                    var zoom = map.getView().getZoom();
+                    if(zoom + 1 < Viewer.getResolutions().length) {
+                      map.getView().setZoom(zoom + 1);
+                    }
+                    result.identify =false;
+                  }
+                  else if(feature.get('features').length == 1 && queryable) {
+                      result.layers.push(l);
+                      result.features.push(feature.get('features')[0]);
+                      result.content += getAttributes(feature.get('features')[0],l);
+                  }
+              }
+              else if(queryable) {
+                  result.layers.push(l);
+                  result.features.push(feature);
+                  result.content += getAttributes(feature,l);
+              }
+
+            });
+        return result;
+    }
     function initCarousel(id, options, cb) {
         var carouselOptions = options || {
           navigation : true, // Show next and prev buttons
