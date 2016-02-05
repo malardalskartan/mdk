@@ -14,7 +14,7 @@ var owlCarousel = require('../externs/owlcarousel-browserify');
 owlCarousel.loadjQueryPlugin();
 
 module.exports = function(options) {
-
+    alert('featureinfo');
     var select;
     var map = Viewer.getMap();
 
