@@ -17,124 +17,161 @@ module.exports = function(options) {
 
     var select;
     var map = Viewer.getMap();
-
     var settings = options ? options : {};
     var showOverlay = settings.hasOwnProperty('overlay') ? settings.overlay : true;
-
-    sidebar.init();
-    Popup.init('#map');
+    var identifyTarget;
+    if(showOverlay) {
+        Popup.init('#map');
+        identifyTarget = 'overlay';
+    }
+    else {
+        sidebar.init();
+        identifyTarget = 'sidebar';
+    }
 
     map.on('click', function(evt) {
+        if(select) {
+            select.getFeatures().clear();
+            map.removeInteraction(select);
+        }
+        Viewer.removeOverlays();
 
-      if(select) {
-          select.getFeatures().clear();
-          map.removeInteraction(select);
-      }
+        var serverData = forEachLayerAtPixel(evt);
+        $.when.apply($, serverData).done(function() {
+            var result = [];
+            if(serverData.length === 1) {
+                var args = [Array.prototype.slice.call(arguments)];
+                var item = {};
+                item.layer = Viewer.getLayer('pagaende_detaljplaner');
+                item.feature = geojsonToFeature(args[0][0]);
+                item.content = getAttributes(item.feature, Viewer.getLayer('pagaende_detaljplaner'));
+                result.push(item);
+            }
+            else if(serverData.length > 1) {
+                var args = Array.prototype.slice.call(arguments);
+            }
+            // var result = clientData;
+            if (result.length > 0) {
+                identify(result, identifyTarget, evt.coordinate)
+            }
+            else {
+              console.log('No features identified');
+              Popup.setVisibility(false);
+              sidebar.setVisibility(false);
+            }
+        });
+        var clientData = forEachFeatureAtPixel(evt);
 
-      Viewer.removeOverlays();
-      var overlay = new ol.Overlay({
-        element: $('#popup').get(0)
-      });
-
-      map.addOverlay(overlay);
-
-      var result = {};
-      var l, layers = [];
-      var features = [];
-      var content ='';
-
-      var result = forEachFeatureAtPixel(evt);
-
-      if (result.features.length > 0 && result.identify) {
-          select = new ol.interaction.Select({layers: result.layers});
-          map.addInteraction(select);
-          content = '<div id="identify"><div id="mdk-identify-carousel" class="owl-carousel owl-theme">' + result.content + '</div></div>';
-          switch (showOverlay) {
-              case true:
-                  var geometry = result.features[0].getGeometry();
-                  var coord;
-                  geometry.getType() == 'Point' ? coord = geometry.getCoordinates() : coord = evt.coordinate;
-                  overlay.setPosition(coord);
-                  //If layer have relations to be queried, ie more information
-                  // if(l.get('relations')) {
-                  //   var format = new ol.format.WKT();
-                  //   var featureCoord = format.writeGeometry(features[0].getGeometry());
-                  //   wfsCql(l.get('relations'), featureCoord);
-                  //   content += '<br><div class="mdk-more-button">Mer information</div>';
-                  //   Popup.setContent({content: content, title: l.get('title')});
-                  //   Popup.setVisibility(true);
-                  //   $('.mdk-more-button').on('click touchend', function(e) {
-                  //     modalMoreInfo();
-                  //     e.preventDefault();
-                  //   });
-                  // }
-                  // else {
-                    Popup.setContent({content: result.content, title: result.layers[0].get('title')});
-                    Popup.setVisibility(true);
-                    var owl = initCarousel('#mdk-identify-carousel', undefined, function(){
-                        var currentItem = this.owl.currentItem;
-                        maputils.clearAndSelect(select, result.features[currentItem]);
-                        Popup.setTitle(result.layers[currentItem].get('title'));
-                    });
-                  // }
-                  var owl = initCarousel('#mdk-identify-carousel');
-                  Viewer.autoPan();
-                  break;
-              case false:
-                  sidebar.setContent({content: result.content, title: result.layers[0].get('title')});
-                  sidebar.setVisibility(true);
-                  var owl = initCarousel('#mdk-identify-carousel', undefined, function(){
-                      var currentItem = this.owl.currentItem;
-                      maputils.clearAndSelect(select, result.features[currentItem]);
-                      sidebar.setTitle(result.layers[currentItem].get('title'));
-                  });
-                  break;
-          }
-      }
-      else {
-        console.log('No features identified');
-        sidebar.setVisibility(false);
-      }
-      evt.preventDefault();
+        evt.preventDefault();
     });
+    function forEachLayerAtPixel(evt) {
+        var result = [];
+        var que = [];
+        map.forEachLayerAtPixel(evt.pixel, function(layer) {
+            var layerType = layer.get('type');
+            switch (layerType) {
+              case 'WMTS':
+                console.log(layer.get('name'));
+                break;
+              case 'WMS':
+                var url = layer.getSource().getGetFeatureInfoUrl(
+                evt.coordinate, map.getView().getResolution(), Viewer.getProjection(),
+                {'INFO_FORMAT': 'application/json'});
+                que.push(getFeatureInfo(url)
+                );
+                break;
+            }
+        });
+        return que;
+    }
     function forEachFeatureAtPixel(evt) {
-        var result = {};
-        result.identify = true;
-        result.layers = [];
-        result.features = [];
-        result.content ='';
-        result.identify = true;
+        var result = [];
         map.forEachFeatureAtPixel(evt.pixel,
             function(feature, layer) {
-
+              var item = {};
               var l = layer;
               var queryable = false;
               if(layer) {
                   queryable = layer.get('queryable');
               }
               if(feature.get('features')) {
+                  //If cluster
                   if (feature.get('features').length > 1) {
                     map.getView().setCenter(evt.coordinate);
                     var zoom = map.getView().getZoom();
                     if(zoom + 1 < Viewer.getResolutions().length) {
                       map.getView().setZoom(zoom + 1);
                     }
-                    result.identify =false;
+                    result = [];
+                    return true;
                   }
                   else if(feature.get('features').length == 1 && queryable) {
-                      result.layers.push(l);
-                      result.features.push(feature.get('features')[0]);
-                      result.content += getAttributes(feature.get('features')[0],l);
+                      item.layer = l;
+                      item.feature = feature.get('features')[0];
+                      item.content = getAttributes(feature.get('features')[0],l)
+                      result.push(item);
                   }
               }
               else if(queryable) {
-                  result.layers.push(l);
-                  result.features.push(feature);
-                  result.content += getAttributes(feature,l);
+                  item.layer = l;
+                  item.feature = feature;
+                  item.content = getAttributes(feature,l)
+                  result.push(item);
               }
 
             });
         return result;
+    }
+    function getFeatureInfo(url) {
+        return $.post(url, function(data) {
+            return data;
+        });
+    }
+    function identify(items, target, coordinate) {
+        var layers = items.map(function(i){
+            return i.layer;
+        });
+        select = new ol.interaction.Select({layers: layers});
+        map.addInteraction(select);
+        var content = items.map(function(i){
+            return i.content;
+        }).join('');
+        content = '<div id="identify"><div id="mdk-identify-carousel" class="owl-carousel owl-theme">' + content + '</div></div>';
+        switch (target) {
+            case 'overlay':
+                var overlay = new ol.Overlay({
+                  element: $('#popup').get(0)
+                });
+                map.addOverlay(overlay);
+                var geometry = items[0].feature.getGeometry();
+                var coord;
+                geometry.getType() == 'Point' ? coord = geometry.getCoordinates() : coord = coordinate;
+                overlay.setPosition(coord);
+                Popup.setContent({content: content, title: items[0].layer.get('title')});
+                Popup.setVisibility(true);
+                var owl = initCarousel('#mdk-identify-carousel', undefined, function(){
+                    var currentItem = this.owl.currentItem;
+                    maputils.clearAndSelect(select, items[currentItem].feature);
+                    Popup.setTitle(items[currentItem].layer.get('title'));
+                });
+                Viewer.autoPan();
+                break;
+            case 'sidebar':
+                sidebar.setContent({content: content, title: items[0].layer.get('title')});
+                sidebar.setVisibility(true);
+                var owl = initCarousel('#mdk-identify-carousel', undefined, function(){
+                    var currentItem = this.owl.currentItem;
+                    maputils.clearAndSelect(select, items[currentItem].feature);
+                    sidebar.setTitle(items[currentItem].layer.get('title'));
+                });
+                break;
+        }
+    }
+    function geojsonToFeature(obj) {
+        var vectorSource = new ol.source.Vector({
+          features: (new ol.format.GeoJSON()).readFeatures(obj)
+        });
+        return vectorSource.getFeatures()[0];
     }
     function initCarousel(id, options, cb) {
         var carouselOptions = options || {

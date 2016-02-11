@@ -193,6 +193,7 @@ function init (mapOptions){
             minResolution: options.hasOwnProperty('minScale') ? scaleToResolution(options.minScale): undefined,
             maxResolution: options.hasOwnProperty('maxScale') ? scaleToResolution(options.maxScale): undefined,
             visible: options.visible,
+            type: options.type || undefined,
             extent: options.extent || undefined,
             attributes: options.attributes
         }
@@ -339,6 +340,9 @@ function init (mapOptions){
     function getProjectionCode() {
       return settings.projectionCode;
     }
+    function getProjection() {
+      return settings.projection;
+    }
     function getMapSource() {
       return settings.source;
     }
@@ -387,6 +391,7 @@ function init (mapOptions){
           maxResolution: layersConfig.hasOwnProperty('maxScale') ? scaleToResolution(layersConfig.maxScale): undefined,
           type: layersConfig.type,
           visible: layersConfig.visible,
+          attributes: layersConfig.attributes,
           legend: false,
           source: new ol.source.TileWMS(({
             url: settings.source[layersConfig.source].url,
@@ -414,6 +419,7 @@ function init (mapOptions){
            minResolution: layersConfig.hasOwnProperty('minScale') ? scaleToResolution(layersConfig.minScale): undefined,
            maxResolution: layersConfig.hasOwnProperty('maxScale') ? scaleToResolution(layersConfig.maxScale): undefined,
            visible: layersConfig.visible,
+           type: layersConfig.type,
            source: new ol.source.WMTS({
              crossOrigin: 'anonymous',
              attributions: attr,
@@ -946,6 +952,7 @@ module.exports.getEditLayer = getEditLayer;
 module.exports.getGroup = getGroup;
 module.exports.getGroups = getGroups;
 module.exports.getProjectionCode = getProjectionCode;
+module.exports.getProjection = getProjection;
 module.exports.getMapSource = getMapSource;
 module.exports.getResolutions = getResolutions;
 module.exports.addWMS = addWMS;
