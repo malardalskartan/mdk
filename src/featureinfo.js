@@ -35,57 +35,68 @@ module.exports = function(options) {
             map.removeInteraction(select);
         }
         Viewer.removeOverlays();
-
-        var serverData = forEachLayerAtPixel(evt);
-        $.when.apply($, serverData).done(function() {
-            var result = [];
-            if(serverData.length === 1) {
-                var args = [Array.prototype.slice.call(arguments)];
-                var item = {};
-                item.layer = Viewer.getLayer('pagaende_detaljplaner');
-                item.feature = geojsonToFeature(args[0][0]);
-                item.content = getAttributes(item.feature, Viewer.getLayer('pagaende_detaljplaner'));
-                result.push(item);
-            }
-            else if(serverData.length > 1) {
-                var args = Array.prototype.slice.call(arguments);
-            }
-            // var result = clientData;
-            if (result.length > 0) {
-                identify(result, identifyTarget, evt.coordinate)
-            }
-            else {
-              console.log('No features identified');
-              Popup.setVisibility(false);
-              sidebar.setVisibility(false);
-            }
-        });
-        var clientData = forEachFeatureAtPixel(evt);
-
+        //Featurinfo in two steps. First serverside and client side when finished
+        var clientResult = forEachFeatureAtPixel(evt);
+        if(clientResult !== false) {
+            var result = [],
+            serverResult = [],
+            promiseFn = [];
+            forEachLayerAtPixel(evt).map(function(request) {
+                request.fn.done(function(data) {
+                    var feature = geojsonToFeature(data),
+                    layer = Viewer.getLayer(request.layer);
+                    serverResult.push({
+                        layer: layer,
+                        feature: feature,
+                        content: getAttributes(feature, layer)
+                    });
+                });
+                promiseFn.push(request.fn);
+            });
+            //When server side finished do client side
+            $.when.apply($, promiseFn).done(function() {
+                result = serverResult.concat(clientResult);
+                if (result.length > 0) {
+                    identify(result, identifyTarget, evt.coordinate)
+                }
+                else {
+                  console.log('No features identified');
+                  Popup.setVisibility(false);
+                  sidebar.setVisibility(false);
+                }
+            });
+        }
         evt.preventDefault();
     });
     function forEachLayerAtPixel(evt) {
-        var result = [];
-        var que = [];
-        map.forEachLayerAtPixel(evt.pixel, function(layer) {
-            var layerType = layer.get('type');
-            switch (layerType) {
-              case 'WMTS':
-                console.log(layer.get('name'));
-                break;
-              case 'WMS':
-                var url = layer.getSource().getGetFeatureInfoUrl(
-                evt.coordinate, map.getView().getResolution(), Viewer.getProjection(),
-                {'INFO_FORMAT': 'application/json'});
-                que.push(getFeatureInfo(url)
-                );
-                break;
-            }
-        });
-        return que;
+        var requests = [];
+        try {
+            map.forEachLayerAtPixel(evt.pixel, function(layer) {
+                var item = getGetFeatureInfoRequest(layer, evt.coordinate);
+                if (item) {
+                    requests.push(getGetFeatureInfoRequest(layer, evt.coordinate));
+                }
+            });
+        }
+        //Fallback for IE 8 and 9 lack of support for cors in canvas
+        catch (e) {
+            var layers = Viewer.getLayers();
+            layers.forEach(function(layer) {
+                if(layer.get('type')=='WMS' && layer.getVisible()==true) {
+                  var item = getGetFeatureInfoRequest(layer, evt.coordinate);
+                  console.log(item);
+                  if (item) {
+                      requests.push(getGetFeatureInfoRequest(layer, evt.coordinate));
+                  }
+                }
+            });
+        }
+        console.log(requests);
+        return requests;
     }
     function forEachFeatureAtPixel(evt) {
-        var result = [];
+        var result = [],
+        cluster = false;
         map.forEachFeatureAtPixel(evt.pixel,
             function(feature, layer) {
               var item = {};
@@ -102,7 +113,7 @@ module.exports = function(options) {
                     if(zoom + 1 < Viewer.getResolutions().length) {
                       map.getView().setZoom(zoom + 1);
                     }
-                    result = [];
+                    cluster = true;
                     return true;
                   }
                   else if(feature.get('features').length == 1 && queryable) {
@@ -120,11 +131,35 @@ module.exports = function(options) {
               }
 
             });
-        return result;
+        if(cluster) {
+            return false;
+        }
+        else {
+            return result;
+        }
+    }
+    function getGetFeatureInfoRequest(layer, coordinate) {
+        var layerType = layer.get('type'),
+        obj = {};
+        switch (layerType) {
+          case 'WMTS':
+            console.log(layer.get('name'));
+            break;
+          case 'WMS':
+            console.log('WMS');
+            var url = layer.getSource().getGetFeatureInfoUrl(
+            coordinate, map.getView().getResolution(), Viewer.getProjection(),
+            {'INFO_FORMAT': 'application/json'});
+            obj.layer = "pagaende_detaljplaner";
+            obj.cb = "GEOJSON";
+            obj.fn = getFeatureInfo(url);
+            return obj;
+            break;
+        }
     }
     function getFeatureInfo(url) {
-        return $.post(url, function(data) {
-            return data;
+        return $.ajax(url, {
+          type: 'post'
         });
     }
     function identify(items, target, coordinate) {
