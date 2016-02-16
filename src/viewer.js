@@ -325,6 +325,14 @@ function init (mapOptions){
         });
         return layer[0];
     }
+    function getQueryableLayers() {
+        var queryableLayers = settings.layers.filter(function(layer) {
+            if(layer.get('queryable') && layer.getVisible()) {
+                return layer;
+            }
+        });
+        return queryableLayers;
+    }
     function getEditLayer() {
       return settings.editLayer;
     }
@@ -392,6 +400,7 @@ function init (mapOptions){
           type: layersConfig.type,
           visible: layersConfig.visible,
           attributes: layersConfig.attributes,
+          queryable: true || layersConfig.queryable,
           legend: false,
           source: new ol.source.TileWMS(({
             url: settings.source[layersConfig.source].url,
@@ -948,6 +957,7 @@ module.exports.getMapUrl = getMapUrl;
 module.exports.getMap = getMap;
 module.exports.getLayers = getLayers;
 module.exports.getLayer = getLayer;
+module.exports.getQueryableLayers = getQueryableLayers;
 module.exports.getEditLayer = getEditLayer;
 module.exports.getGroup = getGroup;
 module.exports.getGroups = getGroups;

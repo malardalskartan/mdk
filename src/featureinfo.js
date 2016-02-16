@@ -45,11 +45,13 @@ module.exports = function(options) {
                 request.fn.done(function(data) {
                     var feature = geojsonToFeature(data),
                     layer = Viewer.getLayer(request.layer);
-                    serverResult.push({
-                        layer: layer,
-                        feature: feature,
-                        content: getAttributes(feature, layer)
-                    });
+                    if(feature) {
+                        serverResult.push({
+                            layer: layer,
+                            feature: feature,
+                            content: getAttributes(feature, layer)
+                        });
+                    }
                 });
                 promiseFn.push(request.fn);
             });
@@ -70,28 +72,36 @@ module.exports = function(options) {
     });
     function forEachLayerAtPixel(evt) {
         var requests = [];
-        try {
+        //Check for support of crossOrigin in image, absent in IE 8 and 9
+        if('crossOrigin' in new(Image)) {
             map.forEachLayerAtPixel(evt.pixel, function(layer) {
                 var item = getGetFeatureInfoRequest(layer, evt.coordinate);
-                if (item) {
-                    requests.push(getGetFeatureInfoRequest(layer, evt.coordinate));
-                }
+                if(item) {requests.push(item)};
             });
         }
-        //Fallback for IE 8 and 9 lack of support for cors in canvas
-        catch (e) {
-            var layers = Viewer.getLayers();
+        //If canvas is tainted
+        else if(isTainted(evt.pixel)) {
+            var layers = Viewer.getQueryableLayers();
             layers.forEach(function(layer) {
-                if(layer.get('type')=='WMS' && layer.getVisible()==true) {
-                  var item = getGetFeatureInfoRequest(layer, evt.coordinate);
-                  console.log(item);
-                  if (item) {
-                      requests.push(getGetFeatureInfoRequest(layer, evt.coordinate));
-                  }
+                //If layer is tainted, then create request for layer
+                if(isTainted(evt.pixel, layer)) {
+                    var item = getGetFeatureInfoRequest(layer, evt.coordinate);
+                    if(item) {requests.push(item)};
+                }
+                //If layer is not tainted, test if layer hit at pixel
+                else if(layerAtPixel(evt.pixel, layer)){
+                    var item = getGetFeatureInfoRequest(layer, evt.coordinate);
+                    if(item) {requests.push(item)};
                 }
             });
         }
-        console.log(requests);
+        //If crossOrigin is not supported and canvas not tainted
+        else {
+            map.forEachLayerAtPixel(evt.pixel, function(layer) {
+                var item = getGetFeatureInfoRequest(layer, evt.coordinate);
+                if(item) {requests.push(item)};
+            });
+        }
         return requests;
     }
     function forEachFeatureAtPixel(evt) {
@@ -143,18 +153,19 @@ module.exports = function(options) {
         obj = {};
         switch (layerType) {
           case 'WMTS':
-            console.log(layer.get('name'));
+            return undefined;
             break;
           case 'WMS':
-            console.log('WMS');
             var url = layer.getSource().getGetFeatureInfoUrl(
             coordinate, map.getView().getResolution(), Viewer.getProjection(),
             {'INFO_FORMAT': 'application/json'});
-            obj.layer = "pagaende_detaljplaner";
+            obj.layer = layer.get('name');
             obj.cb = "GEOJSON";
             obj.fn = getFeatureInfo(url);
             return obj;
             break;
+          default:
+            return undefined;
         }
     }
     function getFeatureInfo(url) {
@@ -277,5 +288,27 @@ module.exports = function(options) {
         var p = prefix || '';
         var s = suffix || '';
         return p + url + s;
+    }
+    function isTainted(pixel, layerFilter) {
+        try {
+            if(layerFilter) {
+                map.forEachLayerAtPixel(pixel, function(layer) {
+                    return layerFilter === layer;
+                });
+            }
+            else {
+                map.forEachLayerAtPixel(pixel, function(layer) {});
+            }
+            return false;
+        }
+        catch(e) {
+            console.log(e);
+            return true;
+        }
+    }
+    function layerAtPixel(pixel, matchLayer) {
+        map.forEachLayerAtPixel(pixel, function(layer) {
+            return matchLayer === layer;
+        })
     }
 }
