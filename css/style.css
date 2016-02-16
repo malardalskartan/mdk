@@ -90,6 +90,7 @@ button {
 }
 .ol-control button {
   border-radius: 4px;
+	cursor: pointer;
   display: block;
   padding: 0;
   color: #424242;
@@ -691,6 +692,7 @@ button.ol-zoom-out {
 }
 button.mdk-button {
   border-radius: 4px;
+	cursor: pointer;
   display: inline-block;
   padding: 0;
   color: #424242;
