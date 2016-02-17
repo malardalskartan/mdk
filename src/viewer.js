@@ -103,8 +103,8 @@ function init (mapOptions){
         });
 
         var zoomControl = new ol.control.Zoom({
-            zoomInTipLabel: '',
-            zoomOutTipLabel:'',
+            zoomInTipLabel: ' ',
+            zoomOutTipLabel:' ',
             zoomInLabel: $.parseHTML('<svg class="mdk-icon-fa-plus"><use xlink:href="css/svg/fa-icons.svg#fa-plus"></use></svg>'),
             zoomOutLabel: $.parseHTML('<svg class="mdk-icon-fa-minus"><use xlink:href="css/svg/fa-icons.svg#fa-minus"></use></svg>')
         });
