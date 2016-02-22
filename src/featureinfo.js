@@ -129,7 +129,7 @@ module.exports = function(options) {
                   else if(feature.get('features').length == 1 && queryable) {
                       item.layer = l;
                       item.feature = feature.get('features')[0];
-                      item.content = getAttributes(feature.get('features')[0],l)
+                      item.content = getAttributes(feature.get('features')[0],l);
                       result.push(item);
                   }
               }
