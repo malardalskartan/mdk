@@ -162,6 +162,10 @@ function init (mapOptions){
             else if(layer.type == 'GEOJSON') {
                 layers.push(createVectorLayer(layerOptions, geojson(layerOptions.source)));
             }
+            else if(layer.type == 'XYZ') {
+                var xyzSource = xyz(layerOptions);
+                layers.push(createTileLayer(layerOptions, xyzSource));
+            }
             else if(layer.type == 'MAPQUEST') {
                 layers.push(addMapQuest(layer));
             }
@@ -531,6 +535,16 @@ function init (mapOptions){
         var tileSource = new ol.source.TileArcGISRest({
             projection: settings.projection,
             params: params,
+            url: url
+        });
+        return tileSource;
+    }
+    function xyz(options) {
+        var format = options.source.split('.')[1],
+        url = options.source.split('.')[0] + '/{z}/{x}/{y}.';
+        url += format;
+        var tileSource = new ol.source.XYZ({
+            projection: settings.projection || 'EPSG:3857',
             url: url
         });
         return tileSource;
