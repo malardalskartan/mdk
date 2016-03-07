@@ -11,6 +11,7 @@ var Popup = require('./popup');
 var Modal = require('./modal');
 var utils = require('./utils');
 var featureinfo = require('./featureinfo');
+var maputils = require('./maputils');
 
 var controls = {};
 controls.geoposition = require('./geoposition');
@@ -87,6 +88,7 @@ function init (mapOptions){
         settings.source = mapOptions.source;
         settings.home = mapOptions.home;
         settings.groups = mapOptions.groups;
+        settings.tileGrid = maputils.tileGrid(settings.projectionExtent,settings.resolutions);
         settings.editLayer = mapOptions.editLayer;
         settings.styles = mapOptions.styles;
         createLayers(mapOptions.layers, settings.layers); //read layers from mapOptions
@@ -193,6 +195,7 @@ function init (mapOptions){
             source: options.source,
             style: options.style || 'default',
             styleName: options.style,
+            tileGrid: options.tileGrid || undefined,
             queryable: options.hasOwnProperty('queryable') ? options.queryable : true,
             minResolution: options.hasOwnProperty('minScale') ? scaleToResolution(options.minScale): undefined,
             maxResolution: options.hasOwnProperty('maxScale') ? scaleToResolution(options.maxScale): undefined,
@@ -433,6 +436,7 @@ function init (mapOptions){
            maxResolution: layersConfig.hasOwnProperty('maxScale') ? scaleToResolution(layersConfig.maxScale): undefined,
            visible: layersConfig.visible,
            type: layersConfig.type,
+           extent: layersConfig.extent || settings.extent, //layer extent to avoid bad requests out of range
            source: new ol.source.WMTS({
              crossOrigin: 'anonymous',
              attributions: attr,
@@ -446,7 +450,6 @@ function init (mapOptions){
                resolutions: settings.resolutions,
                matrixIds: matrixIds
              }),
-             extent: settings.extent, //layer extent to avoid bad requests out of range
              style: 'default'
            })
         })
@@ -545,6 +548,7 @@ function init (mapOptions){
         url += format;
         var tileSource = new ol.source.XYZ({
             projection: settings.projection || 'EPSG:3857',
+            tileGrid: settings.tileGrid || undefined,
             url: url
         });
         return tileSource;

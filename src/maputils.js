@@ -11,5 +11,19 @@ module.exports = {
   clearAndSelect: function(selection, feature) {
       selection.getFeatures().clear();
       selection.getFeatures().push(feature);
+  },
+  customProjection: function(projectionCode, extent) {
+      return new ol.proj.Projection({
+          code: projectionCode,
+          extent: extent
+      });
+  },
+  tileGrid: function(extent, resolutions) {
+      var origin = ol.extent.getTopLeft(extent);
+      return new ol.tilegrid.TileGrid({
+          extent: extent,
+          origin: origin,
+          resolutions: resolutions
+      });
   }
 }
