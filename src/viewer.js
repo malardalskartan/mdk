@@ -436,6 +436,8 @@ function init (mapOptions){
            maxResolution: layersConfig.hasOwnProperty('maxScale') ? scaleToResolution(layersConfig.maxScale): undefined,
            visible: layersConfig.visible,
            type: layersConfig.type,
+           queryable: layersConfig.queryable || false,
+           featureinfoLayer: layersConfig.featureinfoLayer || undefined,
            extent: layersConfig.extent || settings.extent, //layer extent to avoid bad requests out of range
            source: new ol.source.WMTS({
              crossOrigin: 'anonymous',

@@ -153,7 +153,20 @@ module.exports = function(options) {
         obj = {};
         switch (layerType) {
           case 'WMTS':
-            return undefined;
+            if(layer.get('featureinfoLayer')) {
+                var featureinfoLayerName = layer.get('featureinfoLayer'),
+                featureinfoLayer = Viewer.getLayer(featureinfoLayerName),
+                url = featureinfoLayer.getSource().getGetFeatureInfoUrl(
+                coordinate, map.getView().getResolution(), Viewer.getProjection(),
+                {'INFO_FORMAT': 'application/json'});
+                obj.layer = featureinfoLayerName;
+                obj.cb = "GEOJSON";
+                obj.fn = getFeatureInfo(url);
+                return obj;
+            }
+            else {
+                return undefined;
+            }
             break;
           case 'WMS':
             var url = layer.getSource().getGetFeatureInfoUrl(
