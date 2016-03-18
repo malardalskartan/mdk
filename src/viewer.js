@@ -475,7 +475,7 @@ function init (mapOptions){
           url: function(extent, resolution, projection) {
               return serverUrl +
                   '?service=WFS&' +
-                  'version=1.1.0&request=GetFeature&typeName=' + options.name +
+                  'version=1.1.0&request=GetFeature&typeName=' + options.featureType +
                   '&outputFormat=application/json' +
                   '&srsname=' + settings.projectionCode +
                   queryFilter + extent.join(',') + ',' + bboxProjectionCode;
