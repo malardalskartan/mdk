@@ -80,16 +80,16 @@ function init (mapOptions){
                 code: settings.projectionCode,
                 extent: settings.projectionExtent
             });
+            settings.resolutions = mapOptions.resolutions || undefined;            
+            settings.tileGrid = maputils.tileGrid(settings.projectionExtent,settings.resolutions);
         }
 
         settings.extent = mapOptions.extent || undefined;
         settings.center = mapOptions.center;
         settings.zoom = mapOptions.zoom;
-        settings.resolutions = mapOptions.resolutions || undefined;
         settings.source = mapOptions.source;
         settings.home = mapOptions.home;
         settings.groups = mapOptions.groups;
-        settings.tileGrid = maputils.tileGrid(settings.projectionExtent,settings.resolutions);
         settings.editLayer = mapOptions.editLayer;
         settings.styles = mapOptions.styles;
         createLayers(mapOptions.layers, settings.layers); //read layers from mapOptions
@@ -569,8 +569,7 @@ function init (mapOptions){
            maxResolution: layersConfig.hasOwnProperty('maxScale') ? scaleToResolution(layersConfig.maxScale): undefined,
            visible: layersConfig.visible,
            source: new ol.source.MapQuest({
-             layer: layersConfig.name,
-             style: 'default'
+             layer: layersConfig.name
            })
         })
     }

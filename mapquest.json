@@ -8,7 +8,7 @@
     },
     {
       "name": "sharemap"
-    },    
+    },
     {
       "name": "print"
     },
@@ -40,7 +40,7 @@
       "name": "osm",
       "title": "MapQuest",
       "type": "MAPQUEST",
-      "style": "karta_farg",
+      "style": "Road",
       "visible": true
     }
   ],
@@ -82,7 +82,7 @@
           }
         ]
       ],
-      "karta_farg": [
+      "Road": [
         [
           {
             "image": {
