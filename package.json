@@ -22,13 +22,20 @@
     "browserify": "^11.0.1",
     "browserify-shim": "^3.8.10",
     "gulp": "^3.9.0",
+    "handlebars": "^4.0.5",
+    "hbsfy": "^2.5.1",
     "openlayers": "^3.9.0",
     "uglify-js": "^2.4.24",
     "vinyl-source-stream": "^1.1.0",
     "watchify": "^3.3.1"
   },
   "browserify": {
-    "transform": "browserify-shim"
+    "transform": [
+      "browserify-shim",
+      [
+        "hbsfy"
+      ]
+    ]
   },
   "browserify-shim": {
     "./externs/modernizr.js": "modernizr"

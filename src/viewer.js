@@ -7,6 +7,7 @@
 var ol = require('openlayers');
 var $ = require('jquery');
 var Modernizr = require('../externs/modernizr');
+var template = require("./templates/viewer.handlebars");
 var Popup = require('./popup');
 var Modal = require('./modal');
 var utils = require('./utils');
@@ -43,7 +44,7 @@ var settings = {
 var cqlQuery, queryFinished = false;
 
 function init (mapOptions){
-
+        $("#app-wrapper").html(template);
         // if(!(Modernizr.canvas)) {
         //   $('#wrapper').remove();
         //   return;
