@@ -80,7 +80,7 @@ function init (mapOptions){
                 code: settings.projectionCode,
                 extent: settings.projectionExtent
             });
-            settings.resolutions = mapOptions.resolutions || undefined;            
+            settings.resolutions = mapOptions.resolutions || undefined;
             settings.tileGrid = maputils.tileGrid(settings.projectionExtent,settings.resolutions);
         }
 
