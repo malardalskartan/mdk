@@ -252,10 +252,8 @@ module.exports = function(options) {
       if(layer.get('attributes')) {
             //If attributes is string then use template named with the string
             if(typeof layer.get('attributes') === 'string') {
-                //Clean feature attributes from non-wanted properties
-                var attributes = filterObject(feature.getProperties(), ['FID_', 'geometry']);
                 //Use attributes with the template
-                li = featureinfotemplates[layer.get('attributes')](attributes);
+                li = featureinfotemplates(layer.get('attributes'),feature.getProperties());
             }
             else {
                 for(var i=0; i<layer.get('attributes').length; i++) {
@@ -305,7 +303,10 @@ module.exports = function(options) {
           }
       }
       else {
-          li = featureinfotemplates.default({});
+        //Clean feature attributes from non-wanted properties
+        var attributes = filterObject(feature.getProperties(), ['FID_', 'geometry']);
+        //Use attributes with the template
+        li = featureinfotemplates('default',attributes);
       }
       content += li + '</ul></div>';
       return content;

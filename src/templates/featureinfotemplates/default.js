@@ -3,10 +3,9 @@
  * Licensed under BSD 2-Clause (https://github.com/malardalskartan/mdk/blob/master/LICENSE.txt)
  * ======================================================================== */
 "use strict";
-var templates = {};
-templates.default = require("./templates/featureinfotemplates/default");
 
-function featureinfotemplates(template, attributes) {
-    return templates[template](attributes);
+var defaultTemplate = require("./default.handlebars");
+
+module.exports = function(attributes) {
+  return defaultTemplate(attributes);
 }
-module.exports = featureinfotemplates;
