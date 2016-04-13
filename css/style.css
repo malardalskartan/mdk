@@ -26,6 +26,9 @@ b, strong{
 button {
   border: none;
 }
+button:focus {
+	outline: none;
+}
 #no-map {
   display: none;
 }
@@ -1490,10 +1493,10 @@ input.search-field::-ms-clear {
   float: right;
   fill: #424242;
 }
-.ol-control [class^="mdk-icon-"]:hover,
-.ol-control [class*=" mdk-icon-"]:hover,
-.mdk-button [class^="mdk-icon-"]:hover,
-.mdk-button [class*="mdk-icon-"]:hover {
+.ol-control>button:hover [class^="mdk-icon-"],
+.ol-control>button:hover [class*=" mdk-icon-"],
+.mdk-button:hover [class^="mdk-icon-"],
+.mdk-button:hover [class*="mdk-icon-"] {
 	fill: #fff;
 }
 .mdk-icon-fa-location-arrow {
