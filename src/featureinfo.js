@@ -11,30 +11,51 @@ var Popup = require('./popup');
 var sidebar = require('./sidebar');
 var maputils = require('./maputils');
 var featureinfotemplates = require('./featureinfotemplates');
+var featurelayer = require('./featurelayer');
+var style = require('./style');
 var owlCarousel = require('../externs/owlcarousel-browserify');
 owlCarousel.loadjQueryPlugin();
 
 module.exports = function(options) {
 
-    var select;
-    var map = Viewer.getMap();
-    var settings = options ? options : {};
-    var showOverlay = settings.hasOwnProperty('overlay') ? settings.overlay : true;
-    var identifyTarget;
-    if(showOverlay) {
-        Popup.init('#map');
-        identifyTarget = 'overlay';
+  var map = Viewer.getMap();
+
+  var pinStyleOptions = [
+    {
+      'icon': {
+          anchor: [0.5, 32],
+          anchorXUnits: 'fraction',
+          anchorYUnits: 'pixels',
+          src: 'img/png/drop_blue.png'
+      }
     }
-    else {
-        sidebar.init();
-        identifyTarget = 'sidebar';
-    }
+  ];
+  var pinStyle = style.createStyleRule(pinStyleOptions);
+  var selectionStyles = style.createEditStyle();
+
+  var savedPin = options.savedMarker || undefined,
+  selectionLayer = featurelayer(savedPin, map);
+
+  var overlay = new ol.Overlay({
+    element: $('#popup').get(0)
+  });
+  var settings = options ? options : {};
+  var showOverlay = settings.hasOwnProperty('overlay') ? settings.overlay : true;
+  var identifyTarget;
+  if(showOverlay) {
+      Popup.init('#map');
+      var overlay = new ol.Overlay({
+        element: $('#popup').get(0)
+      });
+      map.addOverlay(overlay);
+      identifyTarget = 'overlay';
+  }
+  else {
+      sidebar.init();
+      identifyTarget = 'sidebar';
+  }
 
     map.on('click', function(evt) {
-        if(select) {
-            select.getFeatures().clear();
-            map.removeInteraction(select);
-        }
         Viewer.removeOverlays();
         //Featurinfo in two steps. First serverside and client side when finished
         var clientResult = forEachFeatureAtPixel(evt);
@@ -44,7 +65,7 @@ module.exports = function(options) {
             promiseFn = [];
             forEachLayerAtPixel(evt).map(function(request) {
                 request.fn.done(function(data) {
-                    var feature = geojsonToFeature(data),
+                    var feature = maputils.geojsonToFeature(data),
                     layer = Viewer.getLayer(request.layer);
                     if(feature) {
                         serverResult.push({
@@ -58,15 +79,27 @@ module.exports = function(options) {
             });
             //When server side finished do client side
             $.when.apply($, promiseFn).done(function() {
-                result = serverResult.concat(clientResult);
-                if (result.length > 0) {
-                    identify(result, identifyTarget, evt.coordinate)
-                }
-                else {
-                  console.log('No features identified');
+              result = serverResult.concat(clientResult);
+              if (result.length > 0) {
+                  selectionLayer.clear();
+                  identify(result, identifyTarget, evt.coordinate)
+              }
+              else if(selectionLayer.getFeatures().length > 0) {
+                  selectionLayer.clear();
                   Popup.setVisibility(false);
                   sidebar.setVisibility(false);
-                }
+                  console.log("Clearing selection");
+              }
+              else {
+                  console.log('No features identified');
+                  var resolution = map.getView().getResolution();
+                  setTimeout(function() {
+                      if(!maputils.checkZoomChange(resolution, map.getView().getResolution())) {
+                           var feature = maputils.createPointFeature(evt.coordinate, [pinStyle[0], selectionStyles['Point'][0]]);
+                           selectionLayer.addFeature(feature);
+                      }
+                  }, 250);
+              }
             });
         }
         evt.preventDefault();
@@ -191,18 +224,12 @@ module.exports = function(options) {
         var layers = items.map(function(i){
             return i.layer;
         });
-        select = new ol.interaction.Select({layers: layers});
-        map.addInteraction(select);
         var content = items.map(function(i){
             return i.content;
         }).join('');
         content = '<div id="identify"><div id="mdk-identify-carousel" class="owl-carousel owl-theme">' + content + '</div></div>';
         switch (target) {
             case 'overlay':
-                var overlay = new ol.Overlay({
-                  element: $('#popup').get(0)
-                });
-                map.addOverlay(overlay);
                 var geometry = items[0].feature.getGeometry();
                 var coord;
                 geometry.getType() == 'Point' ? coord = geometry.getCoordinates() : coord = coordinate;
@@ -211,7 +238,7 @@ module.exports = function(options) {
                 Popup.setVisibility(true);
                 var owl = initCarousel('#mdk-identify-carousel', undefined, function(){
                     var currentItem = this.owl.currentItem;
-                    maputils.clearAndSelect(select, items[currentItem].feature);
+                    selectionLayer.clearAndAdd(items[currentItem].feature.clone(), selectionStyles[items[currentItem].feature.getGeometry().getType()]);
                     Popup.setTitle(items[currentItem].layer.get('title'));
                 });
                 Viewer.autoPan();
@@ -221,17 +248,11 @@ module.exports = function(options) {
                 sidebar.setVisibility(true);
                 var owl = initCarousel('#mdk-identify-carousel', undefined, function(){
                     var currentItem = this.owl.currentItem;
-                    maputils.clearAndSelect(select, items[currentItem].feature);
+                    selectionLayer.clearAndAdd(items[currentItem].feature.clone(), selectionStyles[items[currentItem].feature.getGeometry().getType()]);
                     sidebar.setTitle(items[currentItem].layer.get('title'));
                 });
                 break;
         }
-    }
-    function geojsonToFeature(obj) {
-        var vectorSource = new ol.source.Vector({
-          features: (new ol.format.GeoJSON()).readFeatures(obj)
-        });
-        return vectorSource.getFeatures()[0];
     }
     function initCarousel(id, options, cb) {
         var carouselOptions = options || {
