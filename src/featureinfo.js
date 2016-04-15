@@ -31,10 +31,11 @@ module.exports = function(opt_options) {
       }
     }
   ];
+  var pinning = options.hasOwnProperty('pinning') ? options.pinning : true;
   var pinStyle = style.createStyleRule(pinStyleOptions);
   var selectionStyles = style.createEditStyle();
 
-  var savedSelection = options.savedSelection : undefined,
+  var savedSelection = options.savedSelection || undefined,
   selectionLayer = featurelayer(savedSelection, map);
 
   var overlay = new ol.Overlay({
@@ -91,8 +92,7 @@ module.exports = function(opt_options) {
                   sidebar.setVisibility(false);
                   console.log("Clearing selection");
               }
-              else {
-                  console.log('No features identified');
+              else if(pinning){
                   var resolution = map.getView().getResolution();
                   setTimeout(function() {
                       if(!maputils.checkZoomChange(resolution, map.getView().getResolution())) {
@@ -100,6 +100,9 @@ module.exports = function(opt_options) {
                            selectionLayer.addFeature(feature);
                       }
                   }, 250);
+              }
+              else {
+                  console.log('No features identified');
               }
             });
         }
