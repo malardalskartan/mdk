@@ -16,11 +16,12 @@ var style = require('./style');
 var owlCarousel = require('../externs/owlcarousel-browserify');
 owlCarousel.loadjQueryPlugin();
 
-module.exports = function(options) {
-
+module.exports = function(opt_options) {
   var map = Viewer.getMap();
 
-  var pinStyleOptions = [
+  var options = opt_options || {};
+
+  var pinStyleOptions = options.pinStyle || [
     {
       'icon': {
           anchor: [0.5, 32],
@@ -33,14 +34,14 @@ module.exports = function(options) {
   var pinStyle = style.createStyleRule(pinStyleOptions);
   var selectionStyles = style.createEditStyle();
 
-  var savedPin = options ? options.savedMarker : undefined,
-  selectionLayer = featurelayer(savedPin, map);
+  var savedSelection = options.savedSelection : undefined,
+  selectionLayer = featurelayer(savedSelection, map);
 
   var overlay = new ol.Overlay({
     element: $('#popup').get(0)
   });
-  var settings = options ? options : {};
-  var showOverlay = settings.hasOwnProperty('overlay') ? settings.overlay : true;
+  var showOverlay = options.hasOwnProperty('overlay') ? options.overlay : true;
+
   var identifyTarget;
   if(showOverlay) {
       Popup.init('#map');
