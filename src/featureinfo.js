@@ -33,7 +33,7 @@ module.exports = function(options) {
   var pinStyle = style.createStyleRule(pinStyleOptions);
   var selectionStyles = style.createEditStyle();
 
-  var savedPin = options.savedMarker || undefined,
+  var savedPin = options ? options.savedMarker : undefined,
   selectionLayer = featurelayer(savedPin, map);
 
   var overlay = new ol.Overlay({
