@@ -1,4 +1,7 @@
 #MDK
+
+*This repository has been moved. Please visit [https://github.com/origo-map/origo](https://github.com/origo-map/origo) for the maintained new version of the map framework, now called Origo.*
+
 MDK (soon to be renamed to Origo) is the web mapping framework created and used in the project Mälardalskartan. The framework uses the mapping library [OpenLayers 3](http://openlayers.org/) . The project Mälardalskartan is a collaboration between four municipalities in Sweden including Enköping, Eskilstuna, Strängnäs and Västerås.
 
 
